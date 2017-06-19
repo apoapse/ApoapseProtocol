@@ -39,13 +39,13 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -69,7 +69,16 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
+    <IncludePath>C:\Program Files\boost\boost_1_64_0;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
+    <IncludePath>C:\Program Files\boost\boost_1_64_0;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -82,7 +91,16 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>UNIT_TESTS;_WIN32_WINNT=0x0501;DEBUG;_SCL_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_64_0\lib64-msvc-14.1;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -104,13 +122,52 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <Lib>
+      <AdditionalDependencies>C:\Program Files\boost\boost_1_63_0\lib64-msvc-14.0;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_64_0\lib64-msvc-14.1;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ApoapseCoreUTRegistration.hpp" />
+    <ClInclude Include="ByteUtils.hpp" />
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="DateTimeUtils.h" />
+    <ClInclude Include="Diagnostic.hpp" />
+    <ClInclude Include="eLogSeverity.hpp" />
+    <ClInclude Include="ILogger.hpp" />
+    <ClInclude Include="INetworkSender.h" />
+    <ClInclude Include="Log.h" />
+    <ClInclude Include="Logger.h" />
+    <ClInclude Include="MacroUtils.hpp" />
+    <ClInclude Include="Maths.hpp" />
+    <ClInclude Include="Range.hpp" />
+    <ClInclude Include="StringExtensions.hpp" />
+    <ClInclude Include="TCPConnection.h" />
+    <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="TypeDefs.hpp" />
+    <ClInclude Include="MessagePack.hpp" />
+    <ClInclude Include="UnitTest.hpp" />
+    <ClInclude Include="UnitTestsManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Common.cpp" />
+    <ClCompile Include="DateTimeUtils.cpp" />
+    <ClCompile Include="Log.cpp" />
+    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="TCPConnection.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
+    <ClCompile Include="UnitTestsManager.cpp" />
+    <ClCompile Include="UT_ByteUtils.cpp" />
+    <ClCompile Include="UT_DateTimeUtils.cpp" />
+    <ClCompile Include="UT_Maths.cpp" />
+    <ClCompile Include="UT_StringExtensions.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

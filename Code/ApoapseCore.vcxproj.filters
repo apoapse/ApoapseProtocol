@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="MessagePack.hpp">
+      <Filter>Parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeDefs.hpp">
+      <Filter>TypeUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Range.hpp">
+      <Filter>TypeUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Maths.hpp">
+      <Filter>TypeUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="ByteUtils.hpp">
+      <Filter>TypeUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Diagnostic.hpp">
+      <Filter>DiagnosticTools</Filter>
+    </ClInclude>
+    <ClInclude Include="StringExtensions.hpp">
+      <Filter>TypeUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="eLogSeverity.hpp">
+      <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="ILogger.hpp">
+      <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="Log.h">
+      <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadPool.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="DateTimeUtils.h">
+      <Filter>DateTime</Filter>
+    </ClInclude>
+    <ClInclude Include="TCPConnection.h">
+      <Filter>Network\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="INetworkSender.h">
+      <Filter>Network\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="MacroUtils.hpp" />
+    <ClInclude Include="UnitTest.hpp">
+      <Filter>UnitTests\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTestsManager.h">
+      <Filter>UnitTests\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="ApoapseCoreUTRegistration.hpp">
+      <Filter>UnitTests\ApoapseCoreUnitTests</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Log.cpp">
+      <Filter>Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadPool.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Common.cpp" />
+    <ClCompile Include="DateTimeUtils.cpp">
+      <Filter>DateTime</Filter>
+    </ClCompile>
+    <ClCompile Include="TCPConnection.cpp">
+      <Filter>Network\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_DateTimeUtils.cpp">
+      <Filter>UnitTests\ApoapseCoreUnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTestsManager.cpp">
+      <Filter>UnitTests\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_ByteUtils.cpp">
+      <Filter>UnitTests\ApoapseCoreUnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_StringExtensions.cpp">
+      <Filter>UnitTests\ApoapseCoreUnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Maths.cpp">
+      <Filter>UnitTests\ApoapseCoreUnitTests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Parsers">
+      <UniqueIdentifier>{4da32983-8c1d-4e47-a72f-54e5da4e9bc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TypeUtils">
+      <UniqueIdentifier>{e313c49f-3f2e-4a55-aa28-c2b5667fedcd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DiagnosticTools">
+      <UniqueIdentifier>{4c96d61d-e4cd-4271-8b29-d3107a3c136f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logger">
+      <UniqueIdentifier>{4a100121-d694-4090-a2af-3eb57e16675f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threading">
+      <UniqueIdentifier>{8d803c56-c6c8-4628-9d8b-ce6c7651e9fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DateTime">
+      <UniqueIdentifier>{4415e023-9685-44aa-9db8-0b35575c6907}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{f7c5acc9-5a24-4658-808f-f3bf0ac5f973}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Sockets">
+      <UniqueIdentifier>{ecd98fab-723e-4540-aadc-ea76214efc3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UnitTests">
+      <UniqueIdentifier>{03e370ef-ff23-4e9c-88be-88d3863be34d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UnitTests\Framework">
+      <UniqueIdentifier>{ee0a6f1e-c742-4511-ad5e-66c2b132eacf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UnitTests\ApoapseCoreUnitTests">
+      <UniqueIdentifier>{6a6d2a8a-4647-4425-8770-54ee85b26344}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
