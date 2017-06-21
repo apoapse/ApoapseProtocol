@@ -55,7 +55,35 @@
       <Filter>UnitTests\Framework</Filter>
     </ClInclude>
     <ClInclude Include="ApoapseCoreUTRegistration.hpp">
-      <Filter>UnitTests\ApoapseCoreUnitTests</Filter>
+      <Filter>UnitTests\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="GenericConnection.h">
+      <Filter>Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandNames.hpp">
+      <Filter>Protocol\CommandSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkPayload.h">
+      <Filter>Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="ReadBufferSize.hpp">
+      <Filter>Network\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="UT_NetworkPayload.hpp">
+      <Filter>UnitTests\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="UT_ByteUtils.hpp">
+      <Filter>UnitTests\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="UT_DateTimeUtils.hpp">
+      <Filter>UnitTests\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="UT_Maths.hpp">
+      <Filter>UnitTests\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="UT_StringExtensions.hpp">
+      <Filter>UnitTests\Tests</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -75,20 +103,14 @@
     <ClCompile Include="TCPConnection.cpp">
       <Filter>Network\Sockets</Filter>
     </ClCompile>
-    <ClCompile Include="UT_DateTimeUtils.cpp">
-      <Filter>UnitTests\ApoapseCoreUnitTests</Filter>
-    </ClCompile>
     <ClCompile Include="UnitTestsManager.cpp">
       <Filter>UnitTests\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="UT_ByteUtils.cpp">
-      <Filter>UnitTests\ApoapseCoreUnitTests</Filter>
+    <ClCompile Include="GenericConnection.cpp">
+      <Filter>Network\Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="UT_StringExtensions.cpp">
-      <Filter>UnitTests\ApoapseCoreUnitTests</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_Maths.cpp">
-      <Filter>UnitTests\ApoapseCoreUnitTests</Filter>
+    <ClCompile Include="NetworkPayload.cpp">
+      <Filter>Network\Protocol</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -122,7 +144,16 @@
     <Filter Include="UnitTests\Framework">
       <UniqueIdentifier>{ee0a6f1e-c742-4511-ad5e-66c2b132eacf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UnitTests\ApoapseCoreUnitTests">
+    <Filter Include="Network\Protocol">
+      <UniqueIdentifier>{210d5d66-48f9-414b-9944-c173a5ab6c05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Protocol">
+      <UniqueIdentifier>{5993b1e7-90f8-4e50-91bc-1c12c6197be5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Protocol\CommandSystem">
+      <UniqueIdentifier>{cd27cce5-6f89-4375-a8d0-5468339ac4ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UnitTests\Tests">
       <UniqueIdentifier>{6a6d2a8a-4647-4425-8770-54ee85b26344}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

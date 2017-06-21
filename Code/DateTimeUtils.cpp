@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "DateTimeUtils.h"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <regex>

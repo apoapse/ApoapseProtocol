@@ -17,7 +17,7 @@ private:
 	std::atomic<bool> m_isConnected = { false };
 	//boost::asio::io_service::strand m_writeStrand;
 
-	std::deque<std::variant<StrWrapper, BytesWrapper>> m_sendQueue;
+	std::deque<std::variant<BytesWrapper, StrWrapper>> m_sendQueue;
 
 public:
 	using TCPConnection_ptr = std::shared_ptr<TCPConnection>;

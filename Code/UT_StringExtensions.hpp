@@ -1,5 +1,3 @@
-#ifdef UNIT_TESTS
-
 #include "UnitTestsManager.h"
 #include "StringExtensions.hpp"
 
@@ -80,5 +78,3 @@ UNIT_TEST("StringExtensions:IsOnlyAlphanumeric_specialChars")
 
 	UnitTest::Assert(!StringExtensions::IsOnlyAlphanumeric(str));
 } UNIT_TEST_END
-
-#endif	// UNIT_TESTS

@@ -93,6 +93,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>UNIT_TESTS;_WIN32_WINNT=0x0501;DEBUG;_SCL_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>
@@ -137,17 +138,22 @@
   <ItemGroup>
     <ClInclude Include="ApoapseCoreUTRegistration.hpp" />
     <ClInclude Include="ByteUtils.hpp" />
+    <ClInclude Include="CommandNames.hpp" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="DateTimeUtils.h" />
     <ClInclude Include="Diagnostic.hpp" />
     <ClInclude Include="eLogSeverity.hpp" />
+    <ClInclude Include="GenericConnection.h" />
     <ClInclude Include="ILogger.hpp" />
     <ClInclude Include="INetworkSender.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="MacroUtils.hpp" />
     <ClInclude Include="Maths.hpp" />
+    <ClInclude Include="NetworkPayload.h" />
     <ClInclude Include="Range.hpp" />
+    <ClInclude Include="ReadBufferSize.hpp" />
+    <ClInclude Include="stdafx.h" />
     <ClInclude Include="StringExtensions.hpp" />
     <ClInclude Include="TCPConnection.h" />
     <ClInclude Include="ThreadPool.h" />
@@ -155,19 +161,22 @@
     <ClInclude Include="MessagePack.hpp" />
     <ClInclude Include="UnitTest.hpp" />
     <ClInclude Include="UnitTestsManager.h" />
+    <ClInclude Include="UT_ByteUtils.hpp" />
+    <ClInclude Include="UT_DateTimeUtils.hpp" />
+    <ClInclude Include="UT_Maths.hpp" />
+    <ClInclude Include="UT_NetworkPayload.hpp" />
+    <ClInclude Include="UT_StringExtensions.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="DateTimeUtils.cpp" />
+    <ClCompile Include="GenericConnection.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="NetworkPayload.cpp" />
     <ClCompile Include="TCPConnection.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="UnitTestsManager.cpp" />
-    <ClCompile Include="UT_ByteUtils.cpp" />
-    <ClCompile Include="UT_DateTimeUtils.cpp" />
-    <ClCompile Include="UT_Maths.cpp" />
-    <ClCompile Include="UT_StringExtensions.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

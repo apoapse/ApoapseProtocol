@@ -1,4 +1,3 @@
-#ifdef UNIT_TESTS
 #include "UnitTestsManager.h"
 #include "Maths.hpp"
 #include "TypeDefs.hpp"
@@ -32,5 +31,3 @@ UNIT_TEST("Maths:CanFit:Failure")
 {
 	UnitTest::Assert(!CanFit<UInt8>((int)-10));
 } UNIT_TEST_END
-
-#endif

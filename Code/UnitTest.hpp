@@ -53,9 +53,9 @@ public:
 			returnErrorMsg = std::string(e.what());
 			return false;
 		}
-		catch (...)
+		catch (const std::exception& e)
 		{
-			returnErrorMsg = "An unexpected exception has been received";
+			returnErrorMsg = "An unexpected exception has been received: " + std::string(e.what());
 			return false;
 		}
 

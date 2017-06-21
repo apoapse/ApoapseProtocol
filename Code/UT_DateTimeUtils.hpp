@@ -1,5 +1,3 @@
-#ifdef UNIT_TESTS
-
 #include "UnitTestsManager.h"
 #include "DateTimeUtils.h"
 
@@ -48,5 +46,3 @@ UNIT_TEST("DateTimeUtils:UnixTimestampNow")
 {
 	UnitTest::Assert(UnixTimestampNow() > 1);	// #TODO write a better test
 } UNIT_TEST_END
-
-#endif	// UNIT_TESTS

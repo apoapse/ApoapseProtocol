@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "UnitTestsManager.h"
 #include "Diagnostic.hpp"
 #include <iostream>

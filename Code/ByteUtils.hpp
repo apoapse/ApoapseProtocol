@@ -1,13 +1,14 @@
 #pragma once
 #include "TypeDefs.hpp"
 #include <array>
+#include "Range.hpp"
 
-#ifdef _WIN32
-#define BOOST_LITTLE_ENDIAN 1
-#else
-#define BOOST_ENDIAN_DEPRECATED_NAMES
-#include <boost/endian/endian.hpp>
-#endif
+// #ifdef _WIN32
+// #define BOOST_LITTLE_ENDIAN 1
+// #else
+// #define BOOST_ENDIAN_DEPRECATED_NAMES
+// #include <boost/endian/endian.hpp>
+// #endif
 
 enum class Endianness
 {
@@ -15,41 +16,48 @@ enum class Endianness
 	BIG_ENDIAN
 };
 
-#ifdef BOOST_LITTLE_ENDIAN
-template <typename T, Endianness ENDIANNESS = Endianness::LITTLE_ENDIAN>
-#else
-template <typename T, Endianness ENDIANNESS = Endianness::BIG_ENDIAN>
-#endif
-inline std::array<byte, sizeof(T)> ToBytes(T data)
+template <typename T>
+inline std::array<byte, sizeof(T)> ToBytes(T data, Endianness endianness = Endianness::LITTLE_ENDIAN)
 {
 	static_assert(std::is_trivially_copyable<T>::value, "The type provided is not trivially copyable");
 	std::array<byte, sizeof(T)> bytes;
 
 	const byte* it = static_cast<const byte*>(static_cast<void*>(std::addressof(data)));
 
-	if (ENDIANNESS == Endianness::LITTLE_ENDIAN)
-		std::copy(it, it + sizeof(T), std::begin(bytes));
+	if (endianness == Endianness::LITTLE_ENDIAN)
+		std::copy(it, it + sizeof(T), bytes.begin());
 	else
-		std::reverse_copy(it, it + sizeof(T), std::begin(bytes));
+		std::reverse_copy(it, it + sizeof(T), bytes.begin());
 
 	return bytes;
 }
 
-#ifdef BOOST_LITTLE_ENDIAN
-template <typename T, Endianness ENDIANNESS = Endianness::LITTLE_ENDIAN>
-#else
-template <typename T, Endianness ENDIANNESS = Endianness::BIG_ENDIAN>
-#endif
-inline T FromBytes(std::array<byte, sizeof(T)>& byteArray)
+template <typename T>
+inline T FromBytes(std::array<byte, sizeof(T)>& byteArray, Endianness endianness = Endianness::LITTLE_ENDIAN)
 {
 	static_assert(std::is_trivially_copyable<T>::value, "The type provided is not trivially copyable");
 
 	T output;
 
-	if (ENDIANNESS == Endianness::LITTLE_ENDIAN)
-		std::copy(std::begin(byteArray), std::end(byteArray), static_cast<byte*>(static_cast<void*>(std::addressof(output))));
+	if (endianness == Endianness::LITTLE_ENDIAN)
+		std::copy(byteArray.begin(), byteArray.end(), static_cast<byte*>(static_cast<void*>(std::addressof(output))));
 	else
-		std::reverse_copy(std::begin(byteArray), std::end(byteArray), static_cast<byte*>(static_cast<void*>(std::addressof(output))));
+		std::reverse_copy(byteArray.begin(), byteArray.end(), static_cast<byte*>(static_cast<void*>(std::addressof(output))));
+
+	return output;
+}
+
+template <typename T, typename RANGE_TYPE>
+inline T FromBytes(Range<RANGE_TYPE>& bytes, Endianness endianness = Endianness::LITTLE_ENDIAN)
+{
+	static_assert(std::is_trivially_copyable<T>::value, "The type provided is not trivially copyable");
+
+	T output;
+
+	if (endianness == Endianness::LITTLE_ENDIAN)
+		std::copy(bytes.begin(), bytes.begin() + sizeof(T), static_cast<byte*>(static_cast<void*>(std::addressof(output))));
+	else
+		std::reverse_copy(bytes.begin(), bytes.begin() + sizeof(T), static_cast<byte*>(static_cast<void*>(std::addressof(output))));
 
 	return output;
 }
