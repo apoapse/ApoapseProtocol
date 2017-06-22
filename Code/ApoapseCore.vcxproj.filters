@@ -61,9 +61,6 @@
     <ClInclude Include="GenericConnection.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="CommandNames.hpp">
-      <Filter>Protocol\CommandSystem</Filter>
-    </ClInclude>
     <ClInclude Include="NetworkPayload.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
@@ -84,6 +81,9 @@
     </ClInclude>
     <ClInclude Include="UT_StringExtensions.hpp">
       <Filter>UnitTests\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="IdsCommand.hpp">
+      <Filter>Protocol\CommandSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

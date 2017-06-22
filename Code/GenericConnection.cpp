@@ -32,15 +32,59 @@ void GenericConnection::StartReading()
 	ReadSome(m_readBuffer, [this](size_t bytesTransferred) { OnReceivedHeaderData(bytesTransferred); });
 }
 
+void GenericConnection::ProcessHeader(Range<std::array<byte, READ_BUFFER_SIZE>>& range)
+{
+	auto payload = NetworkPayload(range);
+	const size_t currentPayloadLength = (range.Size() > payload.headerInfo.payloadLength) ? payload.headerInfo.payloadLength : range.Size();
+
+	// #TODO check headerInfo.payloadLength for max size allowed
+	// #TODO check if command allowed
+	payload.payloadData.reserve(payload.headerInfo.payloadLength);
+	ProcessPayloadData(range, payload);
+}
+
+void GenericConnection::ProcessPayloadData(Range<std::array<byte, READ_BUFFER_SIZE>>& range, NetworkPayload& payload)
+{
+	const size_t currentPayloadLength = (range.Size() > payload.headerInfo.payloadLength) ? payload.headerInfo.payloadLength : range.Size();
+
+	payload.payloadData.insert(payload.payloadData.end(), range.begin(), range.begin() + currentPayloadLength);
+	range.Consume(currentPayloadLength);
+
+	if (payload.BytesLeft() == 0)
+	{
+		OnReceivedPayload(payload);
+
+		if (range.Size() > 0)
+		{
+			// This data batch contains data for more than just the current payload
+			ProcessHeader(range);
+		}
+		else
+			StartReading();
+	}
+	else
+		ReadSome(m_readBuffer, [this, &payload](size_t bytesTransferred) { OnReceivedPayloadData(bytesTransferred, payload); });
+}
+
+void GenericConnection::ReadPayloadData(NetworkPayload& payload)
+{
+	ReadSome(m_readBuffer, [this, &payload](size_t bytesTransferred) { OnReceivedPayloadData(bytesTransferred, payload); });
+}
+
 void GenericConnection::OnReceivedHeaderData(size_t bytesTransferred)
 {
-	LOG << bytesTransferred;
+	Range <std::array<byte, READ_BUFFER_SIZE>> range(m_readBuffer, bytesTransferred);
+	ProcessHeader(range);
+}
 
-	Range <std::array<byte, READ_BUFFER_SIZE>> range(m_readBuffer);
-	auto headerInfo = ReadHeader(range);
+void GenericConnection::OnReceivedPayloadData(size_t bytesTransferred, NetworkPayload& payload)
+{
+	Range <std::array<byte, READ_BUFFER_SIZE>> range(m_readBuffer, bytesTransferred);
+	ProcessPayloadData(range, payload);
+}
 
-	//std::vector<byte> data(m_readBuffer.begin(), m_readBuffer.begin() + bytesTransferred);
-	LOG << std::string(m_readBuffer.begin(), m_readBuffer.begin() + bytesTransferred);
-	
-	StartReading();
+void GenericConnection::OnReceivedPayload(NetworkPayload& payload)//TEMP
+{
+	LOG_DEBUG_FUNCTION_NAME();
+	LOG_DEBUG << "payloadLength: " << payload.headerInfo.payloadLength;
 }

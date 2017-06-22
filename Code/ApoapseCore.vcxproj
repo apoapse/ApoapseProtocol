@@ -138,7 +138,7 @@
   <ItemGroup>
     <ClInclude Include="ApoapseCoreUTRegistration.hpp" />
     <ClInclude Include="ByteUtils.hpp" />
-    <ClInclude Include="CommandNames.hpp" />
+    <ClInclude Include="IdsCommand.hpp" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="DateTimeUtils.h" />
     <ClInclude Include="Diagnostic.hpp" />

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "NetworkPayload.h"
 #include "ByteUtils.hpp"
+#include "Diagnostic.hpp"
 
 template <typename T>
 UInt64 ReadExplicitLength(Range<std::array<byte, READ_BUFFER_SIZE>>& data)
@@ -16,16 +17,30 @@ UInt64 ReadExplicitLength(Range<std::array<byte, READ_BUFFER_SIZE>>& data)
 	return length;
 }
 
-NetworkMessageHeader ReadHeader(Range<std::array<byte, READ_BUFFER_SIZE>>& data)
+NetworkPayload::NetworkPayload(Range<std::array<byte, READ_BUFFER_SIZE>>& workingData)
+{
+	if (workingData.Size() >= 3)
+		headerInfo = ReadHeader(workingData);
+}
+
+size_t NetworkPayload::BytesLeft() const
+{
+	auto nb = (Int64)headerInfo.payloadLength - (Int64)payloadData.size();
+	ASSERT_MSG(nb >= 0, "The number of bytes left cannot be negative");
+
+	return (size_t)nb;
+}
+
+NetworkMessageHeader NetworkPayload::ReadHeader(Range<std::array<byte, READ_BUFFER_SIZE>>& data)
 {
 	if (data.Size() < 3)
 		throw std::exception("A Apoapse payload header should be 3 bytes minimum");
-	
+
 	NetworkMessageHeader headerInfo;
 
-	headerInfo.commandName = (CommandNames)FromBytes<UInt16>(data, Endianness::BIG_ENDIAN);
+	headerInfo.command = (IdsCommand)FromBytes<UInt16>(data, Endianness::BIG_ENDIAN);
 	data.Consume(sizeof(UInt16));
-	
+
 	switch (data[0])
 	{
 	case 0x00:
