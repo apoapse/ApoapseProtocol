@@ -17,49 +17,119 @@ UInt64 ReadExplicitLength(Range<std::array<byte, READ_BUFFER_SIZE>>& data)
 	return length;
 }
 
-NetworkPayload::NetworkPayload(Range<std::array<byte, READ_BUFFER_SIZE>>& workingData)
+NetworkPayload::NetworkPayload()
 {
-	if (workingData.Size() >= 3)
-		headerInfo = ReadHeader(workingData);
+	
 }
 
-size_t NetworkPayload::BytesLeft() const
+
+void NetworkPayload::ReadHeaderFirstPart(Range<std::array<byte, READ_BUFFER_SIZE>>& data)
 {
-	auto nb = (Int64)headerInfo.payloadLength - (Int64)payloadData.size();
-	ASSERT_MSG(nb >= 0, "The number of bytes left cannot be negative");
+	headerInfo = NetworkMessageHeader();
 
-	return (size_t)nb;
-}
-
-NetworkMessageHeader NetworkPayload::ReadHeader(Range<std::array<byte, READ_BUFFER_SIZE>>& data)
-{
-	if (data.Size() < 3)
-		throw std::exception("A Apoapse payload header should be 3 bytes minimum");
-
-	NetworkMessageHeader headerInfo;
-
-	headerInfo.command = (IdsCommand)FromBytes<UInt16>(data, Endianness::BIG_ENDIAN);
+	headerInfo->command = (IdsCommand)FromBytes<UInt16>(data, Endianness::BIG_ENDIAN);
 	data.Consume(sizeof(UInt16));
 
 	switch (data[0])
 	{
 	case 0x00:
-		headerInfo.payloadLength = ReadExplicitLength<UInt16>(data);
+		headerInfo->payloadLength = ReadExplicitLength<UInt16>(data);
 		break;
 
 	case 0x01:
-		headerInfo.payloadLength = ReadExplicitLength<UInt32>(data);
+		headerInfo->payloadLength = ReadExplicitLength<UInt32>(data);
 		break;
 
 	case 0x02:
-		headerInfo.payloadLength = ReadExplicitLength<UInt64>(data);
+		headerInfo->payloadLength = ReadExplicitLength<UInt64>(data);
 		break;
 
 	default:
-		headerInfo.payloadLength = static_cast<UInt64>(data[0]);
+		headerInfo->payloadLength = static_cast<UInt64>(data[0]);
 		data.Consume(1);
 		break;
 	}
+}
 
-	return headerInfo;
+void NetworkPayload::ReadHeaderPayloadLength(Range<std::array<byte, READ_BUFFER_SIZE>>& data)
+{
+	switch (data[0])
+	{
+	case 0x00:
+		headerInfo->payloadLength = ReadExplicitLength<UInt16>(data);
+		break;
+
+	case 0x01:
+		headerInfo->payloadLength = ReadExplicitLength<UInt32>(data);
+		break;
+
+	case 0x02:
+		headerInfo->payloadLength = ReadExplicitLength<UInt64>(data);
+		break;
+	}
+
+	data.Consume(m_payloadLengthIndicatorSize.value());
+}
+
+void NetworkPayload::Insert(Range<std::array<byte, READ_BUFFER_SIZE>>& range)
+{
+	// In header construction phase
+	if (!headerInfo)
+	{
+		if (!m_headerData && !m_payloadLengthIndicatorSize)
+		{
+			m_headerData = std::vector<byte>();
+
+			const size_t upperBound = (range.Size() >= HEADER_MIN_LENGTH) ? HEADER_MIN_LENGTH : range.Size();
+			m_headerData->insert(m_headerData->begin(), range.begin(), range.begin() + upperBound);
+		}
+
+		if (!m_payloadLengthIndicatorSize && m_headerData->size() >= HEADER_MIN_LENGTH)
+			ReadHeaderFirstPart(range);
+
+		if (m_payloadLengthIndicatorSize)
+		{
+			const size_t upperBound = (range.Size() > m_payloadLengthIndicatorSize.value()) ? m_payloadLengthIndicatorSize.value() : range.Size();
+			m_headerData->insert(m_headerData->begin(), range.begin(), range.begin() + upperBound);
+			range.Consume(upperBound);
+
+			if (m_headerData->size() == m_payloadLengthIndicatorSize.value())
+			{
+				ReadHeaderPayloadLength(range);
+
+				m_payloadLengthIndicatorSize.reset();
+				m_headerData.reset();
+			}
+		}
+	}
+
+	if (headerInfo)
+	{
+		const size_t bytesLeft = BytesLeft();
+		const size_t upperBound = (range.Size() < bytesLeft) ? range.Size() : bytesLeft;
+
+		payloadData.insert(payloadData.begin(), range.begin(), range.begin() + upperBound);
+		range.Consume(upperBound);
+	}
+}
+
+size_t NetworkPayload::BytesLeft() const
+{
+	if (!headerInfo)
+	{
+		// In header construction phase
+		ASSERT(m_headerData);
+
+		if (m_payloadLengthIndicatorSize)
+			return m_payloadLengthIndicatorSize.value() - m_headerData->size();
+		else
+			return HEADER_MIN_LENGTH - m_headerData->size();
+	}
+	else
+	{
+		auto val = (Int64)headerInfo->payloadLength - (Int64)payloadData.size();
+		ASSERT_MSG(val >= 0, "The number of bytes left can't be negative");
+
+		return val;
+	}
 }
