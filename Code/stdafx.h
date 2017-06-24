@@ -13,5 +13,6 @@
 #include <sstream>
 #include <atomic>
 #include <deque>
+#include <regex>
 
 #include <boost/asio.hpp>
