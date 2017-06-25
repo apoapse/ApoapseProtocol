@@ -14,6 +14,19 @@ GenericConnection::~GenericConnection()
 	
 }
 
+void GenericConnection::Send(IdsCommand command, std::shared_ptr<std::vector<byte>> data, TCPConnection* excludedConnection)
+{
+	if (excludedConnection == this)
+		return;
+
+	{
+		auto header = std::make_shared<std::vector<byte>>(NetworkPayload::GenerateHeader(command, *data.get()));
+		TCPConnection::Send(header);
+	}
+
+	TCPConnection::Send(data);
+}
+
 bool GenericConnection::OnConnectedToServer()
 {
 	StartReading();
@@ -34,46 +47,40 @@ void GenericConnection::StartReading()
 
 void GenericConnection::ProcessHeader(Range<std::array<byte, READ_BUFFER_SIZE>>& range)
 {
-	NetworkPayload payload;
-	payload.Insert(range);
-
-	if (payload.BytesLeft() == 0)
-	{
-		OnReceivedPayload(payload);
-		StartReading();
-	}
-	else
-	{
-		ReadPayloadData(payload);
-	}
+	auto payload = std::make_shared<NetworkPayload>();
+	ProcessDataGeneric(range, std::move(payload));
 }
 
-void GenericConnection::ProcessPayloadData(Range<std::array<byte, READ_BUFFER_SIZE>>& range, NetworkPayload& payload)
+void GenericConnection::ProcessDataGeneric(Range<std::array<byte, READ_BUFFER_SIZE>>& range, std::shared_ptr<NetworkPayload> payload)
 {
-	payload.Insert(range);
+	if (range.Size() > 0)
+		payload->Insert(range);
 
-	if (payload.BytesLeft() == 0)
+	if (payload->BytesLeft() == 0)
 	{
 		if (range.Size() == 0)
 		{
-			OnReceivedPayload(payload);
+			OnReceivedPayloadInternal(std::move(payload));
 			StartReading();
 		}
 		else
 		{
-			NetworkPayload payload;
-			payload.Insert(range);
+			OnReceivedPayloadInternal(std::move(payload));
 
-			ProcessPayloadData(range, payload);
+			ASSERT(range.Size() > 0);
+			auto payloadLocal = std::make_shared<NetworkPayload>();
+			payloadLocal->Insert(range);
+
+			ProcessDataGeneric(range, std::move(payloadLocal));
 		}
 	}
 	else
-		ReadPayloadData(payload);
+		ReadPayloadData(std::move(payload));
 }
 
-void GenericConnection::ReadPayloadData(NetworkPayload& payload)
+void GenericConnection::ReadPayloadData(std::shared_ptr<NetworkPayload> payload)
 {
-	ReadSome(m_readBuffer, [this, &payload](size_t bytesTransferred) { OnReceivedPayloadData(bytesTransferred, payload); });
+	ReadSome(m_readBuffer, [this, payload](size_t bytesTransferred) { OnReceivedPayloadData(bytesTransferred, payload); });
 }
 
 void GenericConnection::OnReceivedHeaderData(size_t bytesTransferred)
@@ -82,16 +89,18 @@ void GenericConnection::OnReceivedHeaderData(size_t bytesTransferred)
 	ProcessHeader(range);
 }
 
-void GenericConnection::OnReceivedPayloadData(size_t bytesTransferred, NetworkPayload& payload)
+void GenericConnection::OnReceivedPayloadData(size_t bytesTransferred, std::shared_ptr<NetworkPayload> payload)
 {
+	LOG_DEBUG << bytesTransferred;
+
 	Range <std::array<byte, READ_BUFFER_SIZE>> range(m_readBuffer, bytesTransferred);
-	ProcessPayloadData(range, payload);
+	ProcessDataGeneric(range, std::move(payload));
 }
 
-void GenericConnection::OnReceivedPayload(NetworkPayload& payload)//TEMP
+void GenericConnection::OnReceivedPayloadInternal(std::shared_ptr<NetworkPayload> payload)
 {
-	ASSERT(payload.headerInfo->payloadLength == payload.payloadData.size());
+	ASSERT(payload->headerInfo->payloadLength == payload->payloadData.size());
 
 	LOG_DEBUG_FUNCTION_NAME();
-	LOG_DEBUG << "payloadLength: " << payload.headerInfo->payloadLength;
+	LOG_DEBUG << "payloadLength: " << payload->headerInfo->payloadLength;
 }

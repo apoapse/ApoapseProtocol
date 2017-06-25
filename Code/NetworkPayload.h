@@ -18,15 +18,16 @@ struct NetworkPayload
 	std::optional<NetworkMessageHeader> headerInfo;
 	std::vector<byte> payloadData;
 
-public:
-	NetworkPayload();
 	void Insert(Range<std::array<byte, READ_BUFFER_SIZE>>& data);
 	size_t BytesLeft() const;
+
+	static std::vector<byte> GenerateHeader(IdsCommand command, const std::vector<byte>& data);
 	
 private:
-	void ReadHeaderFirstPart(Range<std::array<byte, READ_BUFFER_SIZE>>& data);
-	void ReadHeaderPayloadLength(Range<std::array<byte, READ_BUFFER_SIZE>>& data);
+	void ReadHeaderFirstPart();
+	void ReadHeaderPayloadLength();
 
 	std::optional<std::vector<byte>> m_headerData;
 	std::optional<UInt16> m_payloadLengthIndicatorSize;
+	bool m_isFirstInsert{ true };
 };

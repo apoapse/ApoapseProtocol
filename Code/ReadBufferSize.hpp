@@ -1,2 +1,2 @@
 #pragma once
-#define READ_BUFFER_SIZE 1024
+#define READ_BUFFER_SIZE 2048
