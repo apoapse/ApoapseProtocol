@@ -139,8 +139,11 @@
   <ItemGroup>
     <ClInclude Include="ApoapseCoreUTRegistration.hpp" />
     <ClInclude Include="ByteUtils.hpp" />
-    <ClInclude Include="IdsCommand.hpp" />
+    <ClInclude Include="Command.h" />
+    <ClInclude Include="CommandsManager.h" />
+    <ClInclude Include="Commands.hpp" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="ConnectCmdBase.h" />
     <ClInclude Include="DateTimeUtils.h" />
     <ClInclude Include="Diagnostic.hpp" />
     <ClInclude Include="eLogSeverity.hpp" />
@@ -152,6 +155,7 @@
     <ClInclude Include="MacroUtils.hpp" />
     <ClInclude Include="Maths.hpp" />
     <ClInclude Include="NetworkPayload.h" />
+    <ClInclude Include="ObjectsFactory.hpp" />
     <ClInclude Include="Range.hpp" />
     <ClInclude Include="ReadBufferSize.hpp" />
     <ClInclude Include="stdafx.h" />
@@ -169,6 +173,8 @@
     <ClInclude Include="UT_StringExtensions.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Command.cpp" />
+    <ClCompile Include="CommandsManager.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="DateTimeUtils.cpp" />
     <ClCompile Include="GenericConnection.cpp" />

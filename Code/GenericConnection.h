@@ -3,7 +3,7 @@
 #include "ReadBufferSize.hpp"
 #include "Range.hpp"
 #include <memory>
-#include "IdsCommand.hpp"
+#include "Commands.hpp"
 struct NetworkPayload;
 
 class GenericConnection : public TCPConnection
@@ -14,7 +14,7 @@ public:
 	GenericConnection(boost::asio::io_service& ioService);
 	virtual ~GenericConnection();
 
-	void Send(IdsCommand command, std::shared_ptr<std::vector<byte>> data, TCPConnection* excludedConnection);
+	void Send(Commands command, std::shared_ptr<std::vector<byte>> data, TCPConnection* excludedConnection);
 	
 private:
 	bool OnConnectedToServer() override;

@@ -1,5 +1,5 @@
 #pragma once
-#include "IdsCommand.hpp"
+#include "Commands.hpp"
 #include "Range.hpp"
 #include <array>
 #include "ReadBufferSize.hpp"
@@ -9,7 +9,7 @@
 
 struct NetworkMessageHeader
 {
-	IdsCommand command;
+	Commands command;
 	UInt64 payloadLength = 0;
 };
 
@@ -21,7 +21,7 @@ struct NetworkPayload
 	void Insert(Range<std::array<byte, READ_BUFFER_SIZE>>& data);
 	size_t BytesLeft() const;
 
-	static std::vector<byte> GenerateHeader(IdsCommand command, const std::vector<byte>& data);
+	static std::vector<byte> GenerateHeader(Commands command, const std::vector<byte>& data);
 	
 private:
 	void ReadHeaderFirstPart();

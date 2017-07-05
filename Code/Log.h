@@ -52,4 +52,10 @@ public:
 		m_stream << std::string((item) ? "true" : "false");
 		return *this;
 	}
+
+	Log& operator<<(const std::exception& e)
+	{
+		m_stream << e.what();
+		return *this;
+	}
 };

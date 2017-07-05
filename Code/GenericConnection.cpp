@@ -14,13 +14,13 @@ GenericConnection::~GenericConnection()
 	
 }
 
-void GenericConnection::Send(IdsCommand command, std::shared_ptr<std::vector<byte>> data, TCPConnection* excludedConnection)
+void GenericConnection::Send(Commands command, std::shared_ptr<std::vector<byte>> data, TCPConnection* excludedConnection)
 {
 	if (excludedConnection == this)
 		return;
 
 	{
-		auto header = std::make_shared<std::vector<byte>>(NetworkPayload::GenerateHeader(command, *data.get()));
+		auto header = std::make_shared<std::vector<byte>>(NetworkPayload::GenerateHeader(command, *data.get()));	// #TODO #OPTIMIZATION Find a way to use a unique_ptr instead, the blocker to that are the boost::bind in TCPConnection
 		TCPConnection::Send(header);
 	}
 

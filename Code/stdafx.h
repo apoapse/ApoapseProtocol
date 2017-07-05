@@ -14,5 +14,6 @@
 #include <atomic>
 #include <deque>
 #include <regex>
+#include <functional>
 
 #include <boost/asio.hpp>

@@ -86,9 +86,10 @@ public:
 	}
 };
 
-#define MSGPK_ORDERED_APPEND(_serializer, _name, _data)			[&] { _serializer.OrderedAppend(_name, _data); }
-#define MSGPK_ORDERED_GROUP(_serializer, _name)					[&] { _serializer.Group(_name,
-#define MSGPK_ORDERED_END_GROUP									); },
+#define MSGPK_ORDERED_APPEND(_serializer, _name, _data)					[&] { _serializer.OrderedAppend(_name, _data); }
+#define MSGPK_ORDERED_GROUP(_serializer, _name)							[&] { _serializer.Group(_name,
+#define MSGPK_ORDERED_END_GROUP											); },
+#define MSGPK_ORDERED_APPEND_ARRAY(_serializer, _type, _name, _vector)	[&] { _serializer.OrderedAppendArray<_type>(_name, _vector); }
 
 class MessagePackSerializer
 {
@@ -250,14 +251,14 @@ private:
 
 			else if (CanFit<UInt16>(data))
 			{
-				const auto byteArray = ToBytes<UInt16, Endianness::BIG_ENDIAN>(data);
+				const auto byteArray = ToBytes<UInt16>(data, Endianness::BIG_ENDIAN);
 
 				InsertBytes<UInt16, FormatFirstByte::UINT_16>(byteArray);
 			}
 
 			else if (CanFit<UInt32>(data))
 			{
-				const auto byteArray = ToBytes<UInt32, Endianness::BIG_ENDIAN>(data);
+				const auto byteArray = ToBytes<UInt32>(data, Endianness::BIG_ENDIAN);
 
 				InsertBytes<UInt32, FormatFirstByte::UINT_32>(byteArray);
 			}
@@ -270,28 +271,28 @@ private:
 
 			else if (CanFit<Int16>(data))
 			{
-				const auto byteArray = ToBytes<Int16, Endianness::BIG_ENDIAN>(data);
+				const auto byteArray = ToBytes<Int16>(data, Endianness::BIG_ENDIAN);
 
 				InsertBytes<Int16, FormatFirstByte::INT_16>(byteArray);
 			}
 
 			else if (CanFit<int>(data))
 			{
-				const auto byteArray = ToBytes<int, Endianness::BIG_ENDIAN>(data);
+				const auto byteArray = ToBytes<int>(data, Endianness::BIG_ENDIAN);
 
 				InsertBytes<int, FormatFirstByte::INT_32>(byteArray);
 			}
 
 			else if (CanFit<UInt64>(data))
 			{
-				const auto byteArray = ToBytes<UInt64, Endianness::BIG_ENDIAN>(data);
+				const auto byteArray = ToBytes<UInt64>(data, Endianness::BIG_ENDIAN);
 
 				InsertBytes<UInt64, FormatFirstByte::UINT_64>(byteArray);
 			}
 
 			else
 			{
-				const auto byteArray = ToBytes<Int64, Endianness::BIG_ENDIAN>(data);
+				const auto byteArray = ToBytes<Int64>(data, Endianness::BIG_ENDIAN);
 
 				InsertBytes<Int64, FormatFirstByte::INT_64>(byteArray);
 			}
@@ -351,10 +352,10 @@ public:
 	}
 
 	template <typename T, typename = std::enable_if<std::is_integral<T>::value>>
-	T GetValue(const std::string& key)
+	T GetValue(const std::string& key) const
 	{
-		const auto itemDef = m_parsedDataLocations[key];
-		Range<byte> bytesRange(m_rawData);
+		const auto itemDef = m_parsedDataLocations.at(key);
+		Range<std::vector<byte>> bytesRange(m_rawData);
 		bytesRange.Consume(itemDef.pos);
 
 		switch (itemDef.type)
@@ -390,14 +391,14 @@ public:
 			return ReadAndCheckInteger<Int64, T>(bytesRange);
 
 		default:
-			throw std::exception("Can't convert the requested value");
+			throw std::exception("Cannot convert the requested value");
 		}
 	}
 
 	template<>
-	bool GetValue(const std::string& key)
+	bool GetValue(const std::string& key) const
 	{
-		const auto itemDef = m_parsedDataLocations[key];
+		const auto itemDef = m_parsedDataLocations.at(key);
 		if (itemDef.type != ItemType::BOOL)
 			throw MessgePackInvalidFormat("The requested value is not of type BOOL");
 
@@ -405,9 +406,9 @@ public:
 	}
 
 	template<>
-	std::string GetValue(const std::string& key)
+	std::string GetValue(const std::string& key) const
 	{
-		const auto itemDef = m_parsedDataLocations[key];
+		const auto itemDef = m_parsedDataLocations.at(key);
 		if (itemDef.type != ItemType::TEXT)
 			throw MessgePackInvalidFormat("The requested value is not of type TEXT");
 
@@ -415,18 +416,18 @@ public:
 	}
 
 	template<>
-	std::vector<byte> GetValue(const std::string& key)
+	std::vector<byte> GetValue(const std::string& key) const
 	{
-		const auto itemDef = m_parsedDataLocations[key];
+		const auto itemDef = m_parsedDataLocations.at(key);
 		if (itemDef.type != ItemType::BYTES_BLOB)
 			throw MessgePackInvalidFormat("The requested value is not of type BYTES_BLOB");
 
 		return std::vector<byte>(m_rawData.begin() + itemDef.pos, m_rawData.begin() + itemDef.pos + itemDef.length);
 	}
 
-	Range<std::vector<byte>> GetByteBlobRange(const std::string& key)
+	Range<std::vector<byte>> GetByteBlobRange(const std::string& key) const
 	{
-		const auto itemDef = m_parsedDataLocations[key];
+		const auto itemDef = m_parsedDataLocations.at(key);
 		if (itemDef.type != ItemType::BYTES_BLOB)
 			throw MessgePackInvalidFormat("The requested value is not of type BYTES_BLOB");
 
@@ -437,7 +438,7 @@ public:
 	}
 
 	template <typename T>
-	std::optional<T> GetValueOptional(const std::string& key)
+	std::optional<T> GetValueOptional(const std::string& key) const
 	{
 		std::optional<T> output;
 
@@ -448,10 +449,10 @@ public:
 	}
 
 	template <typename T>
-	std::vector<T> GetArray(const std::string& key)
+	std::vector<T> GetArray(const std::string& key) const
 	{
 		std::vector<T> output;
-		const auto arrayDef = m_parsedDataLocations[key];
+		const auto arrayDef = m_parsedDataLocations.at(key);
 
 		if (arrayDef.type != ItemType::ARRAY_SIZE_HELPER)
 			throw MessgePackInvalidFormat("The requested item is not an array");
@@ -463,7 +464,7 @@ public:
 	}
 
 	template <typename T>
-	std::optional<std::vector<T>> GetArrayOptional(const std::string& key)
+	std::optional<std::vector<T>> GetArrayOptional(const std::string& key) const
 	{
 		std::optional<std::vector<T>> output;
 
@@ -724,7 +725,7 @@ private:
 	}
 
 	template <typename SOURCE_TYPE, typename TARGET_TYPE>
-	TARGET_TYPE ReadAndCheckInteger(Range<std::vector<byte>>& bytesRange)
+	TARGET_TYPE ReadAndCheckInteger(Range<std::vector<byte>>& bytesRange) const
 	{
 		auto value = ReadInteger<SOURCE_TYPE>(bytesRange);
 
@@ -743,7 +744,7 @@ private:
 		return value;
 	}
 
-	bool IsFirstByteMapIndex(byte nextByte)
+	bool IsFirstByteMapIndex(byte nextByte) const
 	{
 		return (nextByte == (byte)FormatFirstByte::MAP_16 || IsInBound(nextByte, (byte)FormatFirstByte::FIX_MAP_LOW_BOUND, (byte)FormatFirstByte::FIX_MAP_HIGH_BOUND) || nextByte == (byte)FormatFirstByte::MAP_32);
 	}

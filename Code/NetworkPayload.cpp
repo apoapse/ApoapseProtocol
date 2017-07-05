@@ -25,7 +25,7 @@ void NetworkPayload::ReadHeaderFirstPart()
 
 	ASSERT(m_headerData->size() >= HEADER_MIN_LENGTH);
 
-	headerInfo->command = (IdsCommand)FromBytes<UInt16>(data, Endianness::BIG_ENDIAN);
+	headerInfo->command = (Commands)FromBytes<UInt16>(data, Endianness::BIG_ENDIAN);
 	data.Consume(sizeof(UInt16));
 
 	switch (data[0])
@@ -153,7 +153,7 @@ size_t NetworkPayload::BytesLeft() const
 	}
 }
 
-std::vector<byte> NetworkPayload::GenerateHeader(IdsCommand command, const std::vector<byte>& data)
+std::vector<byte> NetworkPayload::GenerateHeader(Commands command, const std::vector<byte>& data)
 {
 	std::vector<byte> headerBytes;
 	headerBytes.reserve(HEADER_MIN_LENGTH);
