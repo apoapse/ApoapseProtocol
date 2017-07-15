@@ -43,7 +43,7 @@ void LogMessage::GenerateDateTime()
 
 	std::stringstream stream;
 
-	ptime currentDate = boost::posix_time::second_clock::local_time();
+	const ptime currentDate = boost::posix_time::second_clock::local_time();
 	date date(currentDate.date());
 
 	date_facet* facet(new date_facet("%a, %d %b %Y "));

@@ -108,6 +108,12 @@ struct CommandInfo
 // 	std::function<bool(LocalUser&, ClientConnection&)> processFromUser = { NULL };
 // 	std::function<void(RemoteServer&)> processFromRemoteServer = { NULL };
 	bool propagateToUser = { false };
+
+	~CommandInfo()
+	{
+		for (auto& field : fields)
+			delete field.fieldValueValidator;
+	}
 };
 
 class Command
@@ -125,5 +131,5 @@ public:
 
 private:
 	void AutoValidate();
-	void ValidateField(const CommandField& field, bool valueExist);
+	bool ValidateField(const CommandField& field, bool valueExist);
 };

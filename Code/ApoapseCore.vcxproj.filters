@@ -54,9 +54,6 @@
     <ClInclude Include="UnitTestsManager.h">
       <Filter>UnitTests\Framework</Filter>
     </ClInclude>
-    <ClInclude Include="ApoapseCoreUTRegistration.hpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="GenericConnection.h">
       <Filter>Network\Protocol</Filter>
@@ -66,21 +63,6 @@
     </ClInclude>
     <ClInclude Include="ReadBufferSize.hpp">
       <Filter>Network\Sockets</Filter>
-    </ClInclude>
-    <ClInclude Include="UT_NetworkPayload.hpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClInclude>
-    <ClInclude Include="UT_ByteUtils.hpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClInclude>
-    <ClInclude Include="UT_DateTimeUtils.hpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClInclude>
-    <ClInclude Include="UT_Maths.hpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClInclude>
-    <ClInclude Include="UT_StringExtensions.hpp">
-      <Filter>UnitTests\Tests</Filter>
     </ClInclude>
     <ClInclude Include="Commands.hpp">
       <Filter>CommandSystem</Filter>
@@ -130,6 +112,21 @@
     </ClCompile>
     <ClCompile Include="CommandsManager.cpp">
       <Filter>CommandSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_ByteUtils.cpp">
+      <Filter>UnitTests\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_DateTimeUtils.cpp">
+      <Filter>UnitTests\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Maths.cpp">
+      <Filter>UnitTests\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_NetworkPayload.cpp">
+      <Filter>UnitTests\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_StringExtensions.cpp">
+      <Filter>UnitTests\Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

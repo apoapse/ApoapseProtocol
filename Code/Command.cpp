@@ -45,7 +45,7 @@ void Command::AutoValidate()
 		}
 		catch (const std::exception& e)
 		{
-			LOG << "Command auto validate: required field " << field.name << " on command " << (UInt16)GetInfo().command << " returned the following exception: " << e.what() << LogSeverity::warning;
+			LOG << "Command auto validate: required field " << field.name << " on command " << (UInt16)GetInfo().command << " returned the following exception: " << e << LogSeverity::warning;
 			m_isValid = false;
 #ifndef DEBUG
 			return;
@@ -54,17 +54,26 @@ void Command::AutoValidate()
 #endif // DEBUG
 		}
 
-		ValidateField(field, valueExist);
+		const bool IsInvalidField = !ValidateField(field, valueExist);
+
+		if (IsInvalidField)
+		{			
+			m_isValid = false;
+#ifndef DEBUG
+			return;
+#else
+			continue;
+#endif // DEBUG
+		}
 	}
 }
 
-void Command::ValidateField(const CommandField& field, bool valueExist)
+bool Command::ValidateField(const CommandField& field, bool valueExist)
 {
 	if (field.requirement == FieldRequirement::ANY_MENDATORY && !valueExist)
 	{
 		LOG << "Command auto validate: required field " << field.name << " on command " << (UInt16)GetInfo().command << " is missing" << LogSeverity::warning;
-		m_isValid = false;
-		return;
+		return false;
 	}
 
 	if (valueExist && field.fieldValueValidator->HasValidatorFunction())
@@ -72,7 +81,9 @@ void Command::ValidateField(const CommandField& field, bool valueExist)
 		if (!field.fieldValueValidator->ExecValidator(field.name, *m_deserializedData.get()))
 		{
 			LOG << "Command auto validate: the field " << field.name << " on command " << (UInt16)GetInfo().command << " is invalid according to an user provided check function" << LogSeverity::warning;
-			return;
+			return false;
 		}
 	}
+
+	return true;
 }

@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "UnitTestsManager.h"
 #include "StringExtensions.hpp"
 

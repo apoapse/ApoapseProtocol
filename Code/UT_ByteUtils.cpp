@@ -1,4 +1,5 @@
-#ifdef UNIT_TESTS
+#include "stdafx.h"
+
 #include "UnitTestsManager.h"
 #include "ByteUtils.hpp"
 
@@ -51,5 +52,3 @@ UNIT_TEST("ByteUtils:FromBytes:Range:BigEndian")
 
 	UnitTest::Assert(result == -432);
 } UNIT_TEST_END
-
-#endif

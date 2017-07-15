@@ -480,7 +480,7 @@ private:
 		const byte currentFirstByte = workingRange[0];
 		workingRange.Consume(1);
 
-		UInt32 nbItems;
+		UInt32 nbItems = 0;
 
 		if (currentFirstByte == (byte)FormatFirstByte::MAP_16)
 		{
@@ -750,7 +750,7 @@ private:
 	}
 
 	template <typename T>
-	static T ReadInteger(Range<std::vector<byte>>& bytesRange)
+	static T ReadInteger(const Range<std::vector<byte>>& bytesRange)
 	{
 		std::array<byte, sizeof(T)> bytes;
 		std::copy(bytesRange.begin(), bytesRange.begin() + sizeof(T), bytes.begin());
@@ -758,7 +758,7 @@ private:
 		return FromBytes<T>(bytes, Endianness::BIG_ENDIAN);
 	}
 
-	static std::string ReadText(Range<std::vector<byte>>& workingRange, UInt32 length)
+	static std::string ReadText(const Range<std::vector<byte>>& workingRange, UInt32 length)
 	{
 		if (length > workingRange.Size())
 			throw MessgePackInvalidFormat("Byte sequence too short");

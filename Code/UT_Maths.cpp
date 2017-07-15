@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "UnitTestsManager.h"
 #include "Maths.hpp"
 #include "TypeDefs.hpp"

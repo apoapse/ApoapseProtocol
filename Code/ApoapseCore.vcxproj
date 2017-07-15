@@ -73,6 +73,7 @@
     <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
     <IncludePath>C:\Program Files\boost\boost_1_64_0;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+    <EnableCppCoreCheck>true</EnableCppCoreCheck>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
@@ -137,7 +138,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ApoapseCoreUTRegistration.hpp" />
     <ClInclude Include="ByteUtils.hpp" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommandsManager.h" />
@@ -166,11 +166,21 @@
     <ClInclude Include="MessagePack.hpp" />
     <ClInclude Include="UnitTest.hpp" />
     <ClInclude Include="UnitTestsManager.h" />
-    <ClInclude Include="UT_ByteUtils.hpp" />
-    <ClInclude Include="UT_DateTimeUtils.hpp" />
-    <ClInclude Include="UT_Maths.hpp" />
-    <ClInclude Include="UT_NetworkPayload.hpp" />
-    <ClInclude Include="UT_StringExtensions.hpp" />
+    <ClCompile Include="UT_ByteUtils.cpp">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
+    <ClCompile Include="UT_DateTimeUtils.cpp">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
+    <ClCompile Include="UT_Maths.cpp">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
+    <ClCompile Include="UT_NetworkPayload.cpp">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
+    <ClCompile Include="UT_StringExtensions.cpp">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Command.cpp" />
