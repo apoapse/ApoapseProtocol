@@ -79,6 +79,24 @@
     <ClInclude Include="ObjectsFactory.hpp">
       <Filter>ObjectUtils</Filter>
     </ClInclude>
+    <ClInclude Include="TCPServer.h">
+      <Filter>Network\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="Database.hpp">
+      <Filter>DataAbstractionLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLPackagedResult.hpp">
+      <Filter>DataAbstractionLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLValue.hpp">
+      <Filter>DataAbstractionLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLQuery.h">
+      <Filter>DataAbstractionLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="DllExportSymbolApi.hpp">
+      <Filter>DllUtils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -128,6 +146,12 @@
     <ClCompile Include="UT_StringExtensions.cpp">
       <Filter>UnitTests\Tests</Filter>
     </ClCompile>
+    <ClCompile Include="TCPServer.cpp">
+      <Filter>Network\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLQuery.cpp">
+      <Filter>DataAbstractionLayer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Parsers">
@@ -174,6 +198,12 @@
     </Filter>
     <Filter Include="ObjectUtils">
       <UniqueIdentifier>{19bff446-e38d-4b3a-b883-cf15d1a7b5b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataAbstractionLayer">
+      <UniqueIdentifier>{c218d407-5201-4351-8c72-7a03c70be57b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DllUtils">
+      <UniqueIdentifier>{8f17086c-17e4-49b4-a5cb-291a1ace29f8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

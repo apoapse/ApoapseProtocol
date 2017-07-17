@@ -144,9 +144,11 @@
     <ClInclude Include="Commands.hpp" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="ConnectCmdBase.h" />
+    <ClInclude Include="Database.hpp" />
     <ClInclude Include="DateTimeUtils.h" />
     <ClInclude Include="Diagnostic.hpp" />
     <ClInclude Include="eLogSeverity.hpp" />
+    <ClInclude Include="DllExportSymbolApi.hpp" />
     <ClInclude Include="GenericConnection.h" />
     <ClInclude Include="ILogger.hpp" />
     <ClInclude Include="INetworkSender.h" />
@@ -158,14 +160,20 @@
     <ClInclude Include="ObjectsFactory.hpp" />
     <ClInclude Include="Range.hpp" />
     <ClInclude Include="ReadBufferSize.hpp" />
+    <ClInclude Include="SQLPackagedResult.hpp" />
+    <ClInclude Include="SQLQuery.h" />
+    <ClInclude Include="SQLValue.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StringExtensions.hpp" />
     <ClInclude Include="TCPConnection.h" />
+    <ClInclude Include="TCPServer.h" />
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="TypeDefs.hpp" />
     <ClInclude Include="MessagePack.hpp" />
     <ClInclude Include="UnitTest.hpp" />
     <ClInclude Include="UnitTestsManager.h" />
+    <ClCompile Include="SQLQuery.cpp" />
+    <ClCompile Include="TCPServer.cpp" />
     <ClCompile Include="UT_ByteUtils.cpp">
       <FileType>CppHeader</FileType>
     </ClCompile>

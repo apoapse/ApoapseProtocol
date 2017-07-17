@@ -56,7 +56,7 @@ public:
 	std::future<typename std::result_of<T()>::type> PushTask(T func)
 	{
 		using TypeResult = std::result_of<T()>::type;
-		static_assert((!std::is_object<TypeResult>::value || std::is_default_constructible<TypeResult>::value && std::is_trivially_assignable<TypeResult, TypeResult>::value), "The type provided need to have a default constructor and trivial assignment operator");
+		static_assert((!std::is_object<TypeResult>::value || std::is_default_constructible<TypeResult>::value/* && std::is_trivially_assignable<TypeResult, TypeResult>::value*/), "The type provided need to have a default constructor and trivial assignment operator");
 
 		auto* task = new Task<TypeResult>(std::move(func));
 		std::future<TypeResult> response = task->task.get_future();
