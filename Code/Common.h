@@ -12,6 +12,9 @@ struct Global
 	std::unique_ptr<class ThreadPool> threadPool;
 	std::unique_ptr<Logger> logger;
 
+	// Only defined on the server
+	class ServerSettings* settings = nullptr;
+
 	Global() = default;
 
 	static Global* CreateGlobal()
