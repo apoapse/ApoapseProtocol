@@ -10,29 +10,37 @@ namespace StringExtensions
 	// Returns:   void
 	// Parameter: std::basic_string<T> & str - input string (direcly edited)
 	// Parameter: const char delimiter - delimiter character (not erased)
+	// Parameter: bool trimDelimiter - define if the delimiter character should be erased or not
 	//************************************
 	template <typename T>
-	void erase_left(std::basic_string<T>& str, const char delimiter)
+	void erase_left(std::basic_string<T>& str, const char delimiter, bool trimDelimiter = false)
 	{
 		const auto result = str.find(delimiter);
 
 		if (result != std::string::npos)
-			str.erase(0, result);	// #OPTIMIZATION use erase or substr?
+		{
+			const size_t trimOffset = (trimDelimiter) ? 1 : 0;	// With an offset of 1, we also remove the delimiter
+			str.erase(0, result + trimOffset);	// #OPTIMIZATION use erase or substr?
+		}
 	}
 
 	//************************************
 	// Method:    StringExtensions::erase_right - Erase all the characters that are located at the left of the specified character starting from the end of the string
 	// Returns:   void
 	// Parameter: std::basic_string<T> & str - input string (direcly edited)
-	// Parameter: const char delimiter - delimiter character (not erased)
+	// Parameter: const char delimiter - delimiter character (not erased by default)
+	// Parameter: bool trimDelimiter - define if the delimiter character should be erased or not
 	//************************************
 	template <typename T>
-	void erase_right(std::basic_string<T>& str, const char delimiter)
+	void erase_right(std::basic_string<T>& str, const char delimiter, bool trimDelimiter = false)
 	{
 		const size_t result = str.find_last_of(delimiter);
 
 		if (result != std::string::npos)	// #OPTIMIZATION use erase or substr?
-			str = str.substr(0, result + 1);	// Offset of 1 because we want to keep the delimiter in string
+		{
+			const size_t trimOffset = (trimDelimiter) ? 0 : 1;	// With an offset of 1, we keep the delimiter in the string
+			str = str.substr(0, result + trimOffset);
+		}
 	}
 
 	//************************************

@@ -8,44 +8,46 @@
 #include "Maths.hpp"
 #include "Range.hpp"
 #include "ByteUtils.hpp"
+#include "StringExtensions.hpp"
+#include "Diagnostic.hpp"
 
 enum class FormatFirstByte
 {
-	NIL = 0xc0,
-	BFALSE = 0xc2,
-	BTRUE = 0xc3,
+	nil = 0xc0,
+	bfalse = 0xc2,
+	btrue = 0xc3,
 
 	// Byte array
-	BIN_8 = 0xc4,
-	BIN_16 = 0xc5,
-	BIN_32 = 0xc6,
+	bin_8 = 0xc4,
+	bin_16 = 0xc5,
+	bin_32 = 0xc6,
 
 	// tuple
-	EXT_8 = 0xc7,
-	EXT_16 = 0xc8,
-	EXT_32 = 0xc9,
+	ext_8 = 0xc7,
+	ext_16 = 0xc8,
+	ext_32 = 0xc9,
 
 	// map
-	FIX_MAP_LOW_BOUND = 0x80,
-	FIX_MAP_HIGH_BOUND = 0x8f,
-	MAP_16 = 0xde,
-	MAP_32 = 0xdf,
+	fix_map_low_bound = 0x80,
+	fix_map_high_bound = 0x8f,
+	map_16 = 0xde,
+	map_32 = 0xdf,
 
 	// Numbers
-	POSITIVE_FIXINT_LOW_BOUND = 0x00,
-	POSITIVE_FIXINT_HIGH_BOUND = 0x7f,
-	NEGATIVE_FIXINT_HIGH_BOUND = 0xe0,
-	NEGATIVE_FIXINT_LOW_BOUND = 0xff,
-	FLOAT_32 = 0xca,
-	FLOAT_64 = 0xcb,
-	UINT_8 = 0xcc,
-	UINT_16 = 0xcd,
-	UINT_32 = 0xce,
-	UINT_64 = 0xcf,
-	INT_8 = 0xd0,
-	INT_16 = 0xd1,
-	INT_32 = 0xd2,
-	INT_64 = 0xd3,
+	positive_fixint_low_bound = 0x00,
+	positive_fixint_high_bound = 0x7f,
+	negative_fixint_high_bound = 0xe0,
+	negative_fixint_low_bound = 0xff,
+	float_32 = 0xca,
+	float_64 = 0xcb,
+	uint_8 = 0xcc,
+	uint_16 = 0xcd,
+	uint_32 = 0xce,
+	uint_64 = 0xcf,
+	int_8 = 0xd0,
+	int_16 = 0xd1,
+	int_32 = 0xd2,
+	int_64 = 0xd3,
 
 	// Fixed size tuple
 	//FIXEXT_1					= 0xd4,
@@ -55,17 +57,17 @@ enum class FormatFirstByte
 	//FIXECT_16					= 0xd8,
 
 	// Byte array (intended for UTF-8 encoded text)
-	FIX_STR_LOW_BOUND = 0xa0,
-	FIX_STR_HIGH_BOUND = 0xbf,
-	STR_8 = 0xd9,
-	STR_16 = 0xda,
-	STR_32 = 0xdb,
+	fix_str_low_bound = 0xa0,
+	fix_str_high_bound = 0xbf,
+	str_8 = 0xd9,
+	str_16 = 0xda,
+	str_32 = 0xdb,
 
 	// Json type array
-	FIXARRAY_LOW_BOUND = 0x90,
-	FIXARRAY_HIGH_BOUND = 0x9f,
-	ARRAY_16 = 0xdc,
-	ARRAY_32 = 0xdd,
+	fixarray_low_bound = 0x90,
+	fixarray_high_bound = 0x9f,
+	array_16 = 0xdc,
+	array_32 = 0xdd,
 	//MAP_16					= 0xde,
 	//MAP_32					= 0xdf,
 
@@ -91,13 +93,20 @@ public:
 #define MSGPK_ORDERED_END_GROUP											); },
 #define MSGPK_ORDERED_APPEND_ARRAY(_serializer, _type, _name, _vector)	[&] { _serializer.OrderedAppendArray<_type>(_name, _vector); }
 
+using ByteContainer = std::vector<byte>;
+
 class MessagePackSerializer
 {
 	std::vector<byte> m_data;
 
+	std::optional<
+		std::map<std::string, std::vector<ByteContainer>>
+	> m_unorderedFields;
+
 public:
 	MessagePackSerializer() = default;
 
+#pragma region Ordered
 	void Group(const std::string& name, std::initializer_list<std::function<void()>> functions)
 	{
 		StartGroupOrdered(functions.size(), name);
@@ -137,6 +146,52 @@ public:
 		AppendItem(name);
 		AppendItem(data);
 	}
+#pragma endregion Ordered
+
+#pragma region Unordered
+	template <typename T>
+	void UnorderedAppend(const std::string& name, T data)
+	{
+		//const auto[groupName, fieldName] = ReadFieldGroupAndName(name);	#CPP17
+		const auto names = ReadFieldGroupAndName(name);
+		const auto fieldName = names.second;
+
+		OrderedAppend(fieldName, data);
+		ProcessNewUnorderedField(names);
+	}
+
+	template <typename T>
+	void UnorderedAppendArray(const std::string& name, const std::vector<T>& arr)
+	{
+		//const auto[groupName, fieldName] = ReadFieldGroupAndName(name);	#CPP17
+		const auto names = ReadFieldGroupAndName(name);
+		const auto fieldName = names.second;
+
+		OrderedAppendArray(fieldName, arr);
+		ProcessNewUnorderedField(names);
+	}
+
+	void UnorderedFieldsCompile()
+	{
+		ASSERT_MSG(m_unorderedFields, "No unordered data to compile");
+
+		StartGroupOrdered((m_unorderedFields->size() - 1) + CountItemsInRootNode(), "");	// Root node, we remove 1 to the total count because CountItemsInRootNode() will include what's inside
+
+		for (const auto& group : m_unorderedFields.value())
+		{
+			const auto groupName = group.first;
+			if (!groupName.empty())
+				StartGroupOrdered(group.second.size(), groupName);
+
+			for (const auto& field : group.second)
+			{
+				m_data.insert(m_data.end(), field.begin(), field.end());
+			}
+		}
+
+		m_unorderedFields.reset();
+	}
+#pragma endregion Unordered
 
 	const std::vector<byte>& GetMessagePackBytes() const
 	{
@@ -144,6 +199,49 @@ public:
 	}
 
 private:
+	void ProcessNewUnorderedField(const std::pair<std::string, std::string>& names)
+	{
+		if (!m_unorderedFields)
+			m_unorderedFields = std::map<std::string, std::vector<ByteContainer>>();
+
+		//const auto[groupName, fieldName] = names;	#CPP17
+		const auto groupName = names.first;
+		const auto fieldName = names.second;
+		ASSERT_MSG(!fieldName.empty(), "The field name cannot be empty");
+
+		const std::vector<byte> dataCopy = std::move(m_data);
+		InsertUnorderedField(groupName, dataCopy);
+	}
+
+	inline void InsertUnorderedField(const std::string& groupName, const ByteContainer& data)
+	{
+		m_unorderedFields.value()[groupName].push_back(data);
+	}
+
+	inline size_t CountItemsInRootNode() const
+	{
+		if (m_unorderedFields->count("") == 0)
+			return 0;
+		else
+			return m_unorderedFields->at("").size();
+	}
+
+	static std::pair<std::string, std::string> ReadFieldGroupAndName(const std::string& name)
+	{
+		const bool containsGroup = StringExtensions::contains(name, '.');
+
+		std::string groupName = (containsGroup) ? name : std::string();
+		std::string fieldName = name;
+
+		if (containsGroup)
+		{
+			StringExtensions::erase_right(groupName, '.', true);
+			StringExtensions::erase_left(fieldName, '.', true);
+		}
+
+		return std::make_pair(groupName, fieldName);
+	}
+
 	void StartGroupOrdered(size_t nbItems, const std::string& name)
 	{
 		if (!CanFit<UInt32>(nbItems))
@@ -152,23 +250,23 @@ private:
 		if (name.length() > 0)
 			AppendItem(name);
 
-		if (IsInBound(nbItems + (size_t)FormatFirstByte::FIX_MAP_LOW_BOUND, (size_t)FormatFirstByte::FIX_MAP_LOW_BOUND, (size_t)FormatFirstByte::FIX_MAP_HIGH_BOUND))
+		if (IsInBound(nbItems + (size_t)FormatFirstByte::fix_map_low_bound, (size_t)FormatFirstByte::fix_map_low_bound, (size_t)FormatFirstByte::fix_map_high_bound))
 		{
-			m_data.push_back(static_cast<byte>((size_t)FormatFirstByte::FIX_MAP_LOW_BOUND + nbItems));
+			m_data.push_back(static_cast<byte>((size_t)FormatFirstByte::fix_map_low_bound + nbItems));
 		}
 		else
 		{
 			if (CanFit<UInt16>(nbItems))
-				InsertBytes<UInt16, FormatFirstByte::MAP_16>(ToBytes<UInt16>((UInt16)nbItems, Endianness::BIG_ENDIAN));
+				InsertBytes<UInt16, FormatFirstByte::map_16>(ToBytes<UInt16>((UInt16)nbItems, Endianness::BIG_ENDIAN));
 
 			else if (CanFit<UInt32>(nbItems))
-				InsertBytes<UInt32, FormatFirstByte::MAP_32>(ToBytes<UInt32>((UInt32)nbItems, Endianness::BIG_ENDIAN));
+				InsertBytes<UInt32, FormatFirstByte::map_32>(ToBytes<UInt32>((UInt32)nbItems, Endianness::BIG_ENDIAN));
 		}
 	}
 
 	inline void AppendItem(bool value)
 	{
-		(value) ? m_data.push_back((byte)FormatFirstByte::BTRUE) : m_data.push_back((byte)FormatFirstByte::BFALSE);
+		(value) ? m_data.push_back((byte)FormatFirstByte::btrue) : m_data.push_back((byte)FormatFirstByte::bfalse);
 	}
 
 	void AppendItem(const std::string& str)
@@ -176,38 +274,38 @@ private:
 		if (!CanFit<UInt32>(str.length()))
 			throw std::out_of_range("The string size is too high to fit into a UInt32");
 
-		if (IsInBound(str.length() + (size_t)FormatFirstByte::FIX_STR_LOW_BOUND, (size_t)FormatFirstByte::FIX_STR_LOW_BOUND, (size_t)FormatFirstByte::FIX_STR_HIGH_BOUND))
+		if (IsInBound(str.length() + (size_t)FormatFirstByte::fix_str_low_bound, (size_t)FormatFirstByte::fix_str_low_bound, (size_t)FormatFirstByte::fix_str_high_bound))
 		{
-			m_data.push_back(static_cast<byte>((size_t)FormatFirstByte::FIX_STR_LOW_BOUND + str.length()));
+			m_data.push_back(static_cast<byte>((size_t)FormatFirstByte::fix_str_low_bound + str.length()));
 		}
 		else
 		{
 			if (CanFit<UInt8>(str.length()))
-				InsertBytes<UInt8, FormatFirstByte::STR_8>(ToBytes<UInt8>((UInt8)str.length(), Endianness::BIG_ENDIAN));
+				InsertBytes<UInt8, FormatFirstByte::str_8>(ToBytes<UInt8>((UInt8)str.length(), Endianness::BIG_ENDIAN));
 
 			else if (CanFit<UInt16>(str.length()))
-				InsertBytes<UInt16, FormatFirstByte::STR_16>(ToBytes<UInt16>((UInt16)str.length(), Endianness::BIG_ENDIAN));
+				InsertBytes<UInt16, FormatFirstByte::str_16>(ToBytes<UInt16>((UInt16)str.length(), Endianness::BIG_ENDIAN));
 
 			else
-				InsertBytes<UInt32, FormatFirstByte::STR_32>(ToBytes<UInt32>((UInt32)str.length(), Endianness::BIG_ENDIAN));
+				InsertBytes<UInt32, FormatFirstByte::str_32>(ToBytes<UInt32>((UInt32)str.length(), Endianness::BIG_ENDIAN));
 		}
 
 		m_data.insert(m_data.end(), str.begin(), str.end());
 	}
 
-	void AppendItem(const std::vector<byte>& data)
+	void AppendItem(const ByteContainer& data)
 	{
 		if (!CanFit<UInt32>(data.size()))
 			throw std::out_of_range("The byte array size is too high to fit into a UInt32");
 
 		if (CanFit<UInt8>(data.size()))
-			InsertBytes<UInt8, FormatFirstByte::BIN_8>(ToBytes<UInt8>((UInt8)data.size(), Endianness::BIG_ENDIAN));
+			InsertBytes<UInt8, FormatFirstByte::bin_8>(ToBytes<UInt8>((UInt8)data.size(), Endianness::BIG_ENDIAN));
 
 		else if (CanFit<UInt16>(data.size()))
-			InsertBytes<UInt16, FormatFirstByte::BIN_16>(ToBytes<UInt16>((UInt16)data.size(), Endianness::BIG_ENDIAN));
+			InsertBytes<UInt16, FormatFirstByte::bin_16>(ToBytes<UInt16>((UInt16)data.size(), Endianness::BIG_ENDIAN));
 
 		else
-			InsertBytes<UInt32, FormatFirstByte::BIN_32>(ToBytes<UInt32>((UInt32)data.size(), Endianness::BIG_ENDIAN));
+			InsertBytes<UInt32, FormatFirstByte::bin_32>(ToBytes<UInt32>((UInt32)data.size(), Endianness::BIG_ENDIAN));
 
 		m_data.insert(m_data.end(), data.begin(), data.end());
 	}
@@ -217,14 +315,14 @@ private:
 	{
 		assert(CanFit<UInt32>(data.size()));
 
-		if (CanFit<UInt8>(data.size()) && IsInBound((size_t)FormatFirstByte::FIXARRAY_LOW_BOUND + data.size(), (size_t)FormatFirstByte::FIXARRAY_LOW_BOUND, (size_t)FormatFirstByte::FIXARRAY_HIGH_BOUND))
-			m_data.push_back(static_cast<byte>((size_t)FormatFirstByte::FIXARRAY_LOW_BOUND + data.size()));
+		if (CanFit<UInt8>(data.size()) && IsInBound((size_t)FormatFirstByte::fixarray_low_bound + data.size(), (size_t)FormatFirstByte::fixarray_low_bound, (size_t)FormatFirstByte::fixarray_high_bound))
+			m_data.push_back(static_cast<byte>((size_t)FormatFirstByte::fixarray_low_bound + data.size()));
 
 		else if (CanFit<UInt16>(data.size()))
-			InsertBytes<UInt16, FormatFirstByte::ARRAY_16>(ToBytes<UInt16>((UInt16)data.size(), Endianness::BIG_ENDIAN));
+			InsertBytes<UInt16, FormatFirstByte::array_16>(ToBytes<UInt16>((UInt16)data.size(), Endianness::BIG_ENDIAN));
 
 		else
-			InsertBytes<UInt32, FormatFirstByte::ARRAY_32>(ToBytes<UInt32>((UInt32)data.size(), Endianness::BIG_ENDIAN));
+			InsertBytes<UInt32, FormatFirstByte::array_32>(ToBytes<UInt32>((UInt32)data.size(), Endianness::BIG_ENDIAN));
 
 		for (const auto& item : data)
 			AppendItem(item);
@@ -233,19 +331,19 @@ private:
 	template <typename T>
 	void AppendItem(T data)	// Numbers
 	{
-		if (data >= 0 && IsInBound(data, (T)FormatFirstByte::POSITIVE_FIXINT_LOW_BOUND, (T)FormatFirstByte::POSITIVE_FIXINT_HIGH_BOUND))
+		if (data >= 0 && IsInBound(data, (T)FormatFirstByte::positive_fixint_low_bound, (T)FormatFirstByte::positive_fixint_high_bound))
 		{
 			m_data.push_back(static_cast<byte>((UInt8)data));	// The number can be represented as a single byte
 		}
-		else if (data < 0 && CanFit<Int8>(data) && IsInBound((Int8)data, (Int8)FormatFirstByte::NEGATIVE_FIXINT_HIGH_BOUND, (Int8)FormatFirstByte::NEGATIVE_FIXINT_LOW_BOUND))	// IsInBound args inverted because we expect a negative number
+		else if (data < 0 && CanFit<Int8>(data) && IsInBound((Int8)data, (Int8)FormatFirstByte::negative_fixint_high_bound, (Int8)FormatFirstByte::negative_fixint_low_bound))	// IsInBound args inverted because we expect a negative number
 		{
 			m_data.push_back(static_cast<byte>((Int8)data));
 		}
 		else
 		{
-			if (CanFit<UInt8>(data))
+			if (CanFit<UInt8>(data)) // #CPP17 replace all instances of CanFit() if statement by if constexpr
 			{
-				m_data.push_back((byte)FormatFirstByte::UINT_8);
+				m_data.push_back((byte)FormatFirstByte::uint_8);
 				m_data.push_back(static_cast<byte>(data));
 			}
 
@@ -253,19 +351,19 @@ private:
 			{
 				const auto byteArray = ToBytes<UInt16>(data, Endianness::BIG_ENDIAN);
 
-				InsertBytes<UInt16, FormatFirstByte::UINT_16>(byteArray);
+				InsertBytes<UInt16, FormatFirstByte::uint_16>(byteArray);
 			}
 
 			else if (CanFit<UInt32>(data))
 			{
 				const auto byteArray = ToBytes<UInt32>(data, Endianness::BIG_ENDIAN);
 
-				InsertBytes<UInt32, FormatFirstByte::UINT_32>(byteArray);
+				InsertBytes<UInt32, FormatFirstByte::uint_32>(byteArray);
 			}
 
 			else if (CanFit<Int8>(data))
 			{
-				m_data.push_back((byte)FormatFirstByte::INT_8);
+				m_data.push_back((byte)FormatFirstByte::int_8);
 				m_data.push_back(static_cast<byte>(data));
 			}
 
@@ -273,28 +371,28 @@ private:
 			{
 				const auto byteArray = ToBytes<Int16>(data, Endianness::BIG_ENDIAN);
 
-				InsertBytes<Int16, FormatFirstByte::INT_16>(byteArray);
+				InsertBytes<Int16, FormatFirstByte::int_16>(byteArray);
 			}
 
 			else if (CanFit<int>(data))
 			{
 				const auto byteArray = ToBytes<int>(data, Endianness::BIG_ENDIAN);
 
-				InsertBytes<int, FormatFirstByte::INT_32>(byteArray);
+				InsertBytes<int, FormatFirstByte::int_32>(byteArray);
 			}
 
 			else if (CanFit<UInt64>(data))
 			{
 				const auto byteArray = ToBytes<UInt64>(data, Endianness::BIG_ENDIAN);
 
-				InsertBytes<UInt64, FormatFirstByte::UINT_64>(byteArray);
+				InsertBytes<UInt64, FormatFirstByte::uint_64>(byteArray);
 			}
 
 			else
 			{
 				const auto byteArray = ToBytes<Int64>(data, Endianness::BIG_ENDIAN);
 
-				InsertBytes<Int64, FormatFirstByte::INT_64>(byteArray);
+				InsertBytes<Int64, FormatFirstByte::int_64>(byteArray);
 			}
 		}
 
@@ -312,21 +410,21 @@ class MessagePackDeserializer
 {
 	enum class ItemType
 	{
-		UNDEFINED,
-		BOOL,
-		POSITIVE_FIXUINT,
-		NEGATIVE_FIXINT,
-		UINT8,
-		UINT16,
-		UINT32,
-		UINT64,
-		INT8,
-		INT16,
-		INT32,
-		INT64,
-		TEXT,
-		BYTES_BLOB,
-		ARRAY_SIZE_HELPER
+		undefined,
+		boolean,
+		positive_fix_uint,
+		negative_fix_int,
+		uint8,
+		uint16,
+		uint32,
+		uint64,
+		int8,
+		int16,
+		int32,
+		int64,
+		text,
+		bytes_blob,
+		array_size_helper
 	};
 
 	struct ItemLocation
@@ -360,34 +458,34 @@ public:
 
 		switch (itemDef.type)
 		{
-		case ItemType::POSITIVE_FIXUINT:
+		case ItemType::positive_fix_uint:
 			return (T)bytesRange[0];
 
-		case ItemType::NEGATIVE_FIXINT:
+		case ItemType::negative_fix_int:
 			return (T)(Int8)bytesRange[0];
 
-		case ItemType::UINT8:
+		case ItemType::uint8:
 			return ReadAndCheckInteger<UInt8, T>(bytesRange);
 
-		case ItemType::UINT16:
+		case ItemType::uint16:
 			return ReadAndCheckInteger<UInt16, T>(bytesRange);
 
-		case ItemType::UINT32:
+		case ItemType::uint32:
 			return ReadAndCheckInteger<UInt32, T>(bytesRange);
 
-		case ItemType::UINT64:
+		case ItemType::uint64:
 			return ReadAndCheckInteger<UInt64, T>(bytesRange);
 
-		case ItemType::INT8:
+		case ItemType::int8:
 			return ReadAndCheckInteger<Int8, T>(bytesRange);
 
-		case ItemType::INT16:
+		case ItemType::int16:
 			return ReadAndCheckInteger<Int16, T>(bytesRange);
 
-		case ItemType::INT32:
+		case ItemType::int32:
 			return ReadAndCheckInteger<int, T>(bytesRange);
 
-		case ItemType::INT64:
+		case ItemType::int64:
 			return ReadAndCheckInteger<Int64, T>(bytesRange);
 
 		default:
@@ -399,17 +497,17 @@ public:
 	bool GetValue(const std::string& key) const
 	{
 		const auto itemDef = m_parsedDataLocations.at(key);
-		if (itemDef.type != ItemType::BOOL)
+		if (itemDef.type != ItemType::boolean)
 			throw MessgePackInvalidFormat("The requested value is not of type BOOL");
 
-		return (m_rawData[itemDef.pos] == (byte)FormatFirstByte::BTRUE);
+		return (m_rawData[itemDef.pos] == (byte)FormatFirstByte::btrue);
 	}
 
 	template<>
 	std::string GetValue(const std::string& key) const
 	{
 		const auto itemDef = m_parsedDataLocations.at(key);
-		if (itemDef.type != ItemType::TEXT)
+		if (itemDef.type != ItemType::text)
 			throw MessgePackInvalidFormat("The requested value is not of type TEXT");
 
 		return std::string(m_rawData.begin() + itemDef.pos, m_rawData.begin() + itemDef.pos + itemDef.length);
@@ -419,7 +517,7 @@ public:
 	std::vector<byte> GetValue(const std::string& key) const
 	{
 		const auto itemDef = m_parsedDataLocations.at(key);
-		if (itemDef.type != ItemType::BYTES_BLOB)
+		if (itemDef.type != ItemType::bytes_blob)
 			throw MessgePackInvalidFormat("The requested value is not of type BYTES_BLOB");
 
 		return std::vector<byte>(m_rawData.begin() + itemDef.pos, m_rawData.begin() + itemDef.pos + itemDef.length);
@@ -428,7 +526,7 @@ public:
 	Range<std::vector<byte>> GetByteBlobRange(const std::string& key) const
 	{
 		const auto itemDef = m_parsedDataLocations.at(key);
-		if (itemDef.type != ItemType::BYTES_BLOB)
+		if (itemDef.type != ItemType::bytes_blob)
 			throw MessgePackInvalidFormat("The requested value is not of type BYTES_BLOB");
 
 		Range<std::vector<byte>> range(m_rawData, itemDef.length);
@@ -454,7 +552,7 @@ public:
 		std::vector<T> output;
 		const auto arrayDef = m_parsedDataLocations.at(key);
 
-		if (arrayDef.type != ItemType::ARRAY_SIZE_HELPER)
+		if (arrayDef.type != ItemType::array_size_helper)
 			throw MessgePackInvalidFormat("The requested item is not an array");
 
 		for (size_t i = 0; i < arrayDef.length; i++)
@@ -475,14 +573,14 @@ public:
 	}
 
 private:
-	void ParseMap(Range<std::vector<byte>>& workingRange, const std::string& currentMapName)
+	void ParseMap(Range<ByteContainer>& workingRange, const std::string& currentMapName)
 	{
 		const byte currentFirstByte = workingRange[0];
 		workingRange.Consume(1);
 
 		UInt32 nbItems = 0;
 
-		if (currentFirstByte == (byte)FormatFirstByte::MAP_16)
+		if (currentFirstByte == (byte)FormatFirstByte::map_16)
 		{
 			if (workingRange.Size() < sizeof(UInt16))
 				throw MessgePackInvalidFormat("Byte sequence too short for UInt16");
@@ -491,12 +589,12 @@ private:
 			workingRange.Consume(sizeof(UInt16));
 		}
 
-		else if (IsInBound(currentFirstByte, (byte)FormatFirstByte::FIX_MAP_LOW_BOUND, (byte)FormatFirstByte::FIX_MAP_HIGH_BOUND))
+		else if (IsInBound(currentFirstByte, (byte)FormatFirstByte::fix_map_low_bound, (byte)FormatFirstByte::fix_map_high_bound))
 		{
-			nbItems = static_cast<UInt32>((UInt8)currentFirstByte - (UInt8)FormatFirstByte::FIX_MAP_LOW_BOUND);
+			nbItems = static_cast<UInt32>((UInt8)currentFirstByte - (UInt8)FormatFirstByte::fix_map_low_bound);
 		}
 
-		else if (currentFirstByte == (byte)FormatFirstByte::MAP_32)
+		else if (currentFirstByte == (byte)FormatFirstByte::map_32)
 		{
 			if (workingRange.Size() < sizeof(UInt32))
 				throw MessgePackInvalidFormat("Byte sequence too short for UInt32");
@@ -519,7 +617,7 @@ private:
 		}
 	}
 
-	void ParseNextItem(Range<std::vector<byte>>& workingRange, const std::string& currentMapName, bool allowMap = true)
+	void ParseNextItem(Range<ByteContainer>& workingRange, const std::string& currentMapName, bool allowMap = true)
 	{
 		if (workingRange.Size() == 0)
 			throw MessgePackInvalidFormat("Byte sequence too short");
@@ -531,24 +629,24 @@ private:
 			ParseMap(workingRange, currentMapName);
 
 		// Text
-		else if (IsInBound(currentFirstByte, (byte)FormatFirstByte::FIX_STR_LOW_BOUND, (byte)FormatFirstByte::FIX_STR_HIGH_BOUND))
+		else if (IsInBound(currentFirstByte, (byte)FormatFirstByte::fix_str_low_bound, (byte)FormatFirstByte::fix_str_high_bound))
 			ParseText(workingRange, currentMapName, false);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::STR_8)
+		else if (currentFirstByte == (byte)FormatFirstByte::str_8)
 			ParseText(workingRange, currentMapName, false);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::STR_16)
+		else if (currentFirstByte == (byte)FormatFirstByte::str_16)
 			ParseText(workingRange, currentMapName, false);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::STR_32)
+		else if (currentFirstByte == (byte)FormatFirstByte::str_32)
 			ParseText(workingRange, currentMapName, false);
 
 		// bool
-		else if (currentFirstByte == (byte)FormatFirstByte::BFALSE || currentFirstByte == (byte)FormatFirstByte::BTRUE)
+		else if (currentFirstByte == (byte)FormatFirstByte::bfalse || currentFirstByte == (byte)FormatFirstByte::btrue)
 		{
 			ItemLocation item;
 			item.pos = workingRange.GetCursorPosition();
-			item.type = ItemType::BOOL;
+			item.type = ItemType::boolean;
 
 			m_parsedDataLocations[currentMapName] = item;
 
@@ -556,80 +654,80 @@ private:
 		}
 
 		// Integer
-		else if (IsInBound(currentFirstByte, (byte)FormatFirstByte::POSITIVE_FIXINT_LOW_BOUND, (byte)FormatFirstByte::POSITIVE_FIXINT_HIGH_BOUND))
+		else if (IsInBound(currentFirstByte, (byte)FormatFirstByte::positive_fixint_low_bound, (byte)FormatFirstByte::positive_fixint_high_bound))
 		{
 			ItemLocation item;
 			item.pos = workingRange.GetCursorPosition();
-			item.type = ItemType::POSITIVE_FIXUINT;
+			item.type = ItemType::positive_fix_uint;
 
 			m_parsedDataLocations[currentMapName] = item;
 
 			workingRange.Consume(1);
 		}
 
-		else if (IsInBound(currentFirstByte, (byte)FormatFirstByte::NEGATIVE_FIXINT_HIGH_BOUND, (byte)FormatFirstByte::NEGATIVE_FIXINT_LOW_BOUND))
+		else if (IsInBound(currentFirstByte, (byte)FormatFirstByte::negative_fixint_high_bound, (byte)FormatFirstByte::negative_fixint_low_bound))
 		{
 			ItemLocation item;
 			item.pos = workingRange.GetCursorPosition();
-			item.type = ItemType::NEGATIVE_FIXINT;
+			item.type = ItemType::negative_fix_int;
 
 			m_parsedDataLocations[currentMapName] = item;
 
 			workingRange.Consume(1);
 		}
 
-		else if (currentFirstByte == (byte)FormatFirstByte::UINT_8)
-			ParseInteger<UInt8>(workingRange, ItemType::UINT8, currentMapName);
+		else if (currentFirstByte == (byte)FormatFirstByte::uint_8)
+			ParseInteger<UInt8>(workingRange, ItemType::uint8, currentMapName);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::UINT_16)
-			ParseInteger<UInt16>(workingRange, ItemType::UINT16, currentMapName);
+		else if (currentFirstByte == (byte)FormatFirstByte::uint_16)
+			ParseInteger<UInt16>(workingRange, ItemType::uint16, currentMapName);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::UINT_32)
-			ParseInteger<UInt32>(workingRange, ItemType::UINT32, currentMapName);
+		else if (currentFirstByte == (byte)FormatFirstByte::uint_32)
+			ParseInteger<UInt32>(workingRange, ItemType::uint32, currentMapName);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::UINT_64)
-			ParseInteger<UInt64>(workingRange, ItemType::UINT64, currentMapName);
+		else if (currentFirstByte == (byte)FormatFirstByte::uint_64)
+			ParseInteger<UInt64>(workingRange, ItemType::uint64, currentMapName);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::INT_8)
-			ParseInteger<Int8>(workingRange, ItemType::INT8, currentMapName);
+		else if (currentFirstByte == (byte)FormatFirstByte::int_8)
+			ParseInteger<Int8>(workingRange, ItemType::int8, currentMapName);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::INT_16)
-			ParseInteger<Int16>(workingRange, ItemType::INT16, currentMapName);
+		else if (currentFirstByte == (byte)FormatFirstByte::int_16)
+			ParseInteger<Int16>(workingRange, ItemType::int16, currentMapName);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::INT_32)
-			ParseInteger<int>(workingRange, ItemType::INT32, currentMapName);
+		else if (currentFirstByte == (byte)FormatFirstByte::int_32)
+			ParseInteger<int>(workingRange, ItemType::int32, currentMapName);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::INT_64)
-			ParseInteger<Int64>(workingRange, ItemType::INT64, currentMapName);
+		else if (currentFirstByte == (byte)FormatFirstByte::int_64)
+			ParseInteger<Int64>(workingRange, ItemType::int64, currentMapName);
 
 		// Byte array
-		else if (currentFirstByte == (byte)FormatFirstByte::BIN_8 || currentFirstByte == (byte)FormatFirstByte::BIN_16 || currentFirstByte == (byte)FormatFirstByte::BIN_32)
+		else if (currentFirstByte == (byte)FormatFirstByte::bin_8 || currentFirstByte == (byte)FormatFirstByte::bin_16 || currentFirstByte == (byte)FormatFirstByte::bin_32)
 			ParseByteArray(workingRange, currentMapName);
 
 		// Array
-		else if (IsInBound(currentFirstByte, (byte)FormatFirstByte::FIXARRAY_LOW_BOUND, (byte)FormatFirstByte::FIXARRAY_HIGH_BOUND) || currentFirstByte == (byte)FormatFirstByte::ARRAY_16 || currentFirstByte == (byte)FormatFirstByte::ARRAY_32)
+		else if (IsInBound(currentFirstByte, (byte)FormatFirstByte::fixarray_low_bound, (byte)FormatFirstByte::fixarray_high_bound) || currentFirstByte == (byte)FormatFirstByte::array_16 || currentFirstByte == (byte)FormatFirstByte::array_32)
 		{
 			ParseArray(workingRange, currentMapName);
 		}
 	}
 
-	std::string ParseText(Range<std::vector<byte>>& workingRange, const std::string& keyName, bool isKey)
+	std::string ParseText(Range<ByteContainer>& workingRange, const std::string& keyName, bool isKey)
 	{
 		const byte currentFirstByte = workingRange[0];
 		UInt32 strLength = 0;
 		workingRange.Consume(1);
 
 		// Parse
-		if (IsInBound(currentFirstByte, (byte)FormatFirstByte::FIX_STR_LOW_BOUND, (byte)FormatFirstByte::FIX_STR_HIGH_BOUND))
-			strLength = static_cast<UInt8>(currentFirstByte - (byte)FormatFirstByte::FIX_STR_LOW_BOUND);
+		if (IsInBound(currentFirstByte, (byte)FormatFirstByte::fix_str_low_bound, (byte)FormatFirstByte::fix_str_high_bound))
+			strLength = static_cast<UInt8>(currentFirstByte - (byte)FormatFirstByte::fix_str_low_bound);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::STR_8)
+		else if (currentFirstByte == (byte)FormatFirstByte::str_8)
 			strLength = (UInt32)ReadAndConsumeInteger<UInt8>(workingRange);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::STR_16)
+		else if (currentFirstByte == (byte)FormatFirstByte::str_16)
 			strLength = (UInt32)ReadAndConsumeInteger<UInt16>(workingRange);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::STR_32)
+		else if (currentFirstByte == (byte)FormatFirstByte::str_32)
 			strLength = (UInt32)ReadAndConsumeInteger<UInt16>(workingRange);
 
 		// Process
@@ -651,7 +749,7 @@ private:
 			ItemLocation item;
 			item.length = strLength;
 			item.pos = workingRange.GetCursorPosition();
-			item.type = ItemType::TEXT;
+			item.type = ItemType::text;
 
 			m_parsedDataLocations[keyName] = item;
 			workingRange.Consume(strLength);
@@ -659,25 +757,25 @@ private:
 		}
 	}
 
-	void ParseArray(Range<std::vector<byte>>& workingRange, const std::string& keyName)
+	void ParseArray(Range<ByteContainer>& workingRange, const std::string& keyName)
 	{
 		const byte currentFirstByte = workingRange[0];
 		workingRange.Consume(1);
 		UInt32 nbItems = 0;
 
 		// Parse
-		if (IsInBound(currentFirstByte, (byte)FormatFirstByte::FIXARRAY_LOW_BOUND, (byte)FormatFirstByte::FIXARRAY_HIGH_BOUND))
-			nbItems = static_cast<UInt8>(currentFirstByte - (byte)FormatFirstByte::FIXARRAY_LOW_BOUND);
+		if (IsInBound(currentFirstByte, (byte)FormatFirstByte::fixarray_low_bound, (byte)FormatFirstByte::fixarray_high_bound))
+			nbItems = static_cast<UInt8>(currentFirstByte - (byte)FormatFirstByte::fixarray_low_bound);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::ARRAY_16)
+		else if (currentFirstByte == (byte)FormatFirstByte::array_16)
 			nbItems = (UInt32)ReadAndConsumeInteger<UInt16>(workingRange);
 
-		else if (currentFirstByte == (byte)FormatFirstByte::ARRAY_32)
+		else if (currentFirstByte == (byte)FormatFirstByte::array_32)
 			nbItems = (UInt32)ReadAndConsumeInteger<UInt32>(workingRange);
 
 		// Add helper
 		ItemLocation item;
-		item.type = ItemType::ARRAY_SIZE_HELPER;
+		item.type = ItemType::array_size_helper;
 		item.pos = 0;
 		item.length = nbItems;
 		m_parsedDataLocations[keyName] = item;
@@ -687,18 +785,18 @@ private:
 			ParseNextItem(workingRange, keyName + "." + std::to_string(i), false);
 	}
 
-	void ParseByteArray(Range<std::vector<byte>>& workingRange, const std::string& keyName)
+	void ParseByteArray(Range<ByteContainer>& workingRange, const std::string& keyName)
 	{
 		const byte currentFirstByte = workingRange[0];
 		UInt32 blobLenght = 0;
 
-		if (currentFirstByte == (byte)FormatFirstByte::BIN_8)
+		if (currentFirstByte == (byte)FormatFirstByte::bin_8)
 			blobLenght = (UInt32)ReadAndConsumeInteger<UInt8>(workingRange);
 
-		if (currentFirstByte == (byte)FormatFirstByte::BIN_16)
+		if (currentFirstByte == (byte)FormatFirstByte::bin_16)
 			blobLenght = (UInt32)ReadAndConsumeInteger<UInt16>(workingRange);
 
-		if (currentFirstByte == (byte)FormatFirstByte::BIN_32)
+		if (currentFirstByte == (byte)FormatFirstByte::bin_32)
 			blobLenght = ReadAndConsumeInteger<UInt32>(workingRange);
 
 		workingRange.Consume(1);
@@ -706,13 +804,13 @@ private:
 		ItemLocation item;
 		item.length = blobLenght;
 		item.pos = workingRange.GetCursorPosition();
-		item.type = ItemType::BYTES_BLOB;
+		item.type = ItemType::bytes_blob;
 
 		m_parsedDataLocations[keyName] = item;
 	}
 
 	template <typename T>
-	void ParseInteger(Range<std::vector<byte>>& workingRange, ItemType itemType, const std::string& keyName)
+	void ParseInteger(Range<ByteContainer>& workingRange, ItemType itemType, const std::string& keyName)
 	{
 		workingRange.Consume(1); // Consume the type specifier
 
@@ -725,7 +823,7 @@ private:
 	}
 
 	template <typename SOURCE_TYPE, typename TARGET_TYPE>
-	TARGET_TYPE ReadAndCheckInteger(Range<std::vector<byte>>& bytesRange) const
+	TARGET_TYPE ReadAndCheckInteger(Range<ByteContainer>& bytesRange) const
 	{
 		auto value = ReadInteger<SOURCE_TYPE>(bytesRange);
 
@@ -736,7 +834,7 @@ private:
 	}
 
 	template <typename T>
-	T ReadAndConsumeInteger(Range<std::vector<byte>>& bytesRange)
+	T ReadAndConsumeInteger(Range<ByteContainer>& bytesRange)
 	{
 		T value = ReadInteger<T>(bytesRange);
 		bytesRange.Consume(sizeof(T));
@@ -746,11 +844,11 @@ private:
 
 	bool IsFirstByteMapIndex(byte nextByte) const
 	{
-		return (nextByte == (byte)FormatFirstByte::MAP_16 || IsInBound(nextByte, (byte)FormatFirstByte::FIX_MAP_LOW_BOUND, (byte)FormatFirstByte::FIX_MAP_HIGH_BOUND) || nextByte == (byte)FormatFirstByte::MAP_32);
+		return (nextByte == (byte)FormatFirstByte::map_16 || IsInBound(nextByte, (byte)FormatFirstByte::fix_map_low_bound, (byte)FormatFirstByte::fix_map_high_bound) || nextByte == (byte)FormatFirstByte::map_32);
 	}
 
 	template <typename T>
-	static T ReadInteger(const Range<std::vector<byte>>& bytesRange)
+	static T ReadInteger(const Range<ByteContainer>& bytesRange)
 	{
 		std::array<byte, sizeof(T)> bytes;
 		std::copy(bytesRange.begin(), bytesRange.begin() + sizeof(T), bytes.begin());
@@ -758,7 +856,7 @@ private:
 		return FromBytes<T>(bytes, Endianness::BIG_ENDIAN);
 	}
 
-	static std::string ReadText(const Range<std::vector<byte>>& workingRange, UInt32 length)
+	static std::string ReadText(const Range<ByteContainer>& workingRange, UInt32 length)
 	{
 		if (length > workingRange.Size())
 			throw MessgePackInvalidFormat("Byte sequence too short");
