@@ -9,7 +9,7 @@ UInt64 ReadExplicitLength(Range<std::vector<byte>>& data)
 {
 	data.Consume(1);	// Consume the byte defining the type of which the length is encoded
 
-	if (data.Size() < sizeof(T))
+	if (data.size() < sizeof(T))
 		throw std::exception("Not enough bytes to make the requested type");
 
 	auto length = (UInt64)FromBytes<T>(data, Endianness::BIG_ENDIAN);
@@ -82,7 +82,7 @@ void NetworkPayload::Insert(Range<std::array<byte, READ_BUFFER_SIZE>>& range)
 			m_headerData = std::vector<byte>();
 			m_headerData->reserve(3);
 
-			const size_t upperBound = (range.Size() >= HEADER_MIN_LENGTH) ? HEADER_MIN_LENGTH : range.Size();
+			const size_t upperBound = (range.size() >= HEADER_MIN_LENGTH) ? HEADER_MIN_LENGTH : range.size();
 			m_headerData->insert(m_headerData->end(), range.begin(), range.begin() + upperBound);
 			range.Consume(upperBound);
 
@@ -92,7 +92,7 @@ void NetworkPayload::Insert(Range<std::array<byte, READ_BUFFER_SIZE>>& range)
 		if (!m_payloadLengthIndicatorSize && m_headerData->size() < HEADER_MIN_LENGTH)
 		{
 			// The very first bytes before calling ReadHeaderFirstPart are not all here yet
-			const size_t upperBound = (range.Size() >= HEADER_MIN_LENGTH - m_headerData->size()) ? HEADER_MIN_LENGTH - m_headerData->size() : range.Size();
+			const size_t upperBound = (range.size() >= HEADER_MIN_LENGTH - m_headerData->size()) ? HEADER_MIN_LENGTH - m_headerData->size() : range.size();
 			m_headerData->insert(m_headerData->end(), range.begin(), range.begin() + upperBound);
 			range.Consume(upperBound);
 		}
@@ -104,7 +104,7 @@ void NetworkPayload::Insert(Range<std::array<byte, READ_BUFFER_SIZE>>& range)
 
 		if (m_payloadLengthIndicatorSize && headerInfo->payloadLength == 0)
 		{
-			const size_t upperBound = (range.Size() > m_payloadLengthIndicatorSize.value()) ? m_payloadLengthIndicatorSize.value() : range.Size();
+			const size_t upperBound = (range.size() > m_payloadLengthIndicatorSize.value()) ? m_payloadLengthIndicatorSize.value() : range.size();
 			m_headerData->insert(m_headerData->end(), range.begin(), range.begin() + upperBound);
 			range.Consume(upperBound);
 
@@ -125,7 +125,7 @@ void NetworkPayload::Insert(Range<std::array<byte, READ_BUFFER_SIZE>>& range)
 		ASSERT(headerInfo->payloadLength > 0);
 
 		const size_t bytesLeft = BytesLeft();
-		const size_t upperBound = (range.Size() < bytesLeft) ? range.Size() : bytesLeft;
+		const size_t upperBound = (range.size() < bytesLeft) ? range.size() : bytesLeft;
 
 		payloadData.insert(payloadData.end(), range.begin(), range.begin() + upperBound);
 		range.Consume(upperBound);

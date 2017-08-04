@@ -11,6 +11,8 @@
 #include "StringExtensions.hpp"
 #include "Diagnostic.hpp"
 
+using namespace std::literals::string_literals;	// Force the use of the string litreal suffix
+
 enum class FormatFirstByte
 {
 	nil = 0xc0,
@@ -119,12 +121,6 @@ public:
 	{
 		AppendItem(name);
 		AppendItem(data);
-	}
-
-	void OrderedAppend(const std::string& name, const char* str)
-	{
-		AppendItem(name);
-		AppendItem(std::string(str));
 	}
 
 	void OrderedAppend(const std::string& name, const std::string& str)
@@ -440,13 +436,7 @@ class MessagePackDeserializer
 public:
 	MessagePackDeserializer(const std::vector<byte>& data) : m_rawData(data)
 	{
-	}
-
-	void Parse()
-	{
-		Range<std::vector<byte>> range(m_rawData);
-
-		ParseMap(range, "");
+		Parse();
 	}
 
 	template <typename T, typename = std::enable_if<std::is_integral<T>::value>>
@@ -573,6 +563,13 @@ public:
 	}
 
 private:
+	void Parse()
+	{
+		Range<std::vector<byte>> range(m_rawData);
+
+		ParseMap(range, "");
+	}
+
 	void ParseMap(Range<ByteContainer>& workingRange, const std::string& currentMapName)
 	{
 		const byte currentFirstByte = workingRange[0];
@@ -582,7 +579,7 @@ private:
 
 		if (currentFirstByte == (byte)FormatFirstByte::map_16)
 		{
-			if (workingRange.Size() < sizeof(UInt16))
+			if (workingRange.size() < sizeof(UInt16))
 				throw MessgePackInvalidFormat("Byte sequence too short for UInt16");
 
 			nbItems = (UInt32)ReadInteger<UInt16>(workingRange);
@@ -596,7 +593,7 @@ private:
 
 		else if (currentFirstByte == (byte)FormatFirstByte::map_32)
 		{
-			if (workingRange.Size() < sizeof(UInt32))
+			if (workingRange.size() < sizeof(UInt32))
 				throw MessgePackInvalidFormat("Byte sequence too short for UInt32");
 
 			nbItems = ReadInteger<UInt32>(workingRange);
@@ -619,7 +616,7 @@ private:
 
 	void ParseNextItem(Range<ByteContainer>& workingRange, const std::string& currentMapName, bool allowMap = true)
 	{
-		if (workingRange.Size() == 0)
+		if (workingRange.size() == 0)
 			throw MessgePackInvalidFormat("Byte sequence too short");
 
 		const byte currentFirstByte = workingRange[0];
@@ -858,7 +855,7 @@ private:
 
 	static std::string ReadText(const Range<ByteContainer>& workingRange, UInt32 length)
 	{
-		if (length > workingRange.Size())
+		if (length > workingRange.size())
 			throw MessgePackInvalidFormat("Byte sequence too short");
 
 		return std::string(workingRange.begin(), workingRange.begin() + length);
