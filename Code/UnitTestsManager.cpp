@@ -13,10 +13,14 @@ void UnitTestsManager::RunTests(const std::string& testsPath /*= ""*/)
 	int errorsCount = 0;
 	const auto toExecuteTestsCount = (int)m_registeredUnitTests.size();
 
+	SortTests();
+
 	Log("EXECUTING " + std::to_string(toExecuteTestsCount) + " UNIT TESTS...");
 
 	for (const UnitTest& test : m_registeredUnitTests)
 	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(3));	// Weirds things happen when all the function follow themselves too fast
+
 		std::string errorMsg = "";
 		bool testResult = test.Run(errorMsg);
 
@@ -60,4 +64,12 @@ void UnitTestsManager::Log(const std::string& msg, ConsoleColors color /*= Conso
 #ifdef _WIN32
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);	// Reset to default color
 #endif
+}
+
+void UnitTestsManager::SortTests()
+{
+	std::sort(m_registeredUnitTests.begin(), m_registeredUnitTests.end(), [](UnitTest& left, UnitTest& right)
+	{
+		return (left.GetFullName() < right.GetFullName());
+	});
 }

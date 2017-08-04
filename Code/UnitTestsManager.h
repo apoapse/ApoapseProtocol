@@ -32,6 +32,7 @@ public:
 
 private:
 	void Log(const std::string& msg, ConsoleColors color = ConsoleColors::DEFAULT) const;
+	void SortTests();
 };
 
 class UnitTestAutoRegister

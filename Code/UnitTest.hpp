@@ -22,8 +22,8 @@ public:
 
 class UnitTest
 {
-	const std::function<void()> m_testCode;
-	const std::string m_fullName;
+	std::function<void()> m_testCode;
+	std::string m_fullName;
 
 public:
 	UnitTest(const std::string& fullName, const std::function<void()> code)
@@ -32,7 +32,7 @@ public:
 	{
 	}
 
-	bool operator== (const UnitTest& other)
+	bool operator== (const UnitTest& other) const
 	{
 		return m_fullName == other.GetFullName();
 	}
