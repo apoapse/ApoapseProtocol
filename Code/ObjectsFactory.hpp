@@ -8,6 +8,7 @@ class ObjectsFactory
 {
 	struct IObjectCreator
 	{
+		virtual ~IObjectCreator() = default;
 		virtual std::unique_ptr<T_BASE_CLASS> Create() = 0;
 	};
 

@@ -118,18 +118,22 @@ struct CommandInfo
 
 class Command
 {
-	std::shared_ptr<NetworkPayload> m_rawData;
 	bool m_isValid{ false };
 
 protected:
 	std::unique_ptr<MessagePackDeserializer> m_deserializedData;
 
 public:
+	virtual ~Command() = default;
+
 	void Parse(std::shared_ptr<NetworkPayload> data);
 	bool IsValid() const;
 	virtual CommandInfo& GetInfo() const = 0;
 
 private:
 	void AutoValidate();
+
+	bool DoesFieldHasValue(const  CommandField &field) const;
+
 	bool ValidateField(const CommandField& field, bool valueExist);
 };

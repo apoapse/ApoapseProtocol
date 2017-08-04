@@ -4,20 +4,21 @@
 #include "Range.hpp"
 #include <memory>
 #include "Commands.hpp"
+#include <chrono>
 struct NetworkPayload;
 
 class GenericConnection : public TCPConnection
 {
-	std::array<byte, READ_BUFFER_SIZE> m_readBuffer;
-	//TODO: last activity counter
+	std::array<byte, READ_BUFFER_SIZE> m_readBuffer; // #THREADING
+	std::chrono::steady_clock::time_point m_lastActivityTime;// #TODO USE #THREADING
 public:
 	GenericConnection(boost::asio::io_service& ioService);
-	virtual ~GenericConnection();
+	virtual ~GenericConnection() override = default;
 
 	void Send(Commands command, std::shared_ptr<std::vector<byte>> data, TCPConnection* excludedConnection);
 	
 private:
-	bool OnConnectedToServer() override;
+	bool OnConnectedToServerInternal() override;
 	bool OnReceivedError(const boost::system::error_code& error) override;
 	void StartReading();
 	void ProcessHeader(Range<std::array<byte, READ_BUFFER_SIZE>>& range);
@@ -25,7 +26,11 @@ private:
 	void ReadPayloadData(std::shared_ptr<NetworkPayload> payload);
 	void OnReceivedHeaderData(size_t bytesTransferred);
 	void OnReceivedPayloadData(size_t bytesTransferred, std::shared_ptr<NetworkPayload> payload);
+	void OnReceivedPayloadInternal(std::shared_ptr<NetworkPayload> payload);
+	virtual void OnSendingSuccessful(size_t bytesTransferred) override;
+	void UpdateLastActivityClock();
 
 protected:
-	virtual void OnReceivedPayloadInternal(std::shared_ptr<NetworkPayload> payload);
+	virtual bool OnConnectedToServer() = 0;
+	virtual void OnReceivedPayload(std::shared_ptr<NetworkPayload> payload) = 0;
 };

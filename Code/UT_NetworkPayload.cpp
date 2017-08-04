@@ -83,7 +83,7 @@ UNIT_TEST("NetworkPayload:InsertRawData")
 
 	auto payload = NetworkPayload();
 	payload.Insert(range);
-	UnitTest::Assert(payload.headerInfo->command == Commands::CONNECT && payload.headerInfo->payloadLength == 3 && payload.payloadData.size() == 3 && range.Size() == 1);
+	UnitTest::Assert(payload.headerInfo->command == Commands::CONNECT && payload.headerInfo->payloadLength == 3 && payload.payloadData.size() == 3 && range.size() == 1);
 } UNIT_TEST_END
 
 UNIT_TEST("NetworkPayload:GenerateHeader")

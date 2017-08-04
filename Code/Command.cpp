@@ -8,12 +8,9 @@ void Command::Parse(std::shared_ptr<NetworkPayload> data)
 {
 	ASSERT(m_deserializedData.get() == nullptr);
 
-	m_rawData = std::move(data);
-	m_deserializedData = std::make_unique<MessagePackDeserializer>(m_rawData->payloadData);
-
 	try
 	{
-		m_deserializedData->Parse();
+		m_deserializedData = std::make_unique<MessagePackDeserializer>(data->payloadData);
 	}
 	catch (const std::exception& e)
 	{
@@ -41,7 +38,7 @@ void Command::AutoValidate()
 
 		try
 		{
-			valueExist = field.fieldValueValidator->HasValue(field.name, *m_deserializedData.get());
+			valueExist = DoesFieldHasValue(field);
 		}
 		catch (const std::exception& e)
 		{
@@ -66,6 +63,11 @@ void Command::AutoValidate()
 #endif // DEBUG
 		}
 	}
+}
+
+bool Command::DoesFieldHasValue(const CommandField &field) const
+{
+	return field.fieldValueValidator->HasValue(field.name, *m_deserializedData.get());
 }
 
 bool Command::ValidateField(const CommandField& field, bool valueExist)

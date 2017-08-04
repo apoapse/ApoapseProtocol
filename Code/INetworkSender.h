@@ -10,6 +10,8 @@ using BytesWrapper = std::shared_ptr<std::vector<byte>>;
 
 struct INetworkSender
 {
+	virtual ~INetworkSender() = default;
+
 	//************************************
 	// Method:    INetworkSender::Send - Send a byte array to a connection or a list of connections (in the case of an user for instance)
 	// Access:    virtual public 

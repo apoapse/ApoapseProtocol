@@ -23,6 +23,8 @@ bool TCPConnection::IsConnected() const
 
 void TCPConnection::Close()
 {
+	LOG << "Manual closing of the TCP connection socket " << GetEndpoint();
+
 	m_isConnected = false;
 	m_socket.close();
 }
@@ -46,7 +48,7 @@ void TCPConnection::HandleConnectAsync(const boost::system::error_code& error)
 		OnReceivedErrorInternal(error);
 	else
 	{
-		this->OnConnectedToServer();
+		this->OnConnectedToServerInternal();
 		m_isConnected = true;
 	}
 }
@@ -142,10 +144,11 @@ void TCPConnection::HandleWriteAsync(const boost::system::error_code& error, siz
 		if (itemRealSize == bytesTransferred)
 		{
 			LOG << bytesTransferred << " bytes has been sent successfully to " << GetEndpoint() << LogSeverity::debug;
+			OnSendingSuccessful(bytesTransferred);
 		}
 		else
 		{
-			LOG << itemRealSize << " bytes expected to be sent to " << GetEndpoint() << " but " << bytesTransferred << " bytes has been transferred" << LogSeverity::error;
+			LOG << itemRealSize << " bytes expected to be sent to " << GetEndpoint() << " but only " << bytesTransferred << " bytes has been transferred" << LogSeverity::error;
 			Close();
 		}
 	}
