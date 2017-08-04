@@ -138,6 +138,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="UT_Uuid.cpp">
+    <ClCompile Include="Uuid.cpp" />
     <ClInclude Include="ByteUtils.hpp" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommandsManager.h" />
@@ -189,6 +191,7 @@
     <ClCompile Include="UT_StringExtensions.cpp">
       <FileType>CppHeader</FileType>
     </ClCompile>
+    <ClInclude Include="Uuid.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Command.cpp" />
