@@ -100,6 +100,7 @@ using ByteContainer = std::vector<byte>;
 class MessagePackSerializer
 {
 	std::vector<byte> m_data;
+	//std::shared_ptr<ByteContainer> m_data;
 
 	std::optional<
 		std::map<std::string, std::vector<ByteContainer>>
@@ -189,7 +190,7 @@ public:
 	}
 #pragma endregion Unordered
 
-	const std::vector<byte>& GetMessagePackBytes() const
+	std::vector<byte>& GetMessagePackBytes()
 	{
 		return m_data;
 	}
@@ -289,7 +290,7 @@ private:
 		m_data.insert(m_data.end(), str.begin(), str.end());
 	}
 
-	void AppendItem(const ByteContainer& data)
+	void AppendItem(const std::vector<byte>& data)
 	{
 		if (!CanFit<UInt32>(data.size()))
 			throw std::out_of_range("The byte array size is too high to fit into a UInt32");
@@ -519,7 +520,7 @@ public:
 		if (itemDef.type != ItemType::bytes_blob)
 			throw MessgePackInvalidFormat("The requested value is not of type BYTES_BLOB");
 
-		Range<std::vector<byte>> range(m_rawData, itemDef.length);
+		Range<std::vector<byte>> range(m_rawData, itemDef.pos + itemDef.length);
 		range.Consume(itemDef.pos);
 
 		return range;
@@ -699,7 +700,7 @@ private:
 
 		// Byte array
 		else if (currentFirstByte == (byte)FormatFirstByte::bin_8 || currentFirstByte == (byte)FormatFirstByte::bin_16 || currentFirstByte == (byte)FormatFirstByte::bin_32)
-			ParseByteArray(workingRange, currentMapName);
+			ParseByteBlob(workingRange, currentMapName);
 
 		// Array
 		else if (IsInBound(currentFirstByte, (byte)FormatFirstByte::fixarray_low_bound, (byte)FormatFirstByte::fixarray_high_bound) || currentFirstByte == (byte)FormatFirstByte::array_16 || currentFirstByte == (byte)FormatFirstByte::array_32)
@@ -782,24 +783,24 @@ private:
 			ParseNextItem(workingRange, keyName + "." + std::to_string(i), false);
 	}
 
-	void ParseByteArray(Range<ByteContainer>& workingRange, const std::string& keyName)
+	void ParseByteBlob(Range<ByteContainer>& workingRange, const std::string& keyName)
 	{
 		const byte currentFirstByte = workingRange[0];
-		UInt32 blobLenght = 0;
-
-		if (currentFirstByte == (byte)FormatFirstByte::bin_8)
-			blobLenght = (UInt32)ReadAndConsumeInteger<UInt8>(workingRange);
-
-		if (currentFirstByte == (byte)FormatFirstByte::bin_16)
-			blobLenght = (UInt32)ReadAndConsumeInteger<UInt16>(workingRange);
-
-		if (currentFirstByte == (byte)FormatFirstByte::bin_32)
-			blobLenght = ReadAndConsumeInteger<UInt32>(workingRange);
-
 		workingRange.Consume(1);
 
+		UInt32 blobLength = 0;
+
+		if (currentFirstByte == (byte)FormatFirstByte::bin_8)
+			blobLength = (UInt32)ReadAndConsumeInteger<UInt8>(workingRange);
+
+		if (currentFirstByte == (byte)FormatFirstByte::bin_16)
+			blobLength = (UInt32)ReadAndConsumeInteger<UInt16>(workingRange);
+
+		if (currentFirstByte == (byte)FormatFirstByte::bin_32)
+			blobLength = ReadAndConsumeInteger<UInt32>(workingRange);
+
 		ItemLocation item;
-		item.length = blobLenght;
+		item.length = blobLength;
 		item.pos = workingRange.GetCursorPosition();
 		item.type = ItemType::bytes_blob;
 
