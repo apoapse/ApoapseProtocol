@@ -31,6 +31,13 @@ const std::array<byte, uuidLengthInBytes>& Uuid::GetInRawFormat() const
 	return m_uuidRawFormat;
 }
 
+std::vector<byte> Uuid::GetAsByteVector() const
+{
+	std::vector<byte> output(m_uuidRawFormat.begin(), m_uuidRawFormat.end());
+
+	return output;
+}
+
 bool Uuid::operator==(const Uuid& other)
 {
 	return std::equal(m_uuidRawFormat.begin(), m_uuidRawFormat.end(), other.GetInRawFormat().begin());

@@ -9,19 +9,28 @@
 
 struct NetworkMessageHeader
 {
-	Commands command;
+	CommandId command;
 	UInt64 payloadLength = 0;
 };
 
-struct NetworkPayload
+class NetworkPayload
 {
+public:
+	static constexpr size_t payloadMaxAllowedLength = 8'000'000;	// 8 MB
+
 	std::optional<NetworkMessageHeader> headerInfo;
 	std::vector<byte> payloadData;
 
 	void Insert(Range<std::array<byte, READ_BUFFER_SIZE>>& data);
 	size_t BytesLeft() const;
 
-	static std::vector<byte> GenerateHeader(Commands command, const std::vector<byte>& data);
+	NetworkPayload() = default;
+
+	// WARNING: Make sure to pass the data with an std::move
+	NetworkPayload(CommandId command, std::vector<byte>&& data);
+
+	static std::vector<byte> GenerateHeader(CommandId command, const std::vector<byte>& data);
+	std::vector<byte> GetHeaderData() const;
 	
 private:
 	void ReadHeaderFirstPart();

@@ -18,6 +18,13 @@ UInt64 ReadExplicitLength(Range<std::vector<byte>>& data)
 	return length;
 }
 
+NetworkPayload::NetworkPayload(CommandId command, std::vector<byte>&& data)
+{
+	payloadData = std::move(data);
+	m_headerData = GenerateHeader(command, payloadData);
+	m_isFirstInsert = false;
+}
+
 void NetworkPayload::ReadHeaderFirstPart()
 {
 	Range<std::vector<byte>> data(m_headerData.value(), HEADER_MIN_LENGTH);
@@ -25,7 +32,7 @@ void NetworkPayload::ReadHeaderFirstPart()
 
 	ASSERT(m_headerData->size() >= HEADER_MIN_LENGTH);
 
-	headerInfo->command = (Commands)FromBytes<UInt16>(data, Endianness::BIG_ENDIAN);
+	headerInfo->command = (CommandId)FromBytes<UInt16>(data, Endianness::BIG_ENDIAN);
 	data.Consume(sizeof(UInt16));
 
 	switch (data[0])
@@ -129,6 +136,9 @@ void NetworkPayload::Insert(Range<std::array<byte, READ_BUFFER_SIZE>>& range)
 
 		payloadData.insert(payloadData.end(), range.begin(), range.begin() + upperBound);
 		range.Consume(upperBound);
+
+		if (payloadData.size() >= payloadMaxAllowedLength)
+			throw std::length_error("");
 	}
 }
 
@@ -153,7 +163,7 @@ size_t NetworkPayload::BytesLeft() const
 	}
 }
 
-std::vector<byte> NetworkPayload::GenerateHeader(Commands command, const std::vector<byte>& data)
+std::vector<byte> NetworkPayload::GenerateHeader(CommandId command, const std::vector<byte>& data)
 {
 	std::vector<byte> headerBytes;
 	headerBytes.reserve(HEADER_MIN_LENGTH);
@@ -198,4 +208,11 @@ std::vector<byte> NetworkPayload::GenerateHeader(Commands command, const std::ve
 	}
 
 	return headerBytes;
+}
+
+std::vector<byte> NetworkPayload::GetHeaderData() const
+{
+	ASSERT(m_headerData);
+
+	return m_headerData.value();
 }

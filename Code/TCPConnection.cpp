@@ -113,22 +113,43 @@ void TCPConnection::Send(StrWrapper strPtr, TCPConnection* excludedConnection/* 
 	// 	}));
 }
 
+void TCPConnection::Send(std::unique_ptr<NetworkPayload> payload, TCPConnection* excludedConnection /*= nullptr*/)
+{
+	ASSERT(excludedConnection == nullptr);
+
+	const bool isWriteInProgress = !m_sendQueue.empty();
+	m_sendQueue.emplace_back(std::move(payload));
+
+	if (!isWriteInProgress)
+		InternalSend();
+
+	// #TODO #THREADING Use the following code to make the Send operation thread safe
+	// m_socket.get_io_service().post(m_writeStrand.wrap([bytesPtr = std::move(bytesPtr), this]() mutable
+	// 	{
+	// 
+	// 	}));
+}
+
 void TCPConnection::InternalSend()
 {
 	const auto& item = m_sendQueue.front();
 
-	ASSERT_MSG(std::holds_alternative<StrWrapper>(item) || std::holds_alternative<BytesWrapper>(item), "Unsupported input type");
+	auto handler = boost::bind(&TCPConnection::HandleWriteAsync, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
 
-	if (std::holds_alternative<StrWrapper>(item))
+	if (std::holds_alternative<std::unique_ptr<NetworkPayload>>(item))
+	{		
+		boost::asio::async_write(m_socket, boost::asio::buffer(std::get<std::unique_ptr<NetworkPayload>>(item)->GetHeaderData()), handler);
+		boost::asio::async_write(m_socket, boost::asio::buffer(std::get<std::unique_ptr<NetworkPayload>>(item)->payloadData), handler);
+	}
+	else if (std::holds_alternative<StrWrapper>(item))
 	{
-		auto handler = boost::bind(&TCPConnection::HandleWriteAsync, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
 		boost::asio::async_write(m_socket, boost::asio::buffer(*std::get<StrWrapper>(item)), handler);
 	}
 	else
 	{
-		auto handler = boost::bind(&TCPConnection::HandleWriteAsync, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
 		boost::asio::async_write(m_socket, boost::asio::buffer(*std::get<BytesWrapper>(item)), handler);
 	}
+	
 }
 
 void TCPConnection::HandleWriteAsync(const boost::system::error_code& error, size_t bytesTransferred)
@@ -139,7 +160,23 @@ void TCPConnection::HandleWriteAsync(const boost::system::error_code& error, siz
 	if (!error)
 	{
 		const auto& item = m_sendQueue.front();
-		const size_t itemRealSize = std::holds_alternative<StrWrapper>(item) ? std::get<StrWrapper>(item)->length() : std::get<BytesWrapper>(item)->size();
+
+		size_t itemRealSize = 0;
+
+		if (std::holds_alternative<std::unique_ptr<NetworkPayload>>(item))
+		{
+			auto& payload = std::get<std::unique_ptr<NetworkPayload>>(item);
+			itemRealSize = payload->GetHeaderData().size() + payload->payloadData.size();
+		}
+		else if (std::holds_alternative<StrWrapper>(item))
+		{
+			itemRealSize = std::get<StrWrapper>(item)->length();
+		}
+		else
+		{
+			itemRealSize = std::get<BytesWrapper>(item)->size();
+		}
+		ASSERT(itemRealSize > 0);
 
 		if (itemRealSize == bytesTransferred)
 		{

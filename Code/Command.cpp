@@ -3,6 +3,7 @@
 #include "Common.h"
 #include "NetworkPayload.h"
 #include "MacroUtils.hpp"
+#include "GenericConnection.h"
 
 void Command::Parse(std::shared_ptr<NetworkPayload> data)
 {
@@ -24,6 +25,12 @@ void Command::Parse(std::shared_ptr<NetworkPayload> data)
 bool Command::IsValid() const
 {
 	return m_isValid;
+}
+
+void Command::Send(MessagePackSerializer& data, INetworkSender& destination, TCPConnection* excludedConnection/* = nullptr*/)
+{
+	auto payload = std::make_unique<NetworkPayload>(GetInfo().command, std::move(data.GetMessagePackBytes()));
+	destination.Send(std::move(payload), excludedConnection);
 }
 
 void Command::AutoValidate()

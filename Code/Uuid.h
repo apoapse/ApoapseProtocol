@@ -16,6 +16,7 @@ public:
 	Uuid(Range<std::vector<byte>>& range);
 
 	const std::array<byte, uuidLengthInBytes>& GetInRawFormat() const;
+	std::vector<byte> GetAsByteVector() const;
 
 	bool operator==(const Uuid& other);
 

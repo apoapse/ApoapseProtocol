@@ -1,8 +1,8 @@
 #pragma once
 #include "TypeDefs.hpp"
 
-enum class Commands : UInt16
+enum class CommandId : UInt16
 {
-	ERROR_MSG							= 1,
-	CONNECT								= 2
+	error_msg							= 1,
+	connect								= 2
 };

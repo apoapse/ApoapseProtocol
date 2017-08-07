@@ -25,14 +25,14 @@ class ObjectsFactory
 	std::map<KEY, std::unique_ptr<IObjectCreator>> m_objectFactories;
 
 public:
-	bool IsObjectExist(const KEY& index) const
+	bool DoesObjectExist(const KEY& index) const
 	{
 		return (m_objectFactories.count(index) > 0);
 	}
 
 	std::unique_ptr<T_BASE_CLASS> CreateObject(const KEY& index)
 	{
-		ASSERT_MSG(IsObjectExist(index), "The requested object does not exist");
+		ASSERT_MSG(DoesObjectExist(index), "The requested object does not exist");
 
 		return m_objectFactories[index]->Create();
 	}
@@ -41,7 +41,7 @@ public:
 	void RegisterObject(const KEY& index)
 	{
 		static_assert(std::is_base_of<T_BASE_CLASS, T_CLASS>::value);
-		ASSERT_MSG(!IsObjectExist(index), "This object is already registered");
+		ASSERT_MSG(!DoesObjectExist(index), "This object is already registered");
 
 		m_objectFactories[index] = std::make_unique<Creator<T_CLASS>>();
 	}

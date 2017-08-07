@@ -143,6 +143,8 @@
       <FileType>CppHeader</FileType>
     </ClCompile>
     <ClCompile Include="Uuid.cpp" />
+    <ClInclude Include="ApoapseError.hpp" />
+    <ClInclude Include="ApoapseErrorCodes.hpp" />
     <ClInclude Include="ByteUtils.hpp" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommandsManager.h" />
@@ -154,6 +156,7 @@
     <ClInclude Include="Diagnostic.hpp" />
     <ClInclude Include="eLogSeverity.hpp" />
     <ClInclude Include="DllExportSymbolApi.hpp" />
+    <ClInclude Include="CmdError.h" />
     <ClInclude Include="GenericConnection.h" />
     <ClInclude Include="ILogger.hpp" />
     <ClInclude Include="INetworkSender.h" />
@@ -161,6 +164,7 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="MacroUtils.hpp" />
     <ClInclude Include="Maths.hpp" />
+    <ClInclude Include="MemoryUtils.hpp" />
     <ClInclude Include="NetworkPayload.h" />
     <ClInclude Include="ObjectsFactory.hpp" />
     <ClInclude Include="Range.hpp" />
@@ -177,6 +181,7 @@
     <ClInclude Include="MessagePack.hpp" />
     <ClInclude Include="UnitTest.hpp" />
     <ClInclude Include="UnitTestsManager.h" />
+    <ClCompile Include="CmdError.cpp" />
     <ClCompile Include="SQLQuery.cpp" />
     <ClCompile Include="TCPServer.cpp" />
     <ClCompile Include="UT_ByteUtils.cpp">

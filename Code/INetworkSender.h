@@ -29,4 +29,8 @@ struct INetworkSender
 	// Parameter: GenericConnection * excludedConnection - In case the implementation of this function send to multiple connections, this argument can be used to exclude one particular connection where the data will not be sent.
 	//************************************
 	virtual void Send(StrWrapper strPtr, TCPConnection* excludedConnection = nullptr) = 0;
+
+	virtual void Send(std::unique_ptr<class NetworkPayload> data, TCPConnection* excludedConnection = nullptr) = 0;
+
+	virtual boost::asio::ip::tcp::endpoint GetEndpoint() const = 0;
 };

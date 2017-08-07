@@ -5,7 +5,7 @@
 #include <memory>
 #include "Commands.hpp"
 #include <chrono>
-struct NetworkPayload;
+class NetworkPayload;
 
 class GenericConnection : public TCPConnection
 {
@@ -14,8 +14,6 @@ class GenericConnection : public TCPConnection
 public:
 	GenericConnection(boost::asio::io_service& ioService);
 	virtual ~GenericConnection() override = default;
-
-	void Send(Commands command, std::shared_ptr<std::vector<byte>> data, TCPConnection* excludedConnection);
 	
 private:
 	bool OnConnectedToServerInternal() override;

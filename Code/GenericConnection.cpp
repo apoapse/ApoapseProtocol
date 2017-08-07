@@ -3,23 +3,11 @@
 #include "Common.h"
 #include "MessagePack.hpp"
 #include "NetworkPayload.h"
+#include "ApoapseError.hpp"
 
 GenericConnection::GenericConnection(boost::asio::io_service& ioService) : TCPConnection(ioService)
 {
 
-}
-
-void GenericConnection::Send(Commands command, std::shared_ptr<std::vector<byte>> data, TCPConnection* excludedConnection)
-{
-	if (excludedConnection == this)
-		return;
-
-	{
-		auto header = std::make_shared<std::vector<byte>>(NetworkPayload::GenerateHeader(command, *data));	// #TODO #OPTIMIZATION Find a way to use a unique_ptr instead, the blocker to that are the boost::bind in TCPConnection
-		TCPConnection::Send(header);
-	}
-
-	TCPConnection::Send(data);
 }
 
 bool GenericConnection::OnConnectedToServerInternal()
@@ -75,9 +63,15 @@ void GenericConnection::ProcessDataGeneric(Range<std::array<byte, READ_BUFFER_SI
 		else
 			ReadPayloadData(std::move(payload));
 	}
+	catch (const std::length_error& e)
+	{
+		ApoapseError::SendError(ApoapseErrorCode::network_message_too_long, *this);
+		Close();
+	}
 	catch (const std::exception& e)
 	{
 		LOG << e << LogSeverity::error;
+		ApoapseError::SendError(ApoapseErrorCode::internal_server_error, *this);
 		Close();
 	}
 }

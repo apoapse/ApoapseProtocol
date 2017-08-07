@@ -14,7 +14,7 @@ UNIT_TEST("NetworkPayload:ReadHeader:16bitLength")
 	auto payload = NetworkPayload();
 	payload.Insert(range);
 
-	UnitTest::Assert(payload.headerInfo->command == Commands::CONNECT && payload.headerInfo->payloadLength == 3);
+	UnitTest::Assert(payload.headerInfo->command == CommandId::connect && payload.headerInfo->payloadLength == 3);
 } UNIT_TEST_END
 
 UNIT_TEST("NetworkPayload:ReadHeader:32bitLength")
@@ -28,7 +28,7 @@ UNIT_TEST("NetworkPayload:ReadHeader:32bitLength")
 	auto payload = NetworkPayload();
 	payload.Insert(range);
 
-	UnitTest::Assert(payload.headerInfo->command == Commands::CONNECT && payload.headerInfo->payloadLength == 986246);
+	UnitTest::Assert(payload.headerInfo->command == CommandId::connect && payload.headerInfo->payloadLength == 986246);
 } UNIT_TEST_END
 
 UNIT_TEST("NetworkPayload:ReadHeader:64bitLength")
@@ -42,7 +42,7 @@ UNIT_TEST("NetworkPayload:ReadHeader:64bitLength")
 	auto payload = NetworkPayload();
 	payload.Insert(range);
 
-	UnitTest::Assert(payload.headerInfo->command == Commands::ERROR_MSG && payload.headerInfo->payloadLength == 5000000000);
+	UnitTest::Assert(payload.headerInfo->command == CommandId::error_msg && payload.headerInfo->payloadLength == 5000000000);
 } UNIT_TEST_END
 
 UNIT_TEST("NetworkPayload:ReadHeader:8bitLength")
@@ -56,7 +56,7 @@ UNIT_TEST("NetworkPayload:ReadHeader:8bitLength")
 	auto payload = NetworkPayload();
 	payload.Insert(range);
 
-	UnitTest::Assert(payload.headerInfo->command == Commands::CONNECT && payload.headerInfo->payloadLength == 86);
+	UnitTest::Assert(payload.headerInfo->command == CommandId::connect && payload.headerInfo->payloadLength == 86);
 } UNIT_TEST_END
 
 UNIT_TEST("NetworkPayload:ReadHeader:8bitLength:2")
@@ -70,7 +70,7 @@ UNIT_TEST("NetworkPayload:ReadHeader:8bitLength:2")
 	auto payload = NetworkPayload();
 	payload.Insert(range);
 
-	UnitTest::Assert(payload.headerInfo->command == Commands::ERROR_MSG && payload.headerInfo->payloadLength == 3);
+	UnitTest::Assert(payload.headerInfo->command == CommandId::error_msg && payload.headerInfo->payloadLength == 3);
 } UNIT_TEST_END
 
 UNIT_TEST("NetworkPayload:InsertRawData")
@@ -83,13 +83,13 @@ UNIT_TEST("NetworkPayload:InsertRawData")
 
 	auto payload = NetworkPayload();
 	payload.Insert(range);
-	UnitTest::Assert(payload.headerInfo->command == Commands::CONNECT && payload.headerInfo->payloadLength == 3 && payload.payloadData.size() == 3 && range.size() == 1);
+	UnitTest::Assert(payload.headerInfo->command == CommandId::connect && payload.headerInfo->payloadLength == 3 && payload.payloadData.size() == 3 && range.size() == 1);
 } UNIT_TEST_END
 
 UNIT_TEST("NetworkPayload:GenerateHeader")
 {
 	std::vector<byte> data{ 0x01, 0x02, 0x03, 0x01, 0x02, 0x03, 0xff };
-	auto header = NetworkPayload::GenerateHeader(Commands::CONNECT, data);
+	auto header = NetworkPayload::GenerateHeader(CommandId::connect, data);
 
 	UnitTest::Assert(header.size() == 3);
 } UNIT_TEST_END
@@ -97,7 +97,7 @@ UNIT_TEST("NetworkPayload:GenerateHeader")
 UNIT_TEST("NetworkPayload:GenerateHeader2")
 {
 	std::vector<byte> data{ 0x01, 0x02, 0x03, 0x01, 0x02, 0x03, 0xff };
-	auto header = NetworkPayload::GenerateHeader(Commands::CONNECT, data);
+	auto header = NetworkPayload::GenerateHeader(CommandId::connect, data);
 	std::array<byte, READ_BUFFER_SIZE> headerDataArr;
 
 	std::copy(header.begin(), header.end(), headerDataArr.begin());
@@ -106,5 +106,5 @@ UNIT_TEST("NetworkPayload:GenerateHeader2")
 	auto payload = NetworkPayload();
 	payload.Insert(range);
 
-	UnitTest::Assert(payload.headerInfo->command == Commands::CONNECT && payload.headerInfo->payloadLength == 7);
+	UnitTest::Assert(payload.headerInfo->command == CommandId::connect && payload.headerInfo->payloadLength == 7);
 } UNIT_TEST_END

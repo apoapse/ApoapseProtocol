@@ -8,7 +8,7 @@
 #include "INetworkSender.h"
 #include "Commands.hpp"
 
-struct NetworkPayload;
+class NetworkPayload;
 
 struct IFieldValidator
 {
@@ -102,7 +102,7 @@ struct CommandField
 struct CommandInfo
 {
 	//std::string name;
-	Commands command;
+	CommandId command;
 	std::vector<CommandField> fields;
 // 	std::function<void(ClientConnection&)> processFromClient = { NULL };
 // 	std::function<bool(LocalUser&, ClientConnection&)> processFromUser = { NULL };
@@ -119,8 +119,6 @@ struct CommandInfo
 class Command
 {
 	bool m_isValid{ false };
-
-protected:
 	std::unique_ptr<MessagePackDeserializer> m_deserializedData;
 
 public:
@@ -130,10 +128,11 @@ public:
 	bool IsValid() const;
 	virtual CommandInfo& GetInfo() const = 0;
 
+protected:
+	void Send(MessagePackSerializer& data, INetworkSender& destination, TCPConnection* excludedConnection = nullptr);
+
 private:
 	void AutoValidate();
-
 	bool DoesFieldHasValue(const  CommandField &field) const;
-
 	bool ValidateField(const CommandField& field, bool valueExist);
 };

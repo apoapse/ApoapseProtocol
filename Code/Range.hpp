@@ -32,6 +32,11 @@ public:
 		return m_associatedArray[m_cursorPosition + pos];
 	}
 
+	typename T::value_type at(size_t pos) const
+	{
+		return m_associatedArray.at(m_cursorPosition + pos);
+	}
+
 	size_t size() const
 	{
 		return (m_upperBound - m_cursorPosition);	// No risk of integer overflow as Consume() would have trown an exception if m_cursorPosition become higher than the array actual size

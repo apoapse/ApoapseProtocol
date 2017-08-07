@@ -6,6 +6,7 @@
 #include <boost\bind.hpp>
 #include <deque>
 #include <variant>
+#include "NetworkPayload.h"
 
 class TCPConnection : public std::enable_shared_from_this<TCPConnection>, public INetworkSender
 {
@@ -17,7 +18,7 @@ private:
 	std::atomic<bool> m_isConnected = { false };
 	//boost::asio::io_service::strand m_writeStrand;
 
-	std::deque<std::variant<BytesWrapper, StrWrapper>> m_sendQueue;
+	std::deque<std::variant<BytesWrapper, StrWrapper, std::unique_ptr<NetworkPayload>>> m_sendQueue;
 
 public:
 	using TCPConnection_ptr = std::shared_ptr<TCPConnection>;
@@ -37,6 +38,7 @@ public:
 
 	void Send(BytesWrapper bytesPtr, TCPConnection* excludedConnection = nullptr) override;
 	void Send(StrWrapper strPtr, TCPConnection* excludedConnection = nullptr) override;
+	void Send(std::unique_ptr<NetworkPayload> payload, TCPConnection* excludedConnection = nullptr) override;
 
 private:
 	void HandleConnectAsync(const boost::system::error_code& error);
