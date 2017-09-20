@@ -19,33 +19,32 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{8F57335E-BE7D-466B-9860-74AD3ED4F810}</ProjectGuid>
-    <RootNamespace>ApoapseCore</RootNamespace>
+    <ProjectGuid>{A1FFE00D-482E-473E-87A5-D849319532E2}</ProjectGuid>
+    <RootNamespace>DatabaseImpl_sqlite</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -69,40 +68,53 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)vs_build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)ThirdParty;C:\Program Files\boost\boost_1_63_0;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)vs_build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)ThirdParty;C:\Program Files\boost\boost_1_63_0;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
-    <IncludePath>C:\Program Files\boost\boost_1_64_0;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
-    <EnableCppCoreCheck>true</EnableCppCoreCheck>
+    <IncludePath>..\ThirdParty\sqlite\include;C:\Program Files\boost\boost_1_63_0;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
+    <LibraryPath>..\ThirdParty\sqlite\sqlite-dll-win64-x64-3160200;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
-    <IncludePath>C:\Program Files\boost\boost_1_64_0;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+    <IntDir>$(SolutionDir)vs_build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)ThirdParty;C:\Program Files\boost\boost_1_63_0;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>COMPILE_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Code\</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\sqlite-dll-win64-x64-3160200</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)ThirdParty\sqlite-dll-win64-x64-3160200\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>UNIT_TESTS;_WIN32_WINNT=0x0501;DEBUG;_SCL_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PreprocessorDefinitions>DYN_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\ApoapseCore\Code\</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
-    <Lib>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_64_0\lib64-msvc-14.1;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <LinkTimeCodeGeneration>
-      </LinkTimeCodeGeneration>
-    </Lib>
+    <Link>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -111,10 +123,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>COMPILE_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Code\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\sqlite-dll-win64-x64-3160200</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)ThirdParty\sqlite-dll-win64-x64-3160200\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -124,101 +140,21 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PreprocessorDefinitions>COMPILE_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Code\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\sqlite-dll-win64-x64-3160200</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)ThirdParty\sqlite-dll-win64-x64-3160200\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <Lib>
-      <AdditionalDependencies>C:\Program Files\boost\boost_1_63_0\lib64-msvc-14.0;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_64_0\lib64-msvc-14.1;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="SecurityAlert.cpp" />
-    <ClCompile Include="UT_MessagePack.cpp" />
-    <ClCompile Include="UT_Uuid.cpp">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
-    <ClCompile Include="Uuid.cpp" />
-    <ClInclude Include="SecurityAlert.h" />
-    <ClInclude Include="ApoapseErrorCodes.hpp" />
-    <ClInclude Include="ByteUtils.hpp" />
-    <ClInclude Include="Command.h" />
-    <ClInclude Include="CommandsManager.h" />
-    <ClInclude Include="Commands.hpp" />
-    <ClInclude Include="Common.h" />
-    <ClInclude Include="ConnectCmdBase.h" />
-    <ClInclude Include="Database.hpp" />
-    <ClInclude Include="DateTimeUtils.h" />
-    <ClInclude Include="Diagnostic.hpp" />
-    <ClInclude Include="eLogSeverity.hpp" />
-    <ClInclude Include="DllExportSymbolApi.hpp" />
-    <ClInclude Include="CmdError.h" />
-    <ClInclude Include="GenericConnection.h" />
-    <ClInclude Include="ILogger.hpp" />
-    <ClInclude Include="INetworkSender.h" />
-    <ClInclude Include="LibraryLoader.hpp" />
-    <ClInclude Include="Log.h" />
-    <ClInclude Include="Logger.h" />
-    <ClInclude Include="MacroUtils.hpp" />
-    <ClInclude Include="Maths.hpp" />
-    <ClInclude Include="MemoryUtils.hpp" />
-    <ClInclude Include="NetworkPayload.h" />
-    <ClInclude Include="ObjectsFactory.hpp" />
-    <ClInclude Include="Range.hpp" />
-    <ClInclude Include="ReadBufferSize.hpp" />
-    <ClInclude Include="SQLPackagedResult.hpp" />
-    <ClInclude Include="SQLQuery.h" />
-    <ClInclude Include="SQLValue.hpp" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="StringExtensions.hpp" />
-    <ClInclude Include="TCPConnection.h" />
-    <ClInclude Include="TCPServer.h" />
-    <ClInclude Include="ThreadPool.h" />
-    <ClInclude Include="TypeDefs.hpp" />
-    <ClInclude Include="MessagePack.hpp" />
-    <ClInclude Include="UnitTest.hpp" />
-    <ClInclude Include="UnitTestsManager.h" />
-    <ClCompile Include="CmdError.cpp" />
-    <ClCompile Include="SQLQuery.cpp" />
-    <ClCompile Include="TCPServer.cpp" />
-    <ClCompile Include="UT_ByteUtils.cpp">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
-    <ClCompile Include="UT_DateTimeUtils.cpp">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
-    <ClCompile Include="UT_Maths.cpp">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
-    <ClCompile Include="UT_NetworkPayload.cpp">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
-    <ClCompile Include="UT_StringExtensions.cpp">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
-    <ClInclude Include="Uuid.h" />
+    <ClCompile Include="SQLite.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Command.cpp" />
-    <ClCompile Include="CommandsManager.cpp" />
-    <ClCompile Include="Common.cpp" />
-    <ClCompile Include="DateTimeUtils.cpp" />
-    <ClCompile Include="GenericConnection.cpp" />
-    <ClCompile Include="Log.cpp" />
-    <ClCompile Include="Logger.cpp" />
-    <ClCompile Include="NetworkPayload.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="TCPConnection.cpp" />
-    <ClCompile Include="ThreadPool.cpp" />
-    <ClCompile Include="UnitTestsManager.cpp" />
+    <ClInclude Include="SQLite.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

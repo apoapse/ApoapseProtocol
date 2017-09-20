@@ -3,7 +3,8 @@
 #include "Common.h"
 #include "MessagePack.hpp"
 #include "NetworkPayload.h"
-#include "ApoapseError.hpp"
+#include "SecurityAlert.h"
+#include "CommandsManager.h"
 
 GenericConnection::GenericConnection(boost::asio::io_service& ioService) : TCPConnection(ioService)
 {
@@ -46,14 +47,14 @@ void GenericConnection::ProcessDataGeneric(Range<std::array<byte, READ_BUFFER_SI
 		{
 			if (range.size() == 0)
 			{
-				OnReceivedPayloadInternal(std::move(payload));
+				OnReceivedPayload(std::move(payload));
 				StartReading();
 			}
 			else
 			{
-				OnReceivedPayloadInternal(std::move(payload));
+				OnReceivedPayload(std::move(payload));
 	
-				// The buffer has data for more than one network payload
+				// The buffer has data for more than one network payload, so we create a new one
 				auto payloadLocal = std::make_shared<NetworkPayload>();
 				payloadLocal->Insert(range);
 	
@@ -63,15 +64,14 @@ void GenericConnection::ProcessDataGeneric(Range<std::array<byte, READ_BUFFER_SI
 		else
 			ReadPayloadData(std::move(payload));
 	}
-	catch (const std::length_error& e)
+	catch (const std::length_error&)
 	{
-		ApoapseError::SendError(ApoapseErrorCode::network_message_too_long, *this);
+		SecurityLog::LogAlert(ApoapseErrorCode::network_message_too_long, *this);
 		Close();
 	}
 	catch (const std::exception& e)
 	{
 		LOG << e << LogSeverity::error;
-		ApoapseError::SendError(ApoapseErrorCode::internal_server_error, *this);
 		Close();
 	}
 }
@@ -97,14 +97,21 @@ void GenericConnection::OnReceivedPayloadData(size_t bytesTransferred, std::shar
 	ProcessDataGeneric(range, std::move(payload));
 }
 
-void GenericConnection::OnReceivedPayloadInternal(std::shared_ptr<NetworkPayload> payload)
+void GenericConnection::OnReceivedPayload(std::shared_ptr<NetworkPayload> payload)
 {
-	ASSERT(payload->headerInfo->payloadLength == payload->payloadData.size());
+	if (payload->headerInfo->payloadLength != payload->payloadData.size())
+	{
+		SecurityLog::LogAlert(ApoapseErrorCode::wrong_network_payload_length, *this);
+		return;
+	}
 
-	LOG_DEBUG_FUNCTION_NAME();
-	LOG_DEBUG << "payloadLength: " << payload->headerInfo->payloadLength;
+	if (CommandsManager::GetInstance().CommandExist(payload->headerInfo->command))
+	{
+		SecurityLog::LogAlert(ApoapseErrorCode::unknown_cmd, *this);
+		return;
+	}
 
-	OnReceivedPayload(std::move(payload));
+	OnReceivedCommand(CommandsManager::GetInstance().CreateCommand(payload->headerInfo->command));
 }
 
 void GenericConnection::OnSendingSuccessful(size_t bytesTransferred)

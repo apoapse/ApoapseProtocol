@@ -32,13 +32,17 @@ public:
 	}
 
 	boost::asio::ip::tcp::endpoint GetEndpoint() const;
+
+	// INetworkSender
 	void Connect(const std::string& adress, const UInt16 port);
 	bool IsConnected() const;
-	void Close();
+	void Close() override;
 
 	void Send(BytesWrapper bytesPtr, TCPConnection* excludedConnection = nullptr) override;
 	void Send(StrWrapper strPtr, TCPConnection* excludedConnection = nullptr) override;
 	void Send(std::unique_ptr<NetworkPayload> payload, TCPConnection* excludedConnection = nullptr) override;
+
+	std::string GetEndpointStr() const override;
 
 private:
 	void HandleConnectAsync(const boost::system::error_code& error);

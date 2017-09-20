@@ -32,5 +32,7 @@ struct INetworkSender
 
 	virtual void Send(std::unique_ptr<class NetworkPayload> data, TCPConnection* excludedConnection = nullptr) = 0;
 
-	virtual boost::asio::ip::tcp::endpoint GetEndpoint() const = 0;
+	//virtual boost::asio::ip::tcp::endpoint GetEndpoint() const = 0;
+	virtual std::string GetEndpointStr() const = 0;
+	virtual void Close() = 0;
 };

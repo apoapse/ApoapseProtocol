@@ -83,22 +83,19 @@
       <Filter>Network\Sockets</Filter>
     </ClInclude>
     <ClInclude Include="Database.hpp">
-      <Filter>DataAbstractionLayer</Filter>
+      <Filter>DatabaseAbstractionLayer</Filter>
     </ClInclude>
     <ClInclude Include="SQLPackagedResult.hpp">
-      <Filter>DataAbstractionLayer</Filter>
+      <Filter>DatabaseAbstractionLayer</Filter>
     </ClInclude>
     <ClInclude Include="SQLValue.hpp">
-      <Filter>DataAbstractionLayer</Filter>
+      <Filter>DatabaseAbstractionLayer</Filter>
     </ClInclude>
     <ClInclude Include="SQLQuery.h">
-      <Filter>DataAbstractionLayer</Filter>
+      <Filter>DatabaseAbstractionLayer</Filter>
     </ClInclude>
     <ClInclude Include="DllExportSymbolApi.hpp">
       <Filter>DllUtils</Filter>
-    </ClInclude>
-    <ClInclude Include="ApoapseError.hpp">
-      <Filter>Network\Protocol</Filter>
     </ClInclude>
     <ClInclude Include="CmdError.h">
       <Filter>CommandSystem\CommandBases</Filter>
@@ -110,6 +107,12 @@
       <Filter>UUID</Filter>
     </ClInclude>
     <ClInclude Include="ApoapseErrorCodes.hpp">
+      <Filter>Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="LibraryLoader.hpp">
+      <Filter>DllUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="SecurityAlert.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
   </ItemGroup>
@@ -165,7 +168,7 @@
       <Filter>Network\Sockets</Filter>
     </ClCompile>
     <ClCompile Include="SQLQuery.cpp">
-      <Filter>DataAbstractionLayer</Filter>
+      <Filter>DatabaseAbstractionLayer</Filter>
     </ClCompile>
     <ClCompile Include="CmdError.cpp">
       <Filter>CommandSystem\CommandBases</Filter>
@@ -178,6 +181,9 @@
     </ClCompile>
     <ClCompile Include="UT_MessagePack.cpp">
       <Filter>UnitTests\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="SecurityAlert.cpp">
+      <Filter>Network\Protocol</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -223,9 +229,6 @@
     <Filter Include="CommandSystem\CommandBases">
       <UniqueIdentifier>{a8b63e2c-e2b6-4912-9c85-58f282d17773}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DataAbstractionLayer">
-      <UniqueIdentifier>{c218d407-5201-4351-8c72-7a03c70be57b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="DllUtils">
       <UniqueIdentifier>{8f17086c-17e4-49b4-a5cb-291a1ace29f8}</UniqueIdentifier>
     </Filter>
@@ -234,6 +237,9 @@
     </Filter>
     <Filter Include="UUID">
       <UniqueIdentifier>{c19efa4d-99ed-44b8-bd06-12ac0d718d4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DatabaseAbstractionLayer">
+      <UniqueIdentifier>{c218d407-5201-4351-8c72-7a03c70be57b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

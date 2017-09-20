@@ -27,6 +27,16 @@ bool Command::IsValid() const
 	return m_isValid;
 }
 
+void Command::Process(const GenericConnection& sender)
+{
+	ASSERT_MSG(false, "This function should never be called directly, it should by overloaded by the command class");
+}
+
+void Command::Process(const User& sender, const GenericConnection& senderConnection)
+{
+	ASSERT_MSG(false, "This function should never be called directly, it should by overloaded by the command class");
+}
+
 void Command::Send(MessagePackSerializer& data, INetworkSender& destination, TCPConnection* excludedConnection/* = nullptr*/)
 {
 	auto payload = std::make_unique<NetworkPayload>(GetInfo().command, std::move(data.GetMessagePackBytes()));
@@ -79,7 +89,7 @@ bool Command::DoesFieldHasValue(const CommandField &field) const
 
 bool Command::ValidateField(const CommandField& field, bool valueExist)
 {
-	if (field.requirement == FieldRequirement::ANY_MENDATORY && !valueExist)
+	if (field.requirement == FieldRequirement::any_mendatory && !valueExist)
 	{
 		LOG << "Command auto validate: required field " << field.name << " on command " << (UInt16)GetInfo().command << " is missing" << LogSeverity::warning;
 		return false;

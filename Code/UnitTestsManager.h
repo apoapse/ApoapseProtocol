@@ -3,6 +3,7 @@
 #include "MacroUtils.hpp"
 #include <vector>
 #include <string>
+#include "TypeDefs.hpp"
 
 class UnitTestsManager
 {

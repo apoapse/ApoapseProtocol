@@ -11,14 +11,14 @@ CommandInfo& CmdError::GetInfo() const
 	info.command = CommandId::error_msg;
 	info.fields =
 	{
-		CommandField{ "error_code", FieldRequirement::ANY_MENDATORY },
-		CommandField{ "related_item", FieldRequirement::ANY_OPTIONAL, FIELD_VALUE_VALIDATOR(std::vector<byte>, Uuid::IsValid) },
+		CommandField{ "error_code", FieldRequirement::any_mendatory },
+		CommandField{ "related_item", FieldRequirement::any_optional, FIELD_VALUE_VALIDATOR(std::vector<byte>, Uuid::IsValid) },
 	};
 
 	return info;
 }
 
-void CmdError::SendError(ApoapseErrorCode error, INetworkSender& destination, class Uuid* relatedElement /*= nullptr*/)
+void CmdError::SendError(ApoapseErrorCode error, INetworkSender& destination, const Uuid* relatedElement /*= nullptr*/)
 {
 	MessagePackSerializer serializer;
 

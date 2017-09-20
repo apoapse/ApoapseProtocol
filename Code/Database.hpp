@@ -4,8 +4,10 @@
 class SQLValue;
 class SQLPackagedResult;
 
-struct Database
+struct IDatabase
 {
+	virtual ~IDatabase() = default;
+
 	virtual bool Open(const char** params, size_t paramsCount) = 0;
 	virtual void Close() = 0;
 

@@ -9,6 +9,9 @@
 #include "Commands.hpp"
 
 class NetworkPayload;
+class User;
+class GenericConnection;
+
 
 struct IFieldValidator
 {
@@ -88,8 +91,8 @@ public:
 
 enum class FieldRequirement
 {
-	ANY_OPTIONAL,
-	ANY_MENDATORY
+	any_optional,
+	any_mendatory
 };
 
 struct CommandField
@@ -107,7 +110,9 @@ struct CommandInfo
 // 	std::function<void(ClientConnection&)> processFromClient = { NULL };
 // 	std::function<bool(LocalUser&, ClientConnection&)> processFromUser = { NULL };
 // 	std::function<void(RemoteServer&)> processFromRemoteServer = { NULL };
-	bool propagateToUser = { false };
+	bool requireAuthentication = { false };
+	bool onlyNonAuthenticated = { false };
+	bool propagateToSenderConnections = { false }; // #TODO 
 
 	~CommandInfo()
 	{
@@ -127,6 +132,9 @@ public:
 	void Parse(std::shared_ptr<NetworkPayload> data);
 	bool IsValid() const;
 	virtual CommandInfo& GetInfo() const = 0;
+
+	virtual void Process(const GenericConnection& sender);
+	virtual void Process(const User& sender, const GenericConnection& senderConnection);
 
 protected:
 	void Send(MessagePackSerializer& data, INetworkSender& destination, TCPConnection* excludedConnection = nullptr);

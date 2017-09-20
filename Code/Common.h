@@ -5,12 +5,14 @@
 #include "Diagnostic.hpp"
 #include "Logger.h"
 #include "ThreadPool.h"
+#include "MemoryUtils.hpp"
+#include "Database.hpp"
 
 struct Global
 {
-	//std::unique_ptr<ISettingsManager> settings;
-	std::unique_ptr<class ThreadPool> threadPool;
+	std::unique_ptr<ThreadPool> threadPool;
 	std::unique_ptr<Logger> logger;
+	IDatabase* database = nullptr;
 
 	// Only defined on the server
 	class ServerSettings* settings = nullptr;

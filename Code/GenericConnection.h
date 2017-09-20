@@ -5,6 +5,7 @@
 #include <memory>
 #include "Commands.hpp"
 #include <chrono>
+#include "Command.h"
 class NetworkPayload;
 
 class GenericConnection : public TCPConnection
@@ -24,11 +25,12 @@ private:
 	void ReadPayloadData(std::shared_ptr<NetworkPayload> payload);
 	void OnReceivedHeaderData(size_t bytesTransferred);
 	void OnReceivedPayloadData(size_t bytesTransferred, std::shared_ptr<NetworkPayload> payload);
-	void OnReceivedPayloadInternal(std::shared_ptr<NetworkPayload> payload);
+	void OnReceivedPayload(std::shared_ptr<NetworkPayload> payload);
 	virtual void OnSendingSuccessful(size_t bytesTransferred) override;
 	void UpdateLastActivityClock();
 
 protected:
 	virtual bool OnConnectedToServer() = 0;
-	virtual void OnReceivedPayload(std::shared_ptr<NetworkPayload> payload) = 0;
+	virtual void OnReceivedCommand(std::unique_ptr<Command> cmd) = 0;
+	//virtual bool CanProcessCommandFromThisConnection(CommandId command) = 0;
 };

@@ -43,12 +43,12 @@ public:
 
 class SQLQuery
 {
-	Database& m_database;
+	IDatabase& m_database;
 	std::stringstream m_query;
 	std::vector<SQLValue*> m_values;
 
 public:
-	SQLQuery(Database& database) : m_database(database)
+	SQLQuery(IDatabase& database) : m_database(database)
 	{
 	}
 

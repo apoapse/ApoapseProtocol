@@ -81,7 +81,8 @@ void TCPConnection::HandleReadInternal(const std::function<void(size_t)>& handle
 
 void TCPConnection::Send(BytesWrapper bytesPtr, TCPConnection* excludedConnection/* = nullptr*/)
 {
-	ASSERT(excludedConnection == nullptr);
+	if (excludedConnection == this)
+		return;
 
 	const bool isWriteInProgress = !m_sendQueue.empty();
 	m_sendQueue.emplace_back(bytesPtr);
@@ -98,7 +99,8 @@ void TCPConnection::Send(BytesWrapper bytesPtr, TCPConnection* excludedConnectio
 
 void TCPConnection::Send(StrWrapper strPtr, TCPConnection* excludedConnection/* = nullptr*/)
 {
-	ASSERT(excludedConnection == nullptr);
+	if (excludedConnection == this)
+		return;
 
 	const bool isWriteInProgress = !m_sendQueue.empty();
 	m_sendQueue.emplace_back(std::move(strPtr));
@@ -115,7 +117,8 @@ void TCPConnection::Send(StrWrapper strPtr, TCPConnection* excludedConnection/* 
 
 void TCPConnection::Send(std::unique_ptr<NetworkPayload> payload, TCPConnection* excludedConnection /*= nullptr*/)
 {
-	ASSERT(excludedConnection == nullptr);
+	if (excludedConnection == this)
+		return;
 
 	const bool isWriteInProgress = !m_sendQueue.empty();
 	m_sendQueue.emplace_back(std::move(payload));
@@ -128,6 +131,11 @@ void TCPConnection::Send(std::unique_ptr<NetworkPayload> payload, TCPConnection*
 	// 	{
 	// 
 	// 	}));
+}
+
+std::string TCPConnection::GetEndpointStr() const
+{
+	return GetEndpoint().address().to_string() + ":" + std::to_string(GetEndpoint().port());
 }
 
 void TCPConnection::InternalSend()

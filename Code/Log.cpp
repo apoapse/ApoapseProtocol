@@ -30,6 +30,10 @@ void LogMessage::GenerateSeverityPrefix()
 		severityPrefix = "FATAL ERROR: ";
 		break;
 
+	case LogSeverity::security_alert:
+		severityPrefix = "SECURITY ALERT: ";
+		break;
+
 	default:
 		severityPrefix = "";
 		break;

@@ -149,7 +149,6 @@ public:
 	template <typename T>
 	void UnorderedAppend(const std::string& name, T data)
 	{
-		//const auto[groupName, fieldName] = ReadFieldGroupAndName(name);	#CPP17
 		const auto names = ReadFieldGroupAndName(name);
 		const auto fieldName = names.second;
 
@@ -160,7 +159,6 @@ public:
 	template <typename T>
 	void UnorderedAppendArray(const std::string& name, const std::vector<T>& arr)
 	{
-		//const auto[groupName, fieldName] = ReadFieldGroupAndName(name);	#CPP17
 		const auto names = ReadFieldGroupAndName(name);
 		const auto fieldName = names.second;
 
@@ -201,9 +199,8 @@ private:
 		if (!m_unorderedFields)
 			m_unorderedFields = std::map<std::string, std::vector<ByteContainer>>();
 
-		//const auto[groupName, fieldName] = names;	#CPP17
-		const auto groupName = names.first;
-		const auto fieldName = names.second;
+		const auto[groupName, fieldName] = names;
+
 		ASSERT_MSG(!fieldName.empty(), "The field name cannot be empty");
 
 		const std::vector<byte> dataCopy = std::move(m_data);

@@ -7,5 +7,6 @@ enum class LogSeverity
 	debug,
 	warning,
 	error,
-	fatalError	// Warning: this will only log a message as fatal error, use FatalError() to actually end the program
+	fatalError,	// Warning: this will only log a message as fatal error, use FatalError() to actually end the program
+	security_alert
 };

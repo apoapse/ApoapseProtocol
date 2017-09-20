@@ -145,6 +145,9 @@ UInt16 Logger::GetConsoleColorBySeverity(LogSeverity severity)
 	case LogSeverity::fatalError:
 		return FOREGROUND_RED | FOREGROUND_INTENSITY;						// Red
 
+	case LogSeverity::security_alert:
+		return FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
+
 	default:
 		return 7;															//	Default color (light gray)
 	}

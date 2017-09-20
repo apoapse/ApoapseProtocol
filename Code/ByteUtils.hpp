@@ -2,6 +2,8 @@
 #include "TypeDefs.hpp"
 #include <array>
 #include "Range.hpp"
+#include <sstream>
+#include <iomanip>
 
 // #ifdef _WIN32
 // #define BOOST_LITTLE_ENDIAN 1
@@ -60,4 +62,20 @@ inline T FromBytes(Range<RANGE_TYPE>& bytes, Endianness endianness = Endianness:
 		std::reverse_copy(bytes.begin(), bytes.begin() + sizeof(T), static_cast<byte*>(static_cast<void*>(std::addressof(output))));
 
 	return output;
+}
+
+template <typename T>
+std::string BytesToHexString(const T& bytesArray)
+{
+	static_assert(std::is_same<T::value_type, byte>::value, "The array provided do not contain bytes");
+
+	std::stringstream ss;
+	ss << std::hex << std::setfill('0');
+
+	for (const auto& byte : bytesArray)
+	{
+		ss << static_cast<Int16>(byte);
+	}
+
+	return ss.str();
 }

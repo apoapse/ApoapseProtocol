@@ -8,7 +8,7 @@ class CmdError : public Command
 public:
 	CommandInfo& GetInfo() const override;
 
-	void SendError(ApoapseErrorCode error, INetworkSender& destination, class Uuid* relatedElement = nullptr);
+	void SendError(ApoapseErrorCode error, INetworkSender& destination, const class Uuid* relatedElement = nullptr);
 	
 private:
 };
