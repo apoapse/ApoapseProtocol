@@ -144,6 +144,7 @@
       <FileType>CppHeader</FileType>
     </ClCompile>
     <ClCompile Include="Uuid.cpp" />
+    <ClInclude Include="Json.hpp" />
     <ClInclude Include="SecurityAlert.h" />
     <ClInclude Include="ApoapseErrorCodes.hpp" />
     <ClInclude Include="ByteUtils.hpp" />

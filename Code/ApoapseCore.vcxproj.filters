@@ -115,6 +115,9 @@
     <ClInclude Include="SecurityAlert.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
+    <ClInclude Include="Json.hpp">
+      <Filter>Parsers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">

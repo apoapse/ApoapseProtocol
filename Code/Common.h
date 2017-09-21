@@ -17,6 +17,9 @@ struct Global
 	// Only defined on the server
 	class ServerSettings* settings = nullptr;
 
+	// Only defined on the client
+	class HTMLUI* htmlUI = nullptr;
+
 	Global() = default;
 
 	static Global* CreateGlobal()
