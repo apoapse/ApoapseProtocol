@@ -18,7 +18,7 @@ public:
 	
 private:
 	bool OnConnectedToServerInternal() override;
-	bool OnReceivedError(const boost::system::error_code& error) override;
+	virtual bool OnReceivedError(const boost::system::error_code& error) override;
 	void StartReading();
 	void ProcessHeader(Range<std::array<byte, READ_BUFFER_SIZE>>& range);
 	void ProcessDataGeneric(Range<std::array<byte, READ_BUFFER_SIZE>>& range, std::shared_ptr<NetworkPayload> payload);

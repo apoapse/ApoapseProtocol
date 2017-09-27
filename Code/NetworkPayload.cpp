@@ -212,7 +212,7 @@ std::vector<byte> NetworkPayload::GenerateHeader(CommandId command, const std::v
 
 std::vector<byte> NetworkPayload::GetHeaderData() const
 {
-	ASSERT(m_headerData);
+	ASSERT(m_headerData.has_value() && m_headerData->size() > 0);
 
 	return m_headerData.value();
 }

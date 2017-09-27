@@ -67,7 +67,6 @@ void GenericConnection::ProcessDataGeneric(Range<std::array<byte, READ_BUFFER_SI
 	catch (const std::length_error&)
 	{
 		SecurityLog::LogAlert(ApoapseErrorCode::network_message_too_long, *this);
-		Close();
 	}
 	catch (const std::exception& e)
 	{
@@ -83,6 +82,7 @@ void GenericConnection::ReadPayloadData(std::shared_ptr<NetworkPayload> payload)
 
 void GenericConnection::OnReceivedHeaderData(size_t bytesTransferred)
 {
+	LOG << "Received message from " << GetEndpointStr() << ". Propagation started.";
 	UpdateLastActivityClock();
 
 	Range <std::array<byte, READ_BUFFER_SIZE>> range(m_readBuffer, bytesTransferred);
