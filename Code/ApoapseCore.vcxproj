@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClCompile Include="SecurityAlert.cpp" />
     <ClCompile Include="UT_MessagePack.cpp" />
+    <ClCompile Include="UT_Range.cpp" />
     <ClCompile Include="UT_Uuid.cpp">
       <FileType>CppHeader</FileType>
     </ClCompile>

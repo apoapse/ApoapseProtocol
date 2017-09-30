@@ -188,6 +188,9 @@
     <ClCompile Include="SecurityAlert.cpp">
       <Filter>Network\Protocol</Filter>
     </ClCompile>
+    <ClCompile Include="UT_Range.cpp">
+      <Filter>UnitTests\Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Parsers">

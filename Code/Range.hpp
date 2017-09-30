@@ -11,12 +11,18 @@ public:
 	// Method:    Range<T>::Range - 
 	// Access:    public 
 	// Parameter: const T & array - std container
-	// Parameter: size_t upperBound - Upper bound of the data, starting from the begging of the container
+	// Parameter: size_t upperBound - Upper bound of the data, starting from the beginning of the container
 	//************************************
 	Range(const T& array, size_t upperBound = 0)
 		: m_associatedArray(array)
 	{
 		m_upperBound = (upperBound == 0) ? m_associatedArray.size() : upperBound;
+	}
+
+	Range(const Range<T>& inputRange, size_t upperBound = 0)
+		: Range(inputRange.m_associatedArray, upperBound)
+	{
+		Consume(inputRange.GetCursorPosition());
 	}
 
 	void Consume(size_t length)
@@ -45,6 +51,11 @@ public:
 	size_t GetCursorPosition() const
 	{
 		return m_cursorPosition;
+	}
+
+	const typename T::value_type* data() const
+	{
+		return std::addressof(m_associatedArray[m_cursorPosition]);
 	}
 
 	typename T::const_iterator begin() const
