@@ -191,6 +191,12 @@
     <ClCompile Include="UT_Range.cpp">
       <Filter>UnitTests\Tests</Filter>
     </ClCompile>
+    <ClCompile Include="UT_CommandSystem.cpp">
+      <Filter>UnitTests\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="CmdUnitTest.cpp">
+      <Filter>CommandSystem\Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Parsers">
@@ -246,6 +252,9 @@
     </Filter>
     <Filter Include="DatabaseAbstractionLayer">
       <UniqueIdentifier>{c218d407-5201-4351-8c72-7a03c70be57b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommandSystem\Commands">
+      <UniqueIdentifier>{c5a3f0d5-3d91-4e71-854f-1c35fdadac45}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
