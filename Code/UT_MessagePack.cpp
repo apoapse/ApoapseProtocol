@@ -5,6 +5,7 @@
 #include "Common.h"
 #include "UnitTestsManager.h"
 #include "MessagePack.hpp"
+#include "Uuid.h"
 
 UNIT_TEST("MessagePack:serialize:ordered")
 {
@@ -35,7 +36,35 @@ UNIT_TEST("MessagePack:serialize:unordered")
 	MessagePackDeserializer deserializer(ser.GetMessagePackBytes());
 
 	UnitTest::Assert(deserializer.GetValue<std::string>("test") == "coucou" && deserializer.GetValue<bool>("testb") == true && deserializer.GetArray<std::string>("loli.arr_test").at(1) == "lul");
+} UNIT_TEST_END
 
+UNIT_TEST("MessagePack:serialize:unordered_2")
+{
+	std::vector<byte> data(2);
+
+	MessagePackSerializer ser;
+	ser.UnorderedAppend("bytes", data);
+	ser.UnorderedAppend<bool>("testb", true);
+	ser.UnorderedFieldsCompile();
+
+	MessagePackDeserializer deserializer(ser.GetMessagePackBytes());
+
+	auto test = ser.GetMessagePackBytes();
+	auto val = deserializer.GetValue<bool>("testb");
+	UnitTest::Assert(deserializer.GetValue<std::vector<byte>>("bytes").size() == 2 && deserializer.GetValue<bool>("testb"));
+} UNIT_TEST_END
+
+UNIT_TEST("MessagePack:serialize:unordered_3")
+{
+	MessagePackSerializer ser;
+	ser.UnorderedAppend("test", "coucou"s);
+	ser.UnorderedAppend("testint", 16);
+
+	ser.UnorderedFieldsCompile();
+
+	MessagePackDeserializer deserializer(ser.GetMessagePackBytes());
+
+	UnitTest::Assert(deserializer.GetValue<std::string>("test") == "coucou" && deserializer.GetValue<int>("testint") == 16);
 } UNIT_TEST_END
 
 UNIT_TEST("MessagePack:deserialize:optional")
@@ -48,6 +77,21 @@ UNIT_TEST("MessagePack:deserialize:optional")
 
 	UnitTest::Assert(deserializer.GetValueOptional<std::string>("test") && !deserializer.GetValueOptional<std::string>("test.noes_not_exist"));
 
+} UNIT_TEST_END
+
+UNIT_TEST("MessagePack:serialize:ordered:bytes")
+{
+	MessagePackSerializer serializer;
+
+	serializer.Group("",
+	{
+		MSGPK_ORDERED_APPEND(serializer, "related_item", Uuid::Generate().GetAsByteVector()),
+		MSGPK_ORDERED_APPEND(serializer, "test_int", 32)
+	});
+
+	MessagePackDeserializer deserializer(serializer.GetMessagePackBytes());
+
+	UnitTest::Assert(Uuid::IsValid(deserializer.GetValue<std::vector<byte>>("related_item")) && deserializer.GetValue<int>("test_int") == 32);
 } UNIT_TEST_END
 
 #endif	// UNIT_TESTS

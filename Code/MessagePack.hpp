@@ -800,6 +800,7 @@ private:
 		item.length = blobLength;
 		item.pos = workingRange.GetCursorPosition();
 		item.type = ItemType::bytes_blob;
+		workingRange.Consume(blobLength);
 
 		m_parsedDataLocations[keyName] = item;
 	}
