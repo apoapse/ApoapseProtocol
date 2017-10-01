@@ -5,21 +5,25 @@
 #include "MacroUtils.hpp"
 #include "GenericConnection.h"
 
-void Command::Parse(std::shared_ptr<NetworkPayload> data)
+void Command::Parse(std::shared_ptr<NetworkPayload> payload)
 {
 	ASSERT(m_deserializedData.get() == nullptr);
 
 	try
 	{
-		m_deserializedData = std::make_unique<MessagePackDeserializer>(data->payloadData);
+		const auto range = payload->GetPayloadContent();
+		auto data = std::vector<byte>(range.begin(), range.end());
+		ASSERT(data.size() == payload->headerInfo->payloadLength);
+
+		m_deserializedData = std::make_unique<MessagePackDeserializer>(std::move(data));
+
+		AutoValidate();
 	}
 	catch (const std::exception& e)
 	{
 		LOG << LogSeverity::error << "Error while parsing a command of type " << (UInt16)GetInfo().command << " : " << e;
 		m_isValid = false;
 	}
-
-	AutoValidate();
 }
 
 bool Command::IsValid() const
@@ -29,17 +33,20 @@ bool Command::IsValid() const
 
 void Command::Process(const GenericConnection& sender)
 {
-	ASSERT_MSG(false, "This function should never be called directly, it should by overloaded by the command class");
+
 }
 
 void Command::Process(const User& sender, const GenericConnection& senderConnection)
 {
-	ASSERT_MSG(false, "This function should never be called directly, it should by overloaded by the command class");
+
 }
 
 void Command::Send(MessagePackSerializer& data, INetworkSender& destination, TCPConnection* excludedConnection/* = nullptr*/)
 {
-	auto payload = std::make_unique<NetworkPayload>(GetInfo().command, std::move(data.GetMessagePackBytes()));
+	auto bytes = std::vector<byte>(NetworkPayload::headerLength + data.GetMessagePackBytes().size());
+	bytes.insert(bytes.begin() + NetworkPayload::headerLength, data.GetMessagePackBytes().begin(), data.GetMessagePackBytes().end());
+
+	auto payload = std::make_unique<NetworkPayload>(GetInfo().command, std::move(bytes));
 	destination.Send(std::move(payload), excludedConnection);
 }
 
@@ -55,7 +62,7 @@ void Command::AutoValidate()
 
 		try
 		{
-			valueExist = DoesFieldHasValue(field);
+			valueExist = DoesFieldHaveValue(field);
 		}
 		catch (const std::exception& e)
 		{
@@ -82,9 +89,9 @@ void Command::AutoValidate()
 	}
 }
 
-bool Command::DoesFieldHasValue(const CommandField &field) const
+bool Command::DoesFieldHaveValue(const CommandField &field) const
 {
-	return field.fieldValueValidator->HasValue(field.name, *m_deserializedData.get());
+	return field.fieldValueValidator->HasValue(field.name, *m_deserializedData);
 }
 
 bool Command::ValidateField(const CommandField& field, bool valueExist)
@@ -95,9 +102,9 @@ bool Command::ValidateField(const CommandField& field, bool valueExist)
 		return false;
 	}
 
-	if (valueExist && field.fieldValueValidator->HasValidatorFunction())
+	if (valueExist)
 	{
-		if (!field.fieldValueValidator->ExecValidator(field.name, *m_deserializedData.get()))
+		if (!field.fieldValueValidator->ExecValidator(field.name, *m_deserializedData))
 		{
 			LOG << "Command auto validate: the field " << field.name << " on command " << (UInt16)GetInfo().command << " is invalid according to an user provided check function" << LogSeverity::warning;
 			return false;
