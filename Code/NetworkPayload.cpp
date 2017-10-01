@@ -4,215 +4,88 @@
 #include "Diagnostic.hpp"
 #include "Maths.hpp"
 
-template <typename T>
-UInt64 ReadExplicitLength(Range<std::vector<byte>>& data)
-{
-	data.Consume(1);	// Consume the byte defining the type of which the length is encoded
-
-	if (data.size() < sizeof(T))
-		throw std::exception("Not enough bytes to make the requested type");
-
-	auto length = (UInt64)FromBytes<T>(data, Endianness::BIG_ENDIAN);
-
-	data.Consume(sizeof(T));
-	return length;
-}
-
 NetworkPayload::NetworkPayload(CommandId command, std::vector<byte>&& data)
 {
-	payloadData = std::move(data);
-	m_headerData = GenerateHeader(command, payloadData);
-	m_isFirstInsert = false;
-}
+	m_rawPayloadData = std::move(data);
+	WriteHeader(command, m_rawPayloadData);
 
-void NetworkPayload::ReadHeaderFirstPart()
-{
-	Range<std::vector<byte>> data(m_headerData.value(), HEADER_MIN_LENGTH);
 	headerInfo = NetworkMessageHeader();
-
-	ASSERT(m_headerData->size() >= HEADER_MIN_LENGTH);
-
-	headerInfo->command = (CommandId)FromBytes<UInt16>(data, Endianness::BIG_ENDIAN);
-	data.Consume(sizeof(UInt16));
-
-	switch (data[0])
-	{
-	case 0x00:
-		m_payloadLengthIndicatorSize = static_cast<UInt16>(sizeof(UInt16));
-		break;
-
-	case 0x01:
-		m_payloadLengthIndicatorSize = static_cast<UInt16>(sizeof(UInt32));
-		break;
-
-	case 0x02:
-		m_payloadLengthIndicatorSize = static_cast<UInt16>(sizeof(UInt64));
-		break;
-
-	default:
-		headerInfo->payloadLength = static_cast<UInt64>(data[0]);
-		m_payloadLengthIndicatorSize = 0;
-		m_headerData.reset();
-		break;
-	}
+	headerInfo->command = command;
+	headerInfo->payloadLength = (static_cast<UInt32>(m_rawPayloadData.size()) - headerLength);
 }
 
-void NetworkPayload::ReadHeaderPayloadLength()
+void NetworkPayload::Insert(Range<std::array<byte, READ_BUFFER_SIZE>>& range, size_t length)
 {
-	Range<std::vector<byte>> data(m_headerData.value());
-	data.Consume(sizeof(UInt16));	// Consume the size of the command type identifier
+	const size_t currentPayloadLength = std::min(std::min((length), static_cast<size_t>(BytesLeft())), range.size());
 
-	switch (data[0])
+	m_rawPayloadData.insert(m_rawPayloadData.end(), range.begin(), range.begin() + currentPayloadLength);
+	range.Consume(currentPayloadLength);
+
+	if (!headerInfo.has_value() && m_rawPayloadData.size() >= headerLength)
 	{
-	case 0x00:
-		headerInfo->payloadLength = ReadExplicitLength<UInt16>(data);
-		break;
-
-	case 0x01:
-		headerInfo->payloadLength = ReadExplicitLength<UInt32>(data);
-		break;
-
-	case 0x02:
-		headerInfo->payloadLength = ReadExplicitLength<UInt64>(data);
-		break;
-	}
-}
-
-void NetworkPayload::Insert(Range<std::array<byte, READ_BUFFER_SIZE>>& range)
-{
-	// In header construction phase
-	if (!headerInfo)
-	{
-		if (m_isFirstInsert)
-		{
-			// Very first call
-			m_headerData = std::vector<byte>();
-			m_headerData->reserve(3);
-
-			const size_t upperBound = (range.size() >= HEADER_MIN_LENGTH) ? HEADER_MIN_LENGTH : range.size();
-			m_headerData->insert(m_headerData->end(), range.begin(), range.begin() + upperBound);
-			range.Consume(upperBound);
-
-			m_isFirstInsert = false;
-		}
-
-		if (!m_payloadLengthIndicatorSize && m_headerData->size() < HEADER_MIN_LENGTH)
-		{
-			// The very first bytes before calling ReadHeaderFirstPart are not all here yet
-			const size_t upperBound = (range.size() >= HEADER_MIN_LENGTH - m_headerData->size()) ? HEADER_MIN_LENGTH - m_headerData->size() : range.size();
-			m_headerData->insert(m_headerData->end(), range.begin(), range.begin() + upperBound);
-			range.Consume(upperBound);
-		}
-
-		if (!headerInfo && m_headerData->size() >= HEADER_MIN_LENGTH)
-		{
-			ReadHeaderFirstPart();
-		}
-
-		if (m_payloadLengthIndicatorSize && headerInfo->payloadLength == 0)
-		{
-			const size_t upperBound = (range.size() > m_payloadLengthIndicatorSize.value()) ? m_payloadLengthIndicatorSize.value() : range.size();
-			m_headerData->insert(m_headerData->end(), range.begin(), range.begin() + upperBound);
-			range.Consume(upperBound);
-
-			if (m_headerData->size() > m_payloadLengthIndicatorSize.value())
-			{
-				ReadHeaderPayloadLength();
-				m_headerData->reserve(headerInfo->payloadLength);
-
-				m_payloadLengthIndicatorSize.reset();
-				m_headerData.reset();
-			}
-		}
-	}
-
-	// In payload body construction phase
-	if (headerInfo)
-	{
-		ASSERT(headerInfo->payloadLength > 0);
+		ReadHeader();
 
 		const size_t bytesLeft = BytesLeft();
-		const size_t upperBound = (range.size() < bytesLeft) ? range.size() : bytesLeft;
+		if (range.size() > 0 && bytesLeft > 0)
+			Insert(range, std::min(range.size(), bytesLeft));
+	}
+}
 
-		payloadData.insert(payloadData.end(), range.begin(), range.begin() + upperBound);
-		range.Consume(upperBound);
+Range<std::vector<byte>> NetworkPayload::GetPayloadContent() const
+{
+	ASSERT_MSG(BytesLeft() == 0, "Trying to access to the payload data while the payload is not complete yet");
 
-		if (payloadData.size() >= payloadMaxAllowedLength)
+	Range<std::vector<byte>> range(m_rawPayloadData);
+	range.Consume(headerLength);
+
+	return range;
+}
+
+const std::vector<byte>& NetworkPayload::GetRawData() const
+{
+	return m_rawPayloadData;
+}
+
+UInt32 NetworkPayload::BytesLeft() const
+{
+	if (headerInfo.has_value())
+		return static_cast<UInt32>(headerInfo->payloadLength - (m_rawPayloadData.size() - headerLength));
+	else
+		return std::max(static_cast<UInt32>(headerLength - m_rawPayloadData.size()), (UInt32)1);	// Make sure the size can never be to 0 in this particular case
+}
+
+void NetworkPayload::ReadHeader()
+{
+	ASSERT(m_rawPayloadData.size() >= headerLength);
+
+	Range<std::vector<byte>> range(m_rawPayloadData);
+
+	headerInfo = NetworkMessageHeader();
+	{
+		headerInfo->command = static_cast<CommandId>(FromBytes<UInt16>(range, Endianness::BIG_ENDIAN));
+		range.Consume(sizeof(UInt16));
+	}
+
+	{
+		headerInfo->payloadLength = FromBytes<UInt32>(range, Endianness::BIG_ENDIAN);
+
+		if (headerInfo->payloadLength > payloadMaxAllowedLength)
 			throw std::length_error("");
 	}
+	//range.Consume(sizeof(UInt32));	// Not needed since it's the last operatation on the temporary Range
 }
 
-size_t NetworkPayload::BytesLeft() const
+void NetworkPayload::WriteHeader(CommandId command, std::vector<byte>& data)
 {
-	if (!headerInfo)
-	{
-		// In header construction phase
-		ASSERT(m_headerData);
+	ASSERT(data.size() > headerLength);
+	ASSERT_MSG(CanFit<UInt32>(data.size()) , "The vector provided is to big for its size to fit into a UInt32");
 
-		if (m_payloadLengthIndicatorSize)
-			return m_payloadLengthIndicatorSize.value() - m_headerData->size();
-		else
-			return HEADER_MIN_LENGTH - m_headerData->size();
-	}
-	else
-	{
-		auto val = (Int64)headerInfo->payloadLength - (Int64)payloadData.size();
-		ASSERT_MSG(val >= 0, "The number of bytes left can't be negative");
-
-		return val;
-	}
-}
-
-std::vector<byte> NetworkPayload::GenerateHeader(CommandId command, const std::vector<byte>& data)
-{
-	std::vector<byte> headerBytes;
-	headerBytes.reserve(HEADER_MIN_LENGTH);
+	const auto cmdId = ToBytes<UInt16>(static_cast<UInt16>(command), Endianness::BIG_ENDIAN);
+	std::copy(cmdId.begin(), cmdId.end(), data.begin());
 
 	{
-		auto commandIdentifier = ToBytes<UInt16>((UInt16)command, Endianness::BIG_ENDIAN);
-		headerBytes.insert(headerBytes.begin(), commandIdentifier.begin(), commandIdentifier.end());
+		const UInt32 pyaloadContentSize = (static_cast<UInt32>(data.size()) - headerLength);
+		const auto payloadLength = ToBytes<UInt32>(static_cast<UInt32>(pyaloadContentSize), Endianness::BIG_ENDIAN);
+		std::copy(payloadLength.begin(), payloadLength.end(), data.begin() + cmdId.size());
 	}
-
-	if (IsInBound(data.size(), (size_t)3, (size_t)255))
-	{
-		headerBytes.push_back(static_cast<UInt8>(data.size()));
-	}
-	else
-	{
-		if (CanFit<UInt16>(data.size()))
-		{
-			headerBytes.push_back(0x00);
-			headerBytes.reserve(HEADER_MIN_LENGTH + sizeof(UInt16));
-
-			auto dataLength = ToBytes<UInt16>((UInt16)data.size(), Endianness::BIG_ENDIAN);
-			headerBytes.insert(headerBytes.begin(), dataLength.begin(), dataLength.end());
-		}
-
-		else if (CanFit<UInt32>(data.size()))
-		{
-			headerBytes.push_back(0x01);
-			headerBytes.reserve(HEADER_MIN_LENGTH + sizeof(UInt32));
-
-			auto dataLength = ToBytes<UInt32>((UInt32)data.size(), Endianness::BIG_ENDIAN);
-			headerBytes.insert(headerBytes.begin(), dataLength.begin(), dataLength.end());
-		}
-
-		else if (CanFit<UInt64>(data.size()))
-		{
-			headerBytes.push_back(0x02);
-			headerBytes.reserve(HEADER_MIN_LENGTH + sizeof(UInt64));
-
-			auto dataLength = ToBytes<UInt64>((UInt64)data.size(), Endianness::BIG_ENDIAN);
-			headerBytes.insert(headerBytes.begin(), dataLength.begin(), dataLength.end());
-		}
-	}
-
-	return headerBytes;
-}
-
-std::vector<byte> NetworkPayload::GetHeaderData() const
-{
-	ASSERT(m_headerData.has_value() && m_headerData->size() > 0);
-
-	return m_headerData.value();
 }

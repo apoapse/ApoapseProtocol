@@ -5,38 +5,32 @@
 #include "ReadBufferSize.hpp"
 #include <optional>
 
-#define HEADER_MIN_LENGTH 3
-
 struct NetworkMessageHeader
 {
 	CommandId command;
-	UInt64 payloadLength = 0;
+	UInt32 payloadLength = 0;
 };
 
 class NetworkPayload
 {
+	std::vector<byte> m_rawPayloadData;
+
 public:
 	static constexpr size_t payloadMaxAllowedLength = 8'000'000;	// 8 MB
-
+	static constexpr UInt8 headerLength = 6;						// UInt16 for the command id + UInt32 for the content length
 	std::optional<NetworkMessageHeader> headerInfo;
-	std::vector<byte> payloadData;
-
-	void Insert(Range<std::array<byte, READ_BUFFER_SIZE>>& data);
-	size_t BytesLeft() const;
 
 	NetworkPayload() = default;
+	NetworkPayload(CommandId command, std::vector<byte>&& data);	// WARNING: Make sure to pass the data with an std::move
 
-	// WARNING: Make sure to pass the data with an std::move
-	NetworkPayload(CommandId command, std::vector<byte>&& data);
+	void Insert(Range<std::array<byte, READ_BUFFER_SIZE>>& data, size_t length);
+	Range<std::vector<byte>> GetPayloadContent() const;
+	const std::vector<byte>& GetRawData() const;
+	UInt32 BytesLeft() const;
 
-	static std::vector<byte> GenerateHeader(CommandId command, const std::vector<byte>& data);
-	std::vector<byte> GetHeaderData() const;
-	
+//private:	// Put public for unit testing
+	void ReadHeader();
+
 private:
-	void ReadHeaderFirstPart();
-	void ReadHeaderPayloadLength();
-
-	std::optional<std::vector<byte>> m_headerData;
-	std::optional<UInt16> m_payloadLengthIndicatorSize;
-	bool m_isFirstInsert{ true };
+	static void WriteHeader(CommandId command, std::vector<byte>& data);
 };
