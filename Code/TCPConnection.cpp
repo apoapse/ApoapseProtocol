@@ -145,9 +145,10 @@ void TCPConnection::InternalSend()
 	auto handler = boost::bind(&TCPConnection::HandleWriteAsync, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
 
 	if (std::holds_alternative<std::unique_ptr<NetworkPayload>>(item))
-	{		
-		boost::asio::async_write(m_socket, boost::asio::buffer(std::get<std::unique_ptr<NetworkPayload>>(item)->GetHeaderData()), handler);
-		boost::asio::async_write(m_socket, boost::asio::buffer(std::get<std::unique_ptr<NetworkPayload>>(item)->payloadData), handler);
+	{	
+		//auto data = ;//TEMP ???
+
+		boost::asio::async_write(m_socket, boost::asio::buffer(std::get<std::unique_ptr<NetworkPayload>>(item)->GetRawData()), handler);
 	}
 	else if (std::holds_alternative<StrWrapper>(item))
 	{
@@ -174,7 +175,7 @@ void TCPConnection::HandleWriteAsync(const boost::system::error_code& error, siz
 		if (std::holds_alternative<std::unique_ptr<NetworkPayload>>(item))
 		{
 			auto& payload = std::get<std::unique_ptr<NetworkPayload>>(item);
-			itemRealSize = payload->GetHeaderData().size() + payload->payloadData.size();
+			itemRealSize = (NetworkPayload::headerLength + payload->headerInfo->payloadLength);
 		}
 		else if (std::holds_alternative<StrWrapper>(item))
 		{
@@ -200,7 +201,9 @@ void TCPConnection::HandleWriteAsync(const boost::system::error_code& error, siz
 	else
 		OnReceivedErrorInternal(error);
 
-	m_sendQueue.pop_front();
+
+	//if (!m_sendQueue.empty())
+		m_sendQueue.pop_front();
 
 	if (!m_sendQueue.empty())
 		InternalSend();

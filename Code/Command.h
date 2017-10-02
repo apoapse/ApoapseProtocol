@@ -11,7 +11,8 @@
 class NetworkPayload;
 class User;
 class GenericConnection;
-
+class ServerConnection;
+class ClientConnection;
 
 struct IFieldValidator
 {
@@ -25,8 +26,6 @@ class FieldValueValidator : public IFieldValidator
 	std::function<bool(T)> m_validatorFunction;
 	
 public:
-	//FieldValueValidator() = default;
-
 	FieldValueValidator(std::function<bool(T)> validatorFunction) : m_validatorFunction(validatorFunction)
 	{
 	}
@@ -57,8 +56,6 @@ class FieldArrayValidator : public IFieldValidator
 	std::function<bool(std::vector<T>)> m_validatorFunction;
 
 public:
-	//FieldArrayValidator() = default;
-
 	FieldArrayValidator(std::function<bool(std::vector<T>)> validatorFunction) : m_validatorFunction(validatorFunction)
 	{
 	}
@@ -115,9 +112,6 @@ struct CommandInfo
 	//std::string name;
 	CommandId command;
 	std::vector<CommandField> fields;
-// 	std::function<void(ClientConnection&)> processFromClient = { NULL };
-// 	std::function<bool(LocalUser&, ClientConnection&)> processFromUser = { NULL };
-// 	std::function<void(RemoteServer&)> processFromRemoteServer = { NULL };
 	bool requireAuthentication = { false };
 	bool onlyNonAuthenticated = { false };
 	bool propagateToSenderConnections = { false }; // #TODO 
@@ -141,8 +135,9 @@ public:
 	bool IsValid() const;
 	virtual CommandInfo& GetInfo() const = 0;
 
-	virtual void Process(const GenericConnection& sender);
-	virtual void Process(const User& sender, const GenericConnection& senderConnection);
+	virtual void Process(const ServerConnection& sender);
+	virtual void Process(const User& sender, const ServerConnection& senderConnection);
+	virtual void Process(const ClientConnection& sender);
 
 protected:
 	void Send(MessagePackSerializer& data, INetworkSender& destination, TCPConnection* excludedConnection = nullptr);

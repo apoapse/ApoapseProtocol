@@ -13,6 +13,7 @@ SecurityLog::SecurityAlert SecurityLog::GetAlertFromErrorCode(ApoapseErrorCode e
 		{ ApoapseErrorCode::wrong_network_payload_length, SecurityAlert::Severity::medium, "A completed network payload is not of the expected size" },
 		{ ApoapseErrorCode::unknown_cmd, SecurityAlert::Severity::minor, "The requested command does not exist" },
 		{ ApoapseErrorCode::cannot_processs_cmd_from_this_connection_type, SecurityAlert::Severity::major, "The connection authentication status does not match the requested Apoapse command requirements" },
+		{ ApoapseErrorCode::invalid_cmd, SecurityAlert::Severity::medium, "The received command fields are invalid" },
 	};
 
 	const auto result = std::find_if(errors.begin(), errors.end(), [&](const auto& item)

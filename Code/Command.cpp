@@ -31,12 +31,17 @@ bool Command::IsValid() const
 	return m_isValid;
 }
 
-void Command::Process(const GenericConnection& sender)
+void Command::Process(const ServerConnection&)
 {
 
 }
 
-void Command::Process(const User& sender, const GenericConnection& senderConnection)
+void Command::Process(const User&, const ServerConnection&)
+{
+
+}
+
+void Command::Process(const ClientConnection&)
 {
 
 }

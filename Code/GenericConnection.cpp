@@ -30,19 +30,19 @@ void GenericConnection::StartReading()
 	ReadSome(m_readBuffer, [this](size_t bytesTransferred) { OnReceivedHeaderData(bytesTransferred); });
 }
 
-void GenericConnection::ProcessHeader(Range<std::array<byte, READ_BUFFER_SIZE>>& range)
+void GenericConnection::ProcessHeader(Range<std::array<byte, READ_BUFFER_SIZE>>& range, size_t bytesTransferred)
 {
 	auto payload = std::make_shared<NetworkPayload>();
-	ProcessDataGeneric(range, std::move(payload));
+	ProcessDataGeneric(range, std::move(payload), bytesTransferred);
 }
 
-void GenericConnection::ProcessDataGeneric(Range<std::array<byte, READ_BUFFER_SIZE>>& range, std::shared_ptr<NetworkPayload> payload)
+void GenericConnection::ProcessDataGeneric(Range<std::array<byte, READ_BUFFER_SIZE>>& range, std::shared_ptr<NetworkPayload> payload, size_t bytesTransferred)
 {
 	try
 	{
 		if (range.size() > 0)
-			payload->Insert(range);
-	
+			payload->Insert(range, bytesTransferred);
+
 		if (payload->BytesLeft() == 0)
 		{
 			if (range.size() == 0)
@@ -56,9 +56,9 @@ void GenericConnection::ProcessDataGeneric(Range<std::array<byte, READ_BUFFER_SI
 	
 				// The buffer has data for more than one network payload, so we create a new one
 				auto payloadLocal = std::make_shared<NetworkPayload>();
-				payloadLocal->Insert(range);
+				//payloadLocal->Insert(range, bytesTransferred);
 	
-				ProcessDataGeneric(range, std::move(payloadLocal));
+				ProcessDataGeneric(range, std::move(payloadLocal), bytesTransferred);
 			}
 		}
 		else
@@ -82,11 +82,10 @@ void GenericConnection::ReadPayloadData(std::shared_ptr<NetworkPayload> payload)
 
 void GenericConnection::OnReceivedHeaderData(size_t bytesTransferred)
 {
-	LOG << "Received message from " << GetEndpointStr() << ". Propagation started.";
 	UpdateLastActivityClock();
 
 	Range <std::array<byte, READ_BUFFER_SIZE>> range(m_readBuffer, bytesTransferred);
-	ProcessHeader(range);
+	ProcessHeader(range, bytesTransferred);
 }
 
 void GenericConnection::OnReceivedPayloadData(size_t bytesTransferred, std::shared_ptr<NetworkPayload> payload)
@@ -94,24 +93,31 @@ void GenericConnection::OnReceivedPayloadData(size_t bytesTransferred, std::shar
 	UpdateLastActivityClock();
 
 	Range <std::array<byte, READ_BUFFER_SIZE>> range(m_readBuffer, bytesTransferred);
-	ProcessDataGeneric(range, std::move(payload));
+	ProcessDataGeneric(range, std::move(payload), bytesTransferred);
 }
 
 void GenericConnection::OnReceivedPayload(std::shared_ptr<NetworkPayload> payload)
 {
-	if (payload->headerInfo->payloadLength != payload->payloadData.size())
-	{
-		SecurityLog::LogAlert(ApoapseErrorCode::wrong_network_payload_length, *this);
-		return;
-	}
+// 	if (payload->headerInfo->payloadLength != payload->m_rawPayloadData.size())
+// 	{
+// 		SecurityLog::LogAlert(ApoapseErrorCode::wrong_network_payload_length, *this);
+// 		return;
+// 	}
 
-	if (CommandsManager::GetInstance().CommandExist(payload->headerInfo->command))
+	if (!CommandsManager::GetInstance().CommandExist(payload->headerInfo->command))
 	{
 		SecurityLog::LogAlert(ApoapseErrorCode::unknown_cmd, *this);
 		return;
 	}
 
-	OnReceivedCommand(CommandsManager::GetInstance().CreateCommand(payload->headerInfo->command));
+	auto cmd = CommandsManager::GetInstance().CreateCommand(payload->headerInfo->command);
+	LOG_DEBUG << "Received command " << static_cast<UInt16>(cmd->GetInfo().command) << " from payload total size: " << payload->GetRawData().size();
+	cmd->Parse(payload);
+
+	if (cmd->IsValid())
+		OnReceivedValidCommand(std::move(cmd));
+	else
+		SecurityLog::LogAlert(ApoapseErrorCode::invalid_cmd, *this);
 }
 
 void GenericConnection::OnSendingSuccessful(size_t bytesTransferred)
