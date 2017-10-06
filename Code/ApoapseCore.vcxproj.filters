@@ -67,9 +67,6 @@
     <ClInclude Include="Commands.hpp">
       <Filter>CommandSystem</Filter>
     </ClInclude>
-    <ClInclude Include="ConnectCmdBase.h">
-      <Filter>CommandSystem\CommandBases</Filter>
-    </ClInclude>
     <ClInclude Include="Command.h">
       <Filter>CommandSystem</Filter>
     </ClInclude>
@@ -117,6 +114,18 @@
     </ClInclude>
     <ClInclude Include="Json.hpp">
       <Filter>Parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="Connect.h">
+      <Filter>CommandSystem\CommandBases</Filter>
+    </ClInclude>
+    <ClInclude Include="ProtectedByteContainer.h">
+      <Filter>Cryptography</Filter>
+    </ClInclude>
+    <ClInclude Include="Hash.hpp">
+      <Filter>Cryptography\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="HashTypes.hpp">
+      <Filter>Cryptography\Algorithms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -197,6 +206,12 @@
     <ClCompile Include="CmdUnitTest.cpp">
       <Filter>CommandSystem\Commands</Filter>
     </ClCompile>
+    <ClCompile Include="ProtectedByteContainer.cpp">
+      <Filter>Cryptography</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_ProtectedByteContainer.cpp">
+      <Filter>UnitTests\Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Parsers">
@@ -255,6 +270,12 @@
     </Filter>
     <Filter Include="CommandSystem\Commands">
       <UniqueIdentifier>{c5a3f0d5-3d91-4e71-854f-1c35fdadac45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cryptography">
+      <UniqueIdentifier>{a6b3fcec-a6d1-482f-82f6-149aad456fd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cryptography\Algorithms">
+      <UniqueIdentifier>{8309ae43-42ae-4ebd-9b71-95b460bfe0ea}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

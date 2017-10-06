@@ -71,7 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
-    <IncludePath>C:\Program Files\boost\boost_1_64_0;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(ProjectDir)..\ThirdParty\cryptopp\;C:\Program Files\boost\boost_1_64_0;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
     <EnableCppCoreCheck>true</EnableCppCoreCheck>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -143,15 +143,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CmdUnitTest.cpp" />
+    <ClCompile Include="ProtectedByteContainer.cpp" />
     <ClCompile Include="SecurityAlert.cpp" />
     <ClCompile Include="UT_CommandSystem.cpp" />
     <ClCompile Include="UT_MessagePack.cpp" />
+    <ClCompile Include="UT_ProtectedByteContainer.cpp" />
     <ClCompile Include="UT_Range.cpp" />
     <ClCompile Include="UT_Uuid.cpp">
       <FileType>CppHeader</FileType>
     </ClCompile>
     <ClCompile Include="Uuid.cpp" />
+    <ClInclude Include="Hash.hpp" />
+    <ClInclude Include="HashTypes.hpp" />
     <ClInclude Include="Json.hpp" />
+    <ClInclude Include="ProtectedByteContainer.h" />
     <ClInclude Include="SecurityAlert.h" />
     <ClInclude Include="ApoapseErrorCodes.hpp" />
     <ClInclude Include="ByteUtils.hpp" />
@@ -159,7 +164,7 @@
     <ClInclude Include="CommandsManager.h" />
     <ClInclude Include="Commands.hpp" />
     <ClInclude Include="Common.h" />
-    <ClInclude Include="ConnectCmdBase.h" />
+    <ClInclude Include="Connect.h" />
     <ClInclude Include="Database.hpp" />
     <ClInclude Include="DateTimeUtils.h" />
     <ClInclude Include="Diagnostic.hpp" />

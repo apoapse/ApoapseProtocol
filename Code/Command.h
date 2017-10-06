@@ -112,6 +112,8 @@ struct CommandInfo
 	//std::string name;
 	CommandId command;
 	std::vector<CommandField> fields;
+	bool serverOnly = { false };
+	bool clientOnly = { false };
 	bool requireAuthentication = { false };
 	bool onlyNonAuthenticated = { false };
 	bool propagateToSenderConnections = { false }; // #TODO 
