@@ -14,7 +14,7 @@ using UInt32	 = std::uint32_t;
 
 using UInt64	 = std::uint64_t;
 
-using byte		 = unsigned char;	// #CPP17 replace with std::byte
+using byte		 = unsigned char;
 
 using DbId		 = Int64;
 
