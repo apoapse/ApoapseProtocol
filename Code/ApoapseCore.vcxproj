@@ -157,6 +157,7 @@
     <ClInclude Include="HashTypes.hpp" />
     <ClInclude Include="Json.hpp" />
     <ClInclude Include="ProtectedByteContainer.h" />
+    <ClInclude Include="ProtocolVersion.hpp" />
     <ClInclude Include="SecurityAlert.h" />
     <ClInclude Include="ApoapseErrorCodes.hpp" />
     <ClInclude Include="ByteUtils.hpp" />
