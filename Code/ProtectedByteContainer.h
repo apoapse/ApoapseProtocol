@@ -10,7 +10,7 @@ class ProtectedByteContainer
 {
 	const size_t m_orignalSize = 0;
 	std::vector<byte> m_container;
-	Cryptography::hash_SHA512 m_hash;
+	hash_SHA512 m_hash;
 
 public:
 	ProtectedByteContainer(const std::vector<byte>& inputContainer);
