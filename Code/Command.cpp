@@ -46,6 +46,12 @@ void Command::Process(const ClientConnection&)
 
 }
 
+void Command::Send(INetworkSender& destination, TCPConnection* excludedConnection /*= nullptr*/)
+{
+	ASSERT(m_serializedData.has_value());
+	Send(m_serializedData.value(), destination, excludedConnection);
+}
+
 void Command::Send(MessagePackSerializer& data, INetworkSender& destination, TCPConnection* excludedConnection/* = nullptr*/)
 {
 	auto bytes = std::vector<byte>(NetworkPayload::headerLength + data.GetMessagePackBytes().size());

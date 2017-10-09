@@ -141,7 +141,11 @@ public:
 	virtual void Process(const User& sender, const ServerConnection& senderConnection);
 	virtual void Process(const ClientConnection& sender);
 
+	// Use to send from the outside a command where the content has already been set internally in m_serializedData
+	void Send(INetworkSender& destination, TCPConnection* excludedConnection = nullptr);
+
 protected:
+	std::optional<MessagePackSerializer> m_serializedData;
 	void Send(MessagePackSerializer& data, INetworkSender& destination, TCPConnection* excludedConnection = nullptr);
 
 private:

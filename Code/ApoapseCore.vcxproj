@@ -165,7 +165,6 @@
     <ClInclude Include="CommandsManager.h" />
     <ClInclude Include="Commands.hpp" />
     <ClInclude Include="Common.h" />
-    <ClInclude Include="Connect.h" />
     <ClInclude Include="Database.hpp" />
     <ClInclude Include="DateTimeUtils.h" />
     <ClInclude Include="Diagnostic.hpp" />

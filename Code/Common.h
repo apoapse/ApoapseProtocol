@@ -14,14 +14,15 @@ struct Global
 	std::unique_ptr<Logger> logger;
 	IDatabase* database = nullptr;
 
-	// Only defined on the server
+#ifdef APOAPSE_SERVER
 	class ServerSettings* settings = nullptr;
+#endif // APOAPSE_CLIENT
 
-	// Only defined on the client
+#ifdef APOAPSE_CLIENT
 	class HTMLUI* htmlUI = nullptr;
+#endif // APOAPSE_CLIENT
 
 	Global() = default;
-
 	static Global* CreateGlobal()
 	{
 		return new Global();
