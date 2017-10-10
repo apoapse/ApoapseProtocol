@@ -86,13 +86,10 @@ public:
 };
 
 #define FIELD_VALUE_VALIDATOR(_type, _func)			new FieldValueValidator<_type>(_func)
-#define FIELD_VALUE(_type)							new FieldValueValidator<_type>([](_type){ return false; })
+#define FIELD_VALUE(_type)							new FieldValueValidator<_type>([](_type){ return true; })
 
 #define FIELD_ARRAY_VALIDATOR(_type, _func)			new FieldArrayValidator<_type>(_func)
 #define FIELD_ARRAY(_type)							new FieldArrayValidator<_type>([](std::vector<_type>&){ return true; })
-//#define FIELD_VALUE_CHECK_TYPE(_type)				new FieldValueValidator<_type>([](_type){ return true; })	// WARNING: In the case of integers, FieldValueValidator::ConvertFromStr is only able to know if the value is a number or not without cheking his size or if it is signed or unsigned.
-//#define PROCESS_METHOD(_inputType, _method)			[this](_inputType& input) { _method(input); };
-//#define PROCESS_METHOD_FROM_USER(_method)			[this](LocalUser& user, ClientConnection& connection) { return _method(user, connection); };
 
 enum class FieldRequirement
 {
