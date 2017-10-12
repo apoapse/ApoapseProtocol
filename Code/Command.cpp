@@ -12,10 +12,10 @@ void Command::Parse(std::shared_ptr<NetworkPayload> payload)
 	try
 	{
 		const auto range = payload->GetPayloadContent();
-		auto data = std::vector<byte>(range.begin(), range.end());
-		ASSERT(data.size() == payload->headerInfo->payloadLength);
+		m_networkPayload = std::vector<byte>(range.begin(), range.end());	// The command need ownership of the network payload data. #TODO Make the NetworkPayload unique_ptr and avoid creating a vector, duplicating the data like we do currently
+		ASSERT(m_networkPayload.size() == payload->headerInfo->payloadLength);
 
-		m_deserializedData = std::make_unique<MessagePackDeserializer>(std::move(data));
+		m_deserializedData = std::make_unique<MessagePackDeserializer>(m_networkPayload);
 
 		AutoValidate();
 	}
@@ -31,17 +31,17 @@ bool Command::IsValid() const
 	return m_isValid;
 }
 
-void Command::Process(const ServerConnection&)
+void Command::Process(ServerConnection&)
 {
 
 }
 
-void Command::Process(const User&, const ServerConnection&)
+void Command::Process(User&, ServerConnection&)
 {
 
 }
 
-void Command::Process(const ClientConnection&)
+void Command::Process(ClientConnection&)
 {
 
 }
@@ -59,6 +59,11 @@ void Command::Send(MessagePackSerializer& data, INetworkSender& destination, TCP
 
 	auto payload = std::make_unique<NetworkPayload>(GetInfo().command, std::move(bytes));
 	destination.Send(std::move(payload), excludedConnection);
+}
+
+const MessagePackDeserializer& Command::GetFieldsData() const
+{
+	return *m_deserializedData;
 }
 
 void Command::AutoValidate()

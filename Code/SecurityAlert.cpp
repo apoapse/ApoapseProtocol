@@ -14,6 +14,7 @@ SecurityLog::SecurityAlert SecurityLog::GetAlertFromErrorCode(ApoapseErrorCode e
 		{ ApoapseErrorCode::unknown_cmd, SecurityAlert::Severity::minor, "The requested command does not exist" },
 		{ ApoapseErrorCode::cannot_processs_cmd_from_this_connection_type, SecurityAlert::Severity::major, "The connection authentication status does not match the requested Apoapse command requirements" },
 		{ ApoapseErrorCode::invalid_cmd, SecurityAlert::Severity::medium, "The received command fields are invalid" },
+		{ ApoapseErrorCode::protocol_version_not_supported, SecurityAlert::Severity::medium, "The requested protocol version is not supported by the server", SecurityAlert::AdditionalAction::notify_sender },
 	};
 
 	const auto result = std::find_if(errors.begin(), errors.end(), [&](const auto& item)

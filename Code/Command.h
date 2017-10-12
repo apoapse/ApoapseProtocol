@@ -126,6 +126,7 @@ class Command
 {
 	bool m_isValid{ false };
 	std::unique_ptr<MessagePackDeserializer> m_deserializedData;
+	std::vector<byte> m_networkPayload;
 
 public:
 	virtual ~Command() = default;
@@ -134,9 +135,9 @@ public:
 	bool IsValid() const;
 	virtual CommandInfo& GetInfo() const = 0;
 
-	virtual void Process(const ServerConnection& sender);
-	virtual void Process(const User& sender, const ServerConnection& senderConnection);
-	virtual void Process(const ClientConnection& sender);
+	virtual void Process(ServerConnection& sender);
+	virtual void Process(User& sender, ServerConnection& senderConnection);
+	virtual void Process(ClientConnection& sender);
 
 	// Use to send from the outside a command where the content has already been set internally in m_serializedData
 	void Send(INetworkSender& destination, TCPConnection* excludedConnection = nullptr);
@@ -144,6 +145,7 @@ public:
 protected:
 	std::optional<MessagePackSerializer> m_serializedData;
 	void Send(MessagePackSerializer& data, INetworkSender& destination, TCPConnection* excludedConnection = nullptr);
+	const MessagePackDeserializer& GetFieldsData() const;
 
 private:
 	void AutoValidate();
