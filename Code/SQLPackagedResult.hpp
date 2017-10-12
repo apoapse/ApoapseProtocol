@@ -27,6 +27,8 @@ public:
 		return m_values.at(index);
 	}
 
+	// #TODO add support for returning values from strutured bindings with std::tupple. See #CPP17 variadic templates improvements.
+
 	size_t ColumnCount() const
 	{
 		return m_values.size();

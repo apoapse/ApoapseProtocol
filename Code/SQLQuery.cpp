@@ -3,6 +3,14 @@
 #include "Common.h"
 #include "StringExtensions.hpp"
 
+SQLQuery::~SQLQuery()
+{
+	for (auto* ptr : m_values)
+		delete ptr;
+
+	m_values.clear();
+}
+
 const SQLPackagedResult SQLQuery::Exec()
 {
 	const std::string preparedQuery = GetPreparedFullQuery();

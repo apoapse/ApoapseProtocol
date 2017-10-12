@@ -23,8 +23,8 @@ class SQLValue
 public:
 	template <typename T>
 	SQLValue(const T& value, ValueType type)
-		: m_data(value),
-		m_type(type)
+		: m_type(type)
+		, m_data(value)
 	{
 	}
 
@@ -36,16 +36,16 @@ public:
 	template <typename T>
 	static ValueType GenerateType()
 	{
-		if (std::type_index(typeid(T)) == std::type_index(typeid(std::string)))
+		if constexpr (std::is_same<T, std::string>::value)
 			return ValueType::TEXT;
 
-		else if (std::type_index(typeid(T)) == std::type_index(typeid(int)))
+		else if constexpr (std::is_same<T, int>::value)
 			return ValueType::INT;
 
-		else if (std::type_index(typeid(T)) == std::type_index(typeid(Int64)))
+		else if constexpr (std::is_same<T, Int64>::value)
 			return ValueType::INT_64;
 
-		if (std::type_index(typeid(T)) == std::type_index(typeid(std::vector<byte>)))
+		if constexpr (std::is_same<T, std::vector<byte>>::value)
 			return ValueType::BYTE_ARRAY;
 
 		else

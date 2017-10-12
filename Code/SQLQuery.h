@@ -52,13 +52,7 @@ public:
 	{
 	}
 
-	virtual ~SQLQuery()
-	{
-		for (auto* ptr : m_values)
-			delete ptr;
-
-		m_values.clear();
-	}
+	virtual ~SQLQuery();
 
 	const SQLPackagedResult Exec();
 
@@ -88,6 +82,15 @@ public:
 	SQLQuery& operator<<(const T& value)
 	{
 		AddValue(new SQLValue(value, SQLValue::GenerateType<T>()));
+
+		return *this;
+	}
+
+	template <size_t SIZE>
+	SQLQuery& operator<<(const std::array<byte, SIZE>& array)
+	{
+		std::vector<byte> value(array.begin(), array.end());
+		AddValue(new SQLValue(value, SQLValue::GenerateType<std::vector<byte>>()));
 
 		return *this;
 	}
