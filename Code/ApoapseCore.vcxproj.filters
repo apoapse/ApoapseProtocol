@@ -127,6 +127,12 @@
     <ClInclude Include="ProtocolVersion.hpp">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
+    <ClInclude Include="RSA.hpp">
+      <Filter>Cryptography\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="HMAC.hpp">
+      <Filter>Cryptography\Algorithms</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -210,6 +216,9 @@
       <Filter>Cryptography</Filter>
     </ClCompile>
     <ClCompile Include="UT_ProtectedByteContainer.cpp">
+      <Filter>UnitTests\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Cryptography.cpp">
       <Filter>UnitTests\Tests</Filter>
     </ClCompile>
   </ItemGroup>

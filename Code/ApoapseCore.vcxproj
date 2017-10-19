@@ -146,6 +146,7 @@
     <ClCompile Include="ProtectedByteContainer.cpp" />
     <ClCompile Include="SecurityAlert.cpp" />
     <ClCompile Include="UT_CommandSystem.cpp" />
+    <ClCompile Include="UT_Cryptography.cpp" />
     <ClCompile Include="UT_MessagePack.cpp" />
     <ClCompile Include="UT_ProtectedByteContainer.cpp" />
     <ClCompile Include="UT_Range.cpp" />
@@ -155,9 +156,11 @@
     <ClCompile Include="Uuid.cpp" />
     <ClInclude Include="Hash.hpp" />
     <ClInclude Include="HashTypes.hpp" />
+    <ClInclude Include="HMAC.hpp" />
     <ClInclude Include="Json.hpp" />
     <ClInclude Include="ProtectedByteContainer.h" />
     <ClInclude Include="ProtocolVersion.hpp" />
+    <ClInclude Include="RSA.hpp" />
     <ClInclude Include="SecurityAlert.h" />
     <ClInclude Include="ApoapseErrorCodes.hpp" />
     <ClInclude Include="ByteUtils.hpp" />
