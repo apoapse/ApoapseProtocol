@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <array>
 #include <string>
 #include <functional>
 #include <map>
@@ -11,7 +12,11 @@
 #include "StringExtensions.hpp"
 #include "Diagnostic.hpp"
 
-using namespace std::literals::string_literals;	// Force the use of the string litreal suffix
+#ifdef _MSC_VER
+#pragma warning (disable : 4310 )
+#endif // _MSC_VER
+
+using namespace std::literals::string_literals;	// Force the use of the string literal suffix
 
 enum class FormatFirstByte
 {
@@ -100,7 +105,7 @@ using ByteContainer = std::vector<byte>;
 class MessagePackSerializer
 {
 	std::vector<byte> m_data;
-	//std::shared_ptr<ByteContainer> m_data;
+	bool m_fieldsCompiled{ true };	// Used to automatically call UnorderedFieldsCompile() i fand when needed
 
 	std::optional<
 		std::map<std::string, std::vector<ByteContainer>>
@@ -118,10 +123,21 @@ public:
 			function();
 	}
 
+	void OrderedAppend(const std::string& name, MessagePackSerializer& outsideSerializer)
+	{
+		OrderedAppend(name, outsideSerializer.GetMessagePackBytes());
+	}
+
 	void OrderedAppend(const std::string& name, const std::vector<byte>& data)
 	{
 		AppendItem(name);
 		AppendItem(data);
+	}
+
+	template <size_t SIZE>
+	void OrderedAppend(const std::string& name, const std::array<byte, SIZE>& data)
+	{
+		OrderedAppend(name, std::vector<byte>(data.begin(), data.end()));
 	}
 
 	void OrderedAppend(const std::string& name, const std::string& str)
@@ -154,6 +170,8 @@ public:
 
 		OrderedAppend(fieldName, data);
 		ProcessNewUnorderedField(names);
+
+		m_fieldsCompiled = false;
 	}
 
 	template <typename T>
@@ -164,8 +182,22 @@ public:
 
 		OrderedAppendArray(fieldName, arr);
 		ProcessNewUnorderedField(names);
+
+		m_fieldsCompiled = false;
 	}
 
+	void UnorderedAppendArray(const std::string& name, std::vector<MessagePackSerializer> outsideSerializers)
+	{
+		std::vector<ByteContainer> msgPackCompiled(outsideSerializers.size());
+		for (size_t i = 0; i < msgPackCompiled.size(); i++)
+		{
+			msgPackCompiled[i] = outsideSerializers[i].GetMessagePackBytes();
+		}
+
+		UnorderedAppendArray<ByteContainer>(name, msgPackCompiled);
+	}
+
+private:
 	void UnorderedFieldsCompile()
 	{
 		ASSERT_MSG(m_unorderedFields, "No unordered data to compile");
@@ -185,11 +217,16 @@ public:
 		}
 
 		m_unorderedFields.reset();
+		m_fieldsCompiled = true;
 	}
 #pragma endregion Unordered
 
+public:
 	std::vector<byte>& GetMessagePackBytes()
 	{
+		if (!m_fieldsCompiled)
+			UnorderedFieldsCompile();
+
 		return m_data;
 	}
 
@@ -343,14 +380,14 @@ private:
 
 			else if (CanFit<UInt16>(data))
 			{
-				const auto byteArray = ToBytes<UInt16>(data, Endianness::BIG_ENDIAN);
+				const auto byteArray = ToBytes<UInt16>(static_cast<UInt16>(data), Endianness::BIG_ENDIAN);
 
 				InsertBytes<UInt16, FormatFirstByte::uint_16>(byteArray);
 			}
 
 			else if (CanFit<UInt32>(data))
 			{
-				const auto byteArray = ToBytes<UInt32>(data, Endianness::BIG_ENDIAN);
+				const auto byteArray = ToBytes<UInt32>(static_cast<UInt32>(data), Endianness::BIG_ENDIAN);
 
 				InsertBytes<UInt32, FormatFirstByte::uint_32>(byteArray);
 			}
@@ -363,28 +400,28 @@ private:
 
 			else if (CanFit<Int16>(data))
 			{
-				const auto byteArray = ToBytes<Int16>(data, Endianness::BIG_ENDIAN);
+				const auto byteArray = ToBytes<Int16>(static_cast<Int16>(data), Endianness::BIG_ENDIAN);
 
 				InsertBytes<Int16, FormatFirstByte::int_16>(byteArray);
 			}
 
 			else if (CanFit<int>(data))
 			{
-				const auto byteArray = ToBytes<int>(data, Endianness::BIG_ENDIAN);
+				const auto byteArray = ToBytes<int>(static_cast<int>(data), Endianness::BIG_ENDIAN);
 
 				InsertBytes<int, FormatFirstByte::int_32>(byteArray);
 			}
 
 			else if (CanFit<UInt64>(data))
 			{
-				const auto byteArray = ToBytes<UInt64>(data, Endianness::BIG_ENDIAN);
+				const auto byteArray = ToBytes<UInt64>(static_cast<UInt64>(data), Endianness::BIG_ENDIAN);
 
 				InsertBytes<UInt64, FormatFirstByte::uint_64>(byteArray);
 			}
 
 			else
 			{
-				const auto byteArray = ToBytes<Int64>(data, Endianness::BIG_ENDIAN);
+				const auto byteArray = ToBytes<Int64>(static_cast<Int64>(data), Endianness::BIG_ENDIAN);
 
 				InsertBytes<Int64, FormatFirstByte::int_64>(byteArray);
 			}
@@ -429,10 +466,23 @@ class MessagePackDeserializer
 	};
 
 	const std::vector<byte>& m_rawData;
+	const std::optional<std::vector<byte>> m_dataOwner;
 	std::map<std::string, ItemLocation> m_parsedDataLocations;
+
+	const std::vector<byte>& GetRawData() const
+	{
+		return (m_dataOwner.has_value()) ? m_dataOwner.value() : m_rawData;
+	}
 
 public:
 	MessagePackDeserializer(const std::vector<byte>& data) : m_rawData(data)
+	{
+		Parse();
+	}
+
+	MessagePackDeserializer(std::vector<byte>&& data)	// This constructor is used to make the deserializer owner of the raw data via a std::move, compaired to the normal constructor which take a reference where the lifetime of the raw data as to be managed by the user.
+		: m_dataOwner(data)
+		, m_rawData(m_dataOwner.value())
 	{
 		Parse();
 	}
@@ -441,7 +491,7 @@ public:
 	T GetValue(const std::string& key) const
 	{
 		const auto itemDef = m_parsedDataLocations.at(key);
-		Range<std::vector<byte>> bytesRange(m_rawData);
+		Range<std::vector<byte>> bytesRange(GetRawData());
 		bytesRange.Consume(itemDef.pos);
 
 		switch (itemDef.type)
@@ -488,7 +538,7 @@ public:
 		if (itemDef.type != ItemType::boolean)
 			throw MessgePackInvalidFormat("The requested value is not of type BOOL");
 
-		return (m_rawData[itemDef.pos] == (byte)FormatFirstByte::btrue);
+		return (GetRawData().at(itemDef.pos) == (byte)FormatFirstByte::btrue);
 	}
 
 	template<>
@@ -498,7 +548,7 @@ public:
 		if (itemDef.type != ItemType::text)
 			throw MessgePackInvalidFormat("The requested value is not of type TEXT");
 
-		return std::string(m_rawData.begin() + itemDef.pos, m_rawData.begin() + itemDef.pos + itemDef.length);
+		return std::string(GetRawData().begin() + itemDef.pos, GetRawData().begin() + itemDef.pos + itemDef.length);
 	}
 
 	template<>
@@ -508,7 +558,20 @@ public:
 		if (itemDef.type != ItemType::bytes_blob)
 			throw MessgePackInvalidFormat("The requested value is not of type BYTES_BLOB");
 
-		return std::vector<byte>(m_rawData.begin() + itemDef.pos, m_rawData.begin() + itemDef.pos + itemDef.length);
+		return std::vector<byte>(GetRawData().begin() + itemDef.pos, GetRawData().begin() + itemDef.pos + itemDef.length);
+	}
+
+
+	template<>
+	MessagePackDeserializer GetValue(const std::string& key) const
+	{
+		const auto itemDef = m_parsedDataLocations.at(key);
+		if (itemDef.type != ItemType::bytes_blob)
+			throw MessgePackInvalidFormat("The requested value is not of type BYTES_BLOB");
+
+		auto bytes = std::vector<byte>(GetRawData().begin() + itemDef.pos, GetRawData().begin() + itemDef.pos + itemDef.length);
+
+		return MessagePackDeserializer(std::move(bytes));
 	}
 
 	Range<std::vector<byte>> GetByteBlobRange(const std::string& key) const
@@ -517,7 +580,7 @@ public:
 		if (itemDef.type != ItemType::bytes_blob)
 			throw MessgePackInvalidFormat("The requested value is not of type BYTES_BLOB");
 
-		Range<std::vector<byte>> range(m_rawData, itemDef.pos + itemDef.length);
+		Range<std::vector<byte>> range(GetRawData(), itemDef.pos + itemDef.length);
 		range.Consume(itemDef.pos);
 
 		return range;
@@ -548,7 +611,6 @@ public:
 
 		return output;
 	}
-
 	template <typename T>
 	std::optional<std::vector<T>> GetArrayOptional(const std::string& key) const
 	{
@@ -563,7 +625,7 @@ public:
 private:
 	void Parse()
 	{
-		Range<std::vector<byte>> range(m_rawData);
+		Range<std::vector<byte>> range(GetRawData());
 
 		ParseMap(range, "");
 	}
@@ -860,3 +922,7 @@ private:
 		return std::string(workingRange.begin(), workingRange.begin() + length);
 	}
 };
+
+#ifdef _MSC_VER
+#pragma warning (default : 4310 )
+#endif // _MSC_VER
