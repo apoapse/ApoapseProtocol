@@ -51,6 +51,37 @@ UNIT_TEST("MessagePack:serialize:unordered_2")
 	UnitTest::Assert(deserializer.GetValue<std::vector<byte>>("bytes").size() == 2 && deserializer.GetValue<bool>("testb"));
 } UNIT_TEST_END
 
+UNIT_TEST("MessagePack:serialize:no_root:ordered")
+{
+	MessagePackSerializer serializer;
+	std::vector<int> arrayData{ 6, 7, 8, -625 };
+
+	serializer.Group("",
+	{
+		MSGPK_ORDERED_APPEND_ARRAY(serializer, int, "root.test_array", arrayData),
+		MSGPK_ORDERED_APPEND(serializer, "root.int1", -26),
+	});
+
+	MessagePackDeserializer deserializer(serializer.GetMessagePackBytes());
+	auto test = serializer.GetMessagePackBytes();
+
+
+	UnitTest::Assert(deserializer.GetValue<Int16>("root.int1") == -26 && deserializer.GetArray<int>("root.test_array").at(1) == 7);
+} UNIT_TEST_END
+
+UNIT_TEST("MessagePack:serialize:no_root:unordered")
+{
+	MessagePackSerializer serializer;
+	std::vector<int> arrayData{ 6, 7, 8, -625 };
+
+	serializer.UnorderedAppendArray("root.test_array", arrayData);
+	serializer.UnorderedAppend("root.int1", -26);
+
+	MessagePackDeserializer deserializer(serializer.GetMessagePackBytes());
+
+	UnitTest::Assert(deserializer.GetValue<Int16>("root.int1") == -26 && deserializer.GetArray<int>("root.test_array").at(1) == 7);
+} UNIT_TEST_END
+
 UNIT_TEST("MessagePack:serialize:unordered:std_array")
 {
 	std::array<byte, 2> arrayTest{ 0xf3, 0x08 };
@@ -133,6 +164,5 @@ UNIT_TEST("MessagePack:serialize:nested_serializer:array")
 
 	UnitTest::Assert(deserializersArray[0].GetValue<std::string>("test_str") == "test_str_0" && deserializersArray[1].GetValue<std::string>("test_str") == "test_str_1");
 } UNIT_TEST_END
-
 
 #endif	// UNIT_TESTS

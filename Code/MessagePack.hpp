@@ -252,7 +252,7 @@ private:
 	inline size_t CountItemsInRootNode() const
 	{
 		if (m_unorderedFields->count("") == 0)
-			return 0;
+			return m_unorderedFields->size();
 		else
 			return m_unorderedFields->at("").size();
 	}
@@ -589,12 +589,7 @@ public:
 	template <typename T>
 	std::optional<T> GetValueOptional(const std::string& key) const
 	{
-		std::optional<T> output;
-
-		if (m_parsedDataLocations.count(key) > 0)
-			output = GetValue<T>(key);
-
-		return output;
+		return (m_parsedDataLocations.count(key) > 0) ? GetValue<T>(key) : std::optional<T>();
 	}
 
 	template <typename T>
