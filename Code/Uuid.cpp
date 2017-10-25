@@ -3,6 +3,7 @@
 #include "Common.h"
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
+#include "MemoryUtils.hpp"
 
 Uuid::Uuid(std::array<byte, uuidLengthInBytes>& uuidBytes)
 {
@@ -11,10 +12,10 @@ Uuid::Uuid(std::array<byte, uuidLengthInBytes>& uuidBytes)
 
 Uuid::Uuid(const std::vector<byte>& uuidBytes)
 {
-	if (uuidBytes.size() == uuidLengthInBytes)
+	if (uuidBytes.size() != uuidLengthInBytes)
 		throw std::out_of_range("The input vector is not of the correct size to create a uuid");
 
-	std::copy(uuidBytes.begin(), uuidBytes.end(), m_uuidRawFormat.begin());
+	m_uuidRawFormat = VectorToArray<byte, uuidLengthInBytes>(uuidBytes);
 }
 
 Uuid::Uuid(Range<std::vector<byte>>& range)

@@ -11,6 +11,8 @@ class Uuid
 	std::array<byte, uuidLengthInBytes> m_uuidRawFormat;
 
 public:
+	Uuid() = default;
+
 	Uuid(std::array<byte, uuidLengthInBytes>& uuidBytes);
 	Uuid(const std::vector<byte>& uuidBytes);
 	Uuid(Range<std::vector<byte>>& range);
