@@ -20,7 +20,8 @@ public:
 	const std::array<byte, uuidLengthInBytes>& GetInRawFormat() const;
 	std::vector<byte> GetAsByteVector() const;
 
-	bool operator==(const Uuid& other);
+	bool operator==(const Uuid& other) const;
+	bool operator<(const Uuid& other) const;
 
 	static Uuid Generate();
 
