@@ -1,10 +1,23 @@
 #pragma once
 #include "Diagnostic.hpp"
+#include <array>
 
 template <typename DERIVED, typename BASE>
-DERIVED* object_static_cast_non_owning(BASE* ptr)
+inline DERIVED* object_static_cast_non_owning(BASE* ptr)
 {
 	return static_cast<DERIVED*>(ptr);
+}
+
+template <typename T, size_t SIZE>
+inline std::array<T, SIZE> VectorToArray(const std::vector<T>& vector)
+{
+	if (vector.size() != SIZE)
+		throw std::range_error("The specified vector is not of the expect length");
+
+	std::array<T, SIZE> output;
+	std::copy(vector.begin(), vector.end(), output.begin());
+
+	return output;
 }
 
 template <typename CLASS>
