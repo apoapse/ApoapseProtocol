@@ -1,13 +1,12 @@
 #pragma once
 #include <vector>
 #include "TypeDefs.hpp"
+#include "CryptographyTypes.hpp"
 #include <cryptopp/sha.h>
 #include <cryptopp/rsa.h>
 #include <cryptopp/seed.h>
 #include <cryptopp/osrng.h>
 
-using PrivateKeyBytes = CryptoPP::SecBlock<byte>;
-using PublicKeyBytes = std::vector<byte>;
 
 namespace Cryptography
 {

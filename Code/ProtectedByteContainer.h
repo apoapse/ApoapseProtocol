@@ -1,7 +1,7 @@
 #pragma once
 #include "TypeDefs.hpp"
 #include <vector>
-#include "HashTypes.hpp"
+#include "CryptographyTypes.hpp"
 
 // ProtectedByteContainer
 // Use this class can be used to store a private key on the RAM with a bit more safety than with a simple vector

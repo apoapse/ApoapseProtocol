@@ -121,9 +121,6 @@
     <ClInclude Include="Hash.hpp">
       <Filter>Cryptography\Algorithms</Filter>
     </ClInclude>
-    <ClInclude Include="HashTypes.hpp">
-      <Filter>Cryptography\Algorithms</Filter>
-    </ClInclude>
     <ClInclude Include="ProtocolVersion.hpp">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
@@ -132,6 +129,21 @@
     </ClInclude>
     <ClInclude Include="HMAC.hpp">
       <Filter>Cryptography\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="CryptographyTypes.hpp">
+      <Filter>Cryptography\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="UsergroupsManager.h">
+      <Filter>UsersSystem\UsergroupBlockchain</Filter>
+    </ClInclude>
+    <ClInclude Include="Usergroup.h">
+      <Filter>UsersSystem\UsergroupBlockchain</Filter>
+    </ClInclude>
+    <ClInclude Include="Username.h">
+      <Filter>UsersSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="IUsersManager.h">
+      <Filter>UsersSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -221,6 +233,15 @@
     <ClCompile Include="UT_Cryptography.cpp">
       <Filter>UnitTests\Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Username.cpp">
+      <Filter>UsersSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Usergroup.cpp">
+      <Filter>UsersSystem\UsergroupBlockchain</Filter>
+    </ClCompile>
+    <ClCompile Include="UsergroupsManager.cpp">
+      <Filter>UsersSystem\UsergroupBlockchain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Parsers">
@@ -285,6 +306,12 @@
     </Filter>
     <Filter Include="Cryptography\Algorithms">
       <UniqueIdentifier>{8309ae43-42ae-4ebd-9b71-95b460bfe0ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UsersSystem">
+      <UniqueIdentifier>{c14b3976-2e18-4ab4-a312-fc215ab57c61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UsersSystem\UsergroupBlockchain">
+      <UniqueIdentifier>{6545a2a3-e161-4379-96ee-21cbad1d9d9a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

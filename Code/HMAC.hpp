@@ -2,7 +2,7 @@
 #include <cryptopp/sha.h>
 #include <cryptopp/hmac.h>
 #include <cryptopp/secblock.h>
-#include "HashTypes.hpp"
+#include "CryptographyTypes.hpp"
 
 using HMAC_key = CryptoPP::SecBlock<byte>;
 

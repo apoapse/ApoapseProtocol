@@ -2,7 +2,7 @@
 #include <array>
 #include <vector>
 #include "TypeDefs.hpp"
-#include "HashTypes.hpp"
+#include "CryptographyTypes.hpp"
 
 #include <cryptopp/sha.h>
 #include <cryptopp/sha3.h>
