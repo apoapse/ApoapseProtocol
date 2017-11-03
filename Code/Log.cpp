@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Log.h"
 #include <boost\date_time.hpp>
+#include "ByteUtils.hpp"
 
 LogMessage::LogMessage(const std::string& message, LogSeverity severity)
 	: msg(message)
@@ -55,4 +56,10 @@ void LogMessage::GenerateDateTime()
 	stream << date << currentDate.time_of_day();
 
 	dateTime = stream.str();
+}
+
+Log& Log::operator<<(std::vector<byte> item)
+{
+	m_stream << BytesToHexString(item);
+	return *this;
 }

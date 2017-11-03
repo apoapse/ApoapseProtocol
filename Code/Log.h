@@ -3,6 +3,7 @@
 #include <sstream>
 #include "ILogger.hpp"
 #include "eLogSeverity.hpp"
+#include "TypeDefs.hpp"
 
 struct LogMessage
 {
@@ -58,4 +59,6 @@ public:
 		m_stream << e.what();
 		return *this;
 	}
+
+	Log& operator<<(std::vector<byte> item);
 };
