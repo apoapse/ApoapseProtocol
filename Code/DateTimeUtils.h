@@ -10,6 +10,7 @@ namespace DateTimeUtils
 
 	public:
 		UTCDateTime(const std::string& dateTime);
+		UTCDateTime() = default;
 
 		std::string str() const;
 

@@ -7,7 +7,8 @@
 
 DateTimeUtils::UTCDateTime::UTCDateTime(const std::string& dateTime) : m_dateTimeStr(dateTime)
 {
-	SECURITY_ASSERT(ValidateFormat(dateTime));
+	if (!ValidateFormat(dateTime))
+		throw std::exception("Text of unexpected format for a ISO-8601 date time");
 }
 
 std::string DateTimeUtils::UTCDateTime::str() const
