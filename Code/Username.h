@@ -20,15 +20,9 @@ public:
 		return stream;
 	}
 
-	bool operator<(const Username& other) const
-	{
-		return (m_usernameHash < other.GetRaw());
-	}
-
-	bool operator==(const Username& other) const
-	{
-		return (m_usernameHash == other.GetRaw());
-	}
+	bool operator<(const Username& other) const;
+	bool operator==(const Username& other) const;
+	bool operator!=(const Username& other) const;
 
 	static bool IsValid(const std::vector<byte>& usernameHash);
 };

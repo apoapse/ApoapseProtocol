@@ -24,6 +24,21 @@ std::string Username::ToStr() const
 	return BytesToHexString(m_usernameHash);
 }
 
+bool Username::operator<(const Username& other) const
+{
+	return (m_usernameHash < other.GetRaw());
+}
+
+bool Username::operator==(const Username& other) const
+{
+	return (m_usernameHash == other.GetRaw());
+}
+
+bool Username::operator!=(const Username& other) const
+{
+	return (m_usernameHash != other.GetRaw());
+}
+
 bool Username::IsValid(const std::vector<byte>& usernameHash)
 {
 	return (usernameHash.size() == sha256Length);

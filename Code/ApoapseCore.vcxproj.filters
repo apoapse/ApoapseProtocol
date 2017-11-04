@@ -145,6 +145,9 @@
     <ClInclude Include="IUsersManager.h">
       <Filter>UsersSystem</Filter>
     </ClInclude>
+    <ClInclude Include="IUser.hpp">
+      <Filter>UsersSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">

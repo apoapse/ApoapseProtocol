@@ -160,6 +160,7 @@
     <ClInclude Include="Hash.hpp" />
     <ClInclude Include="CryptographyTypes.hpp" />
     <ClInclude Include="HMAC.hpp" />
+    <ClInclude Include="IUser.hpp" />
     <ClInclude Include="IUsersManager.h" />
     <ClInclude Include="Json.hpp" />
     <ClInclude Include="ProtectedByteContainer.h" />
