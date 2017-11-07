@@ -27,6 +27,7 @@ public:
 	bool DoesUsergroupExist(const Uuid& uuid) const;
 	Usergroup& GetUsergroupByUuid(const Uuid& uuid);
 	const Usergroup& GetUsergroupOfUser(const Username& username) const;
+	size_t GetUsegroupsCount() const;
 
 	UsergroupBlock GetBlockInEffectAtTheTime(const Uuid& usergroupUuid, const DateTimeUtils::UTCDateTime& dateTime);
 	

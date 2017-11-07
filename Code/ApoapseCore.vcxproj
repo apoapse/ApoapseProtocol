@@ -157,6 +157,7 @@
       <FileType>CppHeader</FileType>
     </ClCompile>
     <ClCompile Include="Uuid.cpp" />
+    <ClInclude Include="CmdServerInfo.h" />
     <ClInclude Include="Hash.hpp" />
     <ClInclude Include="CryptographyTypes.hpp" />
     <ClInclude Include="HMAC.hpp" />

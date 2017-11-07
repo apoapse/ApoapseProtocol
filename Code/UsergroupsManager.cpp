@@ -10,6 +10,8 @@ UsergroupsManager::UsergroupsManager(IUsersManager& usersManager) : usersManager
 
 void UsergroupsManager::Init()
 {
+	LOG << "Initializing usergoups...";
+
 	try
 	{
 		SQLQuery query(*global->database);
@@ -114,6 +116,11 @@ const Usergroup& UsergroupsManager::GetUsergroupOfUser(const Username& username)
 	}
 
 	throw std::exception("The usergroup for the provided username cannot be found");
+}
+
+size_t UsergroupsManager::GetUsegroupsCount() const
+{
+	return m_usergroups.size();
 }
 
 UsergroupBlock UsergroupsManager::GetBlockInEffectAtTheTime(const Uuid& usergroupUuid, const DateTimeUtils::UTCDateTime& dateTime)

@@ -94,9 +94,6 @@
     <ClInclude Include="DllExportSymbolApi.hpp">
       <Filter>DllUtils</Filter>
     </ClInclude>
-    <ClInclude Include="CmdError.h">
-      <Filter>CommandSystem\CommandBases</Filter>
-    </ClInclude>
     <ClInclude Include="MemoryUtils.hpp">
       <Filter>TypeUtils</Filter>
     </ClInclude>
@@ -147,6 +144,12 @@
     </ClInclude>
     <ClInclude Include="IUser.hpp">
       <Filter>UsersSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CmdError.h">
+      <Filter>CommandSystem\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="CmdServerInfo.h">
+      <Filter>CommandSystem\Commands</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -203,9 +206,6 @@
     <ClCompile Include="SQLQuery.cpp">
       <Filter>DatabaseAbstractionLayer</Filter>
     </ClCompile>
-    <ClCompile Include="CmdError.cpp">
-      <Filter>CommandSystem\CommandBases</Filter>
-    </ClCompile>
     <ClCompile Include="Uuid.cpp">
       <Filter>UUID</Filter>
     </ClCompile>
@@ -244,6 +244,9 @@
     </ClCompile>
     <ClCompile Include="UsergroupsManager.cpp">
       <Filter>UsersSystem\UsergroupBlockchain</Filter>
+    </ClCompile>
+    <ClCompile Include="CmdError.cpp">
+      <Filter>CommandSystem\Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -285,9 +288,6 @@
     </Filter>
     <Filter Include="CommandSystem">
       <UniqueIdentifier>{cd27cce5-6f89-4375-a8d0-5468339ac4ce}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommandSystem\CommandBases">
-      <UniqueIdentifier>{a8b63e2c-e2b6-4912-9c85-58f282d17773}</UniqueIdentifier>
     </Filter>
     <Filter Include="DllUtils">
       <UniqueIdentifier>{8f17086c-17e4-49b4-a5cb-291a1ace29f8}</UniqueIdentifier>
