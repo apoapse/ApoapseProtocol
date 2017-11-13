@@ -21,7 +21,7 @@ struct IFieldValidator
 };
 
 template <typename T>
-class FieldValueValidator : public IFieldValidator
+class FieldValueValidator final : public IFieldValidator
 {
 	std::function<bool(T)> m_validatorFunction;
 	
@@ -51,12 +51,12 @@ public:
 };
 
 template <typename T>
-class FieldArrayValidator : public IFieldValidator
+class FieldArrayValidator final : public IFieldValidator
 {
-	std::function<bool(std::vector<T>)> m_validatorFunction;
+	const std::function<bool(std::vector<T>&)> m_validatorFunction;
 
 public:
-	FieldArrayValidator(std::function<bool(std::vector<T>)> validatorFunction) : m_validatorFunction(validatorFunction)
+	FieldArrayValidator(std::function<bool(std::vector<T>&)> validatorFunction) : m_validatorFunction(validatorFunction)
 	{
 	}
 
@@ -65,18 +65,13 @@ public:
 		return deserializer.GetArrayOptional<T>(fieldName).has_value();
 	}
 
-	bool HasValidatorFunction() const override
-	{
-		return m_validatorFunction.has_value();
-	}
-
 	bool ExecValidator(const std::string& fieldName, const MessagePackDeserializer& deserializer) const override
 	{
 		try
 		{
-			std::vector<T> array = deserializer.GetArray<T>(fieldName);
+			std::vector<T> value = deserializer.GetArray<T>(fieldName);
 
-			return m_validatorFunction.value()(array);
+			return m_validatorFunction(value);
 		}
 		catch (const std::exception&)
 		{

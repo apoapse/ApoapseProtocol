@@ -16,7 +16,7 @@ struct Global
 
 #ifdef APOAPSE_SERVER
 	class ServerSettings* settings = nullptr;
-#endif // APOAPSE_CLIENT
+#endif // APOAPSE_SERVER
 
 #ifdef APOAPSE_CLIENT
 	class HTMLUI* htmlUI = nullptr;

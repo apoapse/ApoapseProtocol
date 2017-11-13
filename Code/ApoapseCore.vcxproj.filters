@@ -148,8 +148,8 @@
     <ClInclude Include="CmdError.h">
       <Filter>CommandSystem\Commands</Filter>
     </ClInclude>
-    <ClInclude Include="CmdServerInfo.h">
-      <Filter>CommandSystem\Commands</Filter>
+    <ClInclude Include="AES.hpp">
+      <Filter>Cryptography\Algorithms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

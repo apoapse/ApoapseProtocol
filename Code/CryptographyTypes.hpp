@@ -21,3 +21,6 @@ using hash_SHA3_512 = std::array<byte, sha512Length>;
 using PrivateKeyBytes = CryptoPP::SecBlock<byte>;
 using PublicKeyBytes = std::vector<byte>;
 using EncryptedPrivateKeyBytes = std::vector<byte>;
+
+// AES-CBC
+using IV = std::array<byte, 16>;
