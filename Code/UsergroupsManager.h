@@ -22,12 +22,15 @@ public:
 	static const std::vector<std::string>& GetAllowedPermissions();
 	static bool IsPermissionExist(const std::string& permission);
 
-	bool TryCommitNewBlockFromCommand(const MessagePackDeserializer& msgPack, IUser& author);
+	bool TryCommitNewBlockFromCommand(const MessagePackDeserializer& msgPack, IUser* author = nullptr);
+	bool TryCreateNewUsergroup(const Uuid& uuid, const std::vector<std::string>& permissions, const MessagePackDeserializer& msgPack);
 
 	bool DoesUsergroupExist(const Uuid& uuid) const;
 	Usergroup& GetUsergroupByUuid(const Uuid& uuid);
 	const Usergroup& GetUsergroupOfUser(const Username& username) const;
 	size_t GetUsegroupsCount() const;
+
+	void DeleteUsergroup(const Uuid& uuid);
 
 	UsergroupBlock GetBlockInEffectAtTheTime(const Uuid& usergroupUuid, const DateTimeUtils::UTCDateTime& dateTime);
 	

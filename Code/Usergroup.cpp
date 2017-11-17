@@ -203,7 +203,7 @@ std::vector<Username> UsergroupBlock::ReadUsernamesFromField(std::vector<ByteCon
 }
 
 
-Usergroup::Usergroup(const Uuid& uuid, UsergroupsManager& usergrpManager)
+Usergroup::Usergroup(const Uuid& uuid, UsergroupsManager* usergrpManager)
 	: uuid(uuid)
 	, usergroupsManager(usergrpManager)
 {
@@ -212,7 +212,7 @@ Usergroup::Usergroup(const Uuid& uuid, UsergroupsManager& usergrpManager)
 
 Usergroup Usergroup::CreateFromDatabase(const Uuid& uuid, UsergroupsManager& usergrpManager)
 {
-	Usergroup group(uuid, usergrpManager);
+	Usergroup group(uuid, &usergrpManager);
 	group.ConstructFromDatabase();
 
 	return group;
@@ -246,7 +246,7 @@ void Usergroup::ConstructFromDatabase()
 			block.usergroupUuid = uuid;
 
 			MessagePackDeserializer deserializer(rawblock);
-			if (!UsergroupBlock::ReadRawBlock(deserializer, block, usergroupsManager))
+			if (!UsergroupBlock::ReadRawBlock(deserializer, block, *usergroupsManager))
 				std::exception("Invalid usergroup block");
 
 			if (ValidateBlockInContext(block, previousBlock))
@@ -266,12 +266,19 @@ void Usergroup::ConstructFromDatabase()
 
 bool Usergroup::ValidateBlockInContext(const UsergroupBlock& block, const UsergroupBlock* previousBlock)
 {
+	const PublicKeyBytes signerPublicKey = usergroupsManager->usersManager.GetUserIdentityPublicKey(block.macSigner);
+	if (!ValidateBlockMac(block, signerPublicKey))
+	{
+		LOG << LogSeverity::error << "The block signature is invalid";
+		return false;
+	}
+
 	if (previousBlock == nullptr)
 	{
 		if (block.version != 1)
 		{
 			LOG << LogSeverity::error << "The first block does not have 1 as a version number";
-			return false;
+			return false; // #TODO Do not disconnect the client, just discard the block
 		}
 	}
 	else
@@ -288,13 +295,6 @@ bool Usergroup::ValidateBlockInContext(const UsergroupBlock& block, const Usergr
 			return false;
 		}
 
-		const PublicKeyBytes signerPublicKey = usergroupsManager.usersManager.GetUserIdentityPublicKey(block.macSigner);
-		if (!ValidateBlockMac(block, signerPublicKey))
-		{
-			LOG << LogSeverity::error << "The block signature is invalid";
-			return false;
-		}
-
 		if (block.dateTime < previousBlock->dateTime)
 		{
 			LOG << LogSeverity::error << "The current block is older than the previous block";
@@ -302,7 +302,7 @@ bool Usergroup::ValidateBlockInContext(const UsergroupBlock& block, const Usergr
 		}
 
 
-		const auto blockOfTheAuthorAtCreationTime = usergroupsManager.GetBlockInEffectAtTheTime(uuid, block.dateTime);
+		const auto blockOfTheAuthorAtCreationTime = usergroupsManager->GetBlockInEffectAtTheTime(uuid, block.dateTime);
 		if (block.permissions != previousBlock->permissions)
 		{
 			if (!blockOfTheAuthorAtCreationTime.HasPermission("CHANGE_PERMISSIONS"))
@@ -328,6 +328,12 @@ bool Usergroup::ValidateBlockInContext(const UsergroupBlock& block, const Usergr
 void Usergroup::InsertNewBlock(const UsergroupBlock& block)
 {
 	m_blockchain.push_back(block);
+	
+	SQLQuery query(*global->database);
+	query << INSERT_INTO << "usergroups_blockchain" << "(usergroup_uuid, version, block, mac, date_time)" <<
+			 VALUES<< "(" << block.usergroupUuid.GetAsByteVector() << "," << static_cast<Int64>(block.version) << "," << block.blockRawBytes << "," << block.mac << "," << block.dateTime.str() << ")";
+	query.ExecAsync();
+
 	LOG << LogSeverity::verbose << "Added a new block to the usergroup " << uuid.GetAsByteVector() << " version: " << block.version;
 }
 

@@ -23,6 +23,7 @@
 #define DESC		" DESC "
 #define ASC			" ASC "
 #define LIMIT		" LIMIT "
+#define DELETE_FROM	"DELETE FROM "
 
 #define STR_TO_QUERY_SYNTAX(_str)	_str.c_str()
 

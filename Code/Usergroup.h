@@ -37,15 +37,16 @@ private:
 
 class Usergroup
 {
-	UsergroupsManager& usergroupsManager;
+	UsergroupsManager* usergroupsManager;
 	std::vector<UsergroupBlock> m_blockchain;	// We expect this list to be sorted from the first version to the last #THREADING
 	//std::vector<Username> m_members;
 
 public:
 	size_t currentVersion = 0;
-	const Uuid uuid;
+	Uuid uuid;
 
-	Usergroup(const Uuid& uuid, UsergroupsManager& usergrpManager);
+	Usergroup(const Uuid& uuid, UsergroupsManager* usergrpManager);
+	Usergroup() = default;
 
 	static Usergroup CreateFromDatabase(const Uuid& uuid, UsergroupsManager& usergrpManager);
 	void ConstructFromDatabase();

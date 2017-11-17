@@ -97,6 +97,12 @@ struct CommandField
 	std::string name;
 	FieldRequirement requirement;
 	IFieldValidator* fieldValueValidator;
+
+	template <typename T>
+	static bool ContainerIsNotEmpty(const T& arr)
+	{
+		return (arr.size() > 0);
+	}
 };
 
 struct CommandInfo

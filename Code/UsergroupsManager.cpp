@@ -36,7 +36,7 @@ void UsergroupsManager::Init()
 
 void UsergroupsManager::InitializeUsergroup(const Uuid& groupUuid)
 {
-	auto group = Usergroup::CreateFromDatabase(groupUuid, *this);
+	m_usergroups[groupUuid] = Usergroup::CreateFromDatabase(groupUuid, *this);
 }
 
 const std::vector<std::string>& UsergroupsManager::GetAllowedPermissions()
@@ -59,7 +59,7 @@ bool UsergroupsManager::IsPermissionExist(const std::string& permission)
 	return (std::find(allowedPerms.begin(), allowedPerms.end(), permission) != allowedPerms.end());
 }
 
-bool UsergroupsManager::TryCommitNewBlockFromCommand(const MessagePackDeserializer& msgPack, IUser& author)
+bool UsergroupsManager::TryCommitNewBlockFromCommand(const MessagePackDeserializer& msgPack, IUser* author /*= nullptr*/)
 {
 	if (auto block = UsergroupBlock::CreateFromCommand(msgPack, *this))
 	{
@@ -74,7 +74,7 @@ bool UsergroupsManager::TryCommitNewBlockFromCommand(const MessagePackDeserializ
 		if (!usergroup.ValidateBlockInContext(block.value(), &usergroup.GetCurrentVersionBlock()))
 			return false;
 
-		if (block->macSigner != author.GetUsername())
+		if (author && block->macSigner != author->GetUsername())
 		{
 			LOG << LogSeverity::error << "Trying to insert a new username block from a user command but the mac signer is not the command user";
 			return false;
@@ -86,6 +86,32 @@ bool UsergroupsManager::TryCommitNewBlockFromCommand(const MessagePackDeserializ
 	}
 	else
 	{
+		return false;
+	}
+}
+
+bool UsergroupsManager::TryCreateNewUsergroup(const Uuid& uuid, const std::vector<std::string>& permissions, const MessagePackDeserializer& msgPack)
+{
+	if (DoesUsergroupExist(uuid))
+	{
+		LOG << LogSeverity::error << "A usergroup with the name uuid already exist";
+		return false;
+	}
+
+	Usergroup group(uuid, this);
+	m_usergroups[uuid] = group;
+
+	if (TryCommitNewBlockFromCommand(msgPack))
+	{
+		SQLQuery query(*global->database);
+		query << INSERT_INTO << "usergroups" << "(uuid)" << VALUES << "(" << uuid.GetAsByteVector() << ")";
+		query.ExecAsync();
+
+		return true;
+	}
+	else
+	{
+		DeleteUsergroup(uuid);
 		return false;
 	}
 }
@@ -121,6 +147,15 @@ const Usergroup& UsergroupsManager::GetUsergroupOfUser(const Username& username)
 size_t UsergroupsManager::GetUsegroupsCount() const
 {
 	return m_usergroups.size();
+}
+
+void UsergroupsManager::DeleteUsergroup(const Uuid& uuid)
+{
+	m_usergroups.erase(uuid);
+
+	SQLQuery query(*global->database);
+	query << DELETE_FROM << "usergroups" << WHERE << "uuid" << EQUALS << uuid.GetAsByteVector();
+	query.ExecAsync();
 }
 
 UsergroupBlock UsergroupsManager::GetBlockInEffectAtTheTime(const Uuid& usergroupUuid, const DateTimeUtils::UTCDateTime& dateTime)
