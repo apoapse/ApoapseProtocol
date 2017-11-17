@@ -151,6 +151,9 @@
     <ClInclude Include="AES.hpp">
       <Filter>Cryptography\Algorithms</Filter>
     </ClInclude>
+    <ClInclude Include="Random.hpp">
+      <Filter>Cryptography\Algorithms</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">

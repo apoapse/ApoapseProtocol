@@ -166,6 +166,7 @@
     <ClInclude Include="Json.hpp" />
     <ClInclude Include="ProtectedByteContainer.h" />
     <ClInclude Include="ProtocolVersion.hpp" />
+    <ClInclude Include="Random.hpp" />
     <ClInclude Include="RSA.hpp" />
     <ClInclude Include="SecurityAlert.h" />
     <ClInclude Include="ApoapseErrorCodes.hpp" />
