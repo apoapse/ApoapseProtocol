@@ -20,7 +20,7 @@ public:
 
 	void InitializeUsergroup(const Uuid& groupUuid);
 	static const std::vector<std::string>& GetAllowedPermissions();
-	static bool IsPermissionExist(const std::string& permission);
+	static bool DoesPermissionExist(const std::string& permission);
 
 	bool TryCommitNewBlockFromCommand(const MessagePackDeserializer& msgPack, IUser* author = nullptr);
 	bool TryCreateNewUsergroup(const Uuid& uuid, const std::vector<std::string>& permissions, const MessagePackDeserializer& msgPack);

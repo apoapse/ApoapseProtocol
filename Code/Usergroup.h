@@ -10,6 +10,12 @@ class UsergroupsManager;
 
 struct UsergroupBlock
 {
+	struct UserKeys
+	{
+		Username username;
+		EncryptedPrivateKeyBytes encryptedDecryptionKey;
+	};
+
 	Uuid usergroupUuid;
 	UInt64 version = 0;
 	PublicKeyBytes publicKey;
@@ -20,26 +26,28 @@ struct UsergroupBlock
 	std::vector<byte> mac;
 	hash_SHA3_256 previousBlockHash;
 	DateTimeUtils::UTCDateTime dateTime;
+	std::vector<UserKeys> usersKeys;
 	ByteContainer blockRawBytes;
 
 	static std::optional<UsergroupBlock> CreateFromCommand(const MessagePackDeserializer& msgPack, UsergroupsManager& usergrpManager/*, const Username& author*/);
 	static std::optional<UsergroupBlock> CreateFromDatabase(const Uuid& usergroupUuid, UInt64 version, UsergroupsManager& usergrpManager);
 	static bool CheckBlockMessagePackFields(const MessagePackDeserializer& blockMsgPack);
 	static bool ReadRawBlock(const MessagePackDeserializer& blockMsgPack, UsergroupBlock& block, UsergroupsManager& usergrpManager);
-	static bool CheckPermissions(const UsergroupBlock& block);
-	static bool CheckUsers(const UsergroupBlock& block, UsergroupsManager& usergrpManager);
 
 	bool HasPermission(const std::string& permission) const;
 
 private:
 	static std::vector<Username> ReadUsernamesFromField(std::vector<ByteContainer> arr);
+	static bool CheckPermissions(const UsergroupBlock& block);
+	static bool CheckUsers(const UsergroupBlock& block, UsergroupsManager& usergrpManager);
+	static bool CheckUsersKeys(const UsergroupBlock& block, UsergroupsManager& usergrpManager);
+	static std::vector<UserKeys> ReadUserKeysFromCmd(const MessagePackDeserializer& msgPack);
 };
 
 class Usergroup
 {
 	UsergroupsManager* usergroupsManager;
 	std::vector<UsergroupBlock> m_blockchain;	// We expect this list to be sorted from the first version to the last #THREADING
-	//std::vector<Username> m_members;
 
 public:
 	size_t currentVersion = 0;
@@ -50,9 +58,6 @@ public:
 
 	static Usergroup CreateFromDatabase(const Uuid& uuid, UsergroupsManager& usergrpManager);
 	void ConstructFromDatabase();
-	//bool PostValidate() const;
-
-	//bool VerifyNewBlock(const UsergroupBlock& block);
 
 	bool operator==(const Usergroup& other) const;
 

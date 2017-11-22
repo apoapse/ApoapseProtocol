@@ -44,5 +44,3 @@ void FatalError(const std::string& msg);
 #else
 #define LOG_DEBUG_FUNCTION_NAME()
 #endif
-
-#define SECURITY_ASSERT(_exp)	ASSERT_MSG(_exp, "Security assert")	// #TODO design so that we can use it outside of the debug mode

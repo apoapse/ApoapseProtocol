@@ -131,6 +131,7 @@ bool UsergroupBlock::ReadRawBlock(const MessagePackDeserializer& blockMsgPack, U
 	block.permissions = blockMsgPack.GetArray<std::string>("permissions");
 	block.previousBlockHash = VectorToArray<byte, sha256Length>(blockMsgPack.GetValue<ByteContainer>("previous_block.hash"));
 	block.macSigner = Username(blockMsgPack.GetValue<ByteContainer>("mac_user_signer"));
+	block.usersKeys = ReadUserKeysFromCmd(blockMsgPack);
 
 	if (block.dateTime > DateTimeUtils::UTCDateTime::CurrentTime())
 	{
@@ -138,7 +139,7 @@ bool UsergroupBlock::ReadRawBlock(const MessagePackDeserializer& blockMsgPack, U
 		return false;
 	}
 
-	if (!CheckPermissions(block) || !CheckUsers(block, usergrpManager))
+	if (!CheckPermissions(block) || !CheckUsers(block, usergrpManager) || !CheckUsersKeys(block, usergrpManager))
 		return false;
 
 	return true;
@@ -148,7 +149,7 @@ bool UsergroupBlock::CheckPermissions(const UsergroupBlock& block)
 {
 	for (const auto& perm : block.permissions)
 	{
-		if (!UsergroupsManager::IsPermissionExist(perm))
+		if (!UsergroupsManager::DoesPermissionExist(perm))
 		{
 			LOG << LogSeverity::error << "One of the permissions of the usergroup block is not present in the whitelist";
 			return false;
@@ -180,9 +181,68 @@ bool UsergroupBlock::CheckUsers(const UsergroupBlock& block, UsergroupsManager& 
 	return true;
 }
 
+bool UsergroupBlock::CheckUsersKeys(const UsergroupBlock& block, UsergroupsManager& usergrpManager)
+{
+	if (block.usersKeys.empty())
+	{
+		LOG << LogSeverity::error << "The users keys list is empty";
+		return false;
+	}
+
+	if (block.usersKeys.size() != block.userList.size())
+	{
+		LOG << LogSeverity::error << "The number of users keys does not match the number of users defined in the usergroup block";
+		return false;
+	}
+
+	for (const auto& username : block.userList)
+	{
+		const auto res = std::find_if(block.usersKeys.begin(), block.usersKeys.end(), [&username](const UserKeys& userKeys)
+		{
+			return (userKeys.username == username);
+		});
+
+		if (res == block.usersKeys.end())
+		{
+			LOG << LogSeverity::error << "One of the users of the block does not have a corresponding encrypted private key";
+			return false;
+		}
+	}
+
+	return true;
+}
+
+std::vector<UsergroupBlock::UserKeys> UsergroupBlock::ReadUserKeysFromCmd(const MessagePackDeserializer& msgPack)
+{
+	std::vector<UsergroupBlock::UserKeys> output;
+
+	if (auto fields = msgPack.GetArrayOptional<MessagePackDeserializer>("users_keys"))
+	{
+		for (const auto& item : *fields)
+		{
+			if (!item.GetValueOptional<ByteContainer>("username") || !item.GetValueOptional<ByteContainer>("decryption_key"))
+				return std::vector<UsergroupBlock::UserKeys>();
+
+			if (!Username::IsValid(item.GetValue<ByteContainer>("username")))
+				return std::vector<UsergroupBlock::UserKeys>();
+
+			if (item.GetValue<ByteContainer>("decryption_key").empty())
+				return std::vector<UsergroupBlock::UserKeys>();
+
+			UsergroupBlock::UserKeys keyDef;
+			keyDef.username = Username(item.GetValue<ByteContainer>("username"));
+			keyDef.encryptedDecryptionKey = item.GetValue<ByteContainer>("decryption_key");
+
+			output.push_back(keyDef);
+		}
+	}
+
+	return output;
+}
+
 bool UsergroupBlock::HasPermission(const std::string& perm) const
 {
-	ASSERT_MSG(UsergroupsManager::IsPermissionExist(perm), "Trying to compare a permission that does not exist.");
+	ASSERT_MSG(UsergroupsManager::DoesPermissionExist(perm), "Trying to compare a permission that does not exist.");
 
 	return (std::find(permissions.begin(), permissions.end(), perm) != permissions.end());
 }

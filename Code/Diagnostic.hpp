@@ -20,6 +20,23 @@
 		}\
 	} while (false) \
 
+#else
+
+#define ASSERT_MSG(_exp, _msg)
+#define ASSERT(_exp)
+
+#endif // DEBUG
+
+#ifdef ENABLE_SECURITY_ASSERTS
+
+#define SECURITY_ASSERT(_exp)	if (!(_exp))	throw std::exception(std::string("SECURITY ASSERT: " + ExtractClassName(__FUNCTION__)).c_str());	// #TODO design so that we can use it outside of the debug mode
+
+#else
+
+#define SECURITY_ASSERT(_exp)	
+
+#endif // ENABLE_SECURITY_ASSETS
+
 inline std::string ExtractFileName(const std::string& filePath)
 {
 	auto pos = filePath.find_last_of("\\");
@@ -30,13 +47,6 @@ inline std::string ExtractFileName(const std::string& filePath)
 	else
 		return filePath;
 }
-
-#else
-
-#define ASSERT_MSG(_exp, _msg)	
-#define ASSERT(_exp)	
-
-#endif // DEBUG
 
 inline std::string ExtractClassName(const std::string& fullName)
 {

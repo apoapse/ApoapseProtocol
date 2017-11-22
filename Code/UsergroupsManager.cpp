@@ -52,7 +52,7 @@ const std::vector<std::string>& UsergroupsManager::GetAllowedPermissions()
 	return permissions;
 }
 
-bool UsergroupsManager::IsPermissionExist(const std::string& permission)
+bool UsergroupsManager::DoesPermissionExist(const std::string& permission)
 {
 	const auto& allowedPerms = GetAllowedPermissions();
 
@@ -79,7 +79,7 @@ bool UsergroupsManager::TryCommitNewBlockFromCommand(const MessagePackDeserializ
 			LOG << LogSeverity::error << "Trying to insert a new username block from a user command but the mac signer is not the command user";
 			return false;
 		}
-
+		
 		usergroup.InsertNewBlock(block.value());
 		// #TODO if server: send new block (avoir un système externe et universel de traitement des opérations?
 		return true;
@@ -94,7 +94,7 @@ bool UsergroupsManager::TryCreateNewUsergroup(const Uuid& uuid, const std::vecto
 {
 	if (DoesUsergroupExist(uuid))
 	{
-		LOG << LogSeverity::error << "A usergroup with the name uuid already exist";
+		LOG << LogSeverity::error << "A usergroup with this uuid already exist";
 		return false;
 	}
 
