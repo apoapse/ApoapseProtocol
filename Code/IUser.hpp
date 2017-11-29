@@ -1,4 +1,6 @@
 #pragma once
+class Username;
+class Uuid;
 
 struct IUser
 {

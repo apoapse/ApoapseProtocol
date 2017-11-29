@@ -5,263 +5,6 @@
 #include "UsergroupsManager.h"
 #include "MemoryUtils.hpp"
 #include "SQLQuery.h"
-#include "Hash.hpp"
-#include "UsergroupsManager.h"
-
-std::optional<UsergroupBlock> UsergroupBlock::CreateFromCommand(const MessagePackDeserializer& msgPack, UsergroupsManager& usergrpManager/*, const Username& author*/)
-{
-	try
-	{
-		UsergroupBlock block{};
-	
-		{
-			if (!msgPack.GetValueOptional<ByteContainer>("usergroup_block.uuid") || !Uuid::IsValid(msgPack.GetValue<ByteContainer>("usergroup_block.uuid")))
-				return std::optional<UsergroupBlock>();
-
-			block.usergroupUuid = Uuid(msgPack.GetValue<ByteContainer>("usergroup_block.uuid"));
-		}
-	
-		{
-			if (!msgPack.GetValueOptional<ByteContainer>("usergroup_block.mac")/* || msgPack.GetValue<ByteContainer>("usergroup_block.mac").size() != 256*/)
-				return std::optional<UsergroupBlock>();
-	
-			block.mac = msgPack.GetValue<ByteContainer>("usergroup_block.mac");
-		}
-	
-		if (const auto blockMsgPack = msgPack.GetValueOptional<MessagePackDeserializer>("usergroup_block.block"))
-		{
-			if (ReadRawBlock(*blockMsgPack, block, usergrpManager))
-				block.blockRawBytes = msgPack.GetValue<ByteContainer>("usergroup_block.block");
-			else
-				return std::optional<UsergroupBlock>();
-		}
-		else
-		{
-			return std::optional<UsergroupBlock>();
-		}
-	
-		return block;
-	}
-	catch (const std::exception&)
-	{
-		return std::optional<UsergroupBlock>();
-	}
-}
-
-std::optional<UsergroupBlock> UsergroupBlock::CreateFromDatabase(const Uuid& usergroupUuid, UInt64 version, UsergroupsManager& usergrpManager)
-{
-	SQLQuery query(*global->database);
-	query << SELECT << "block, MAC, date_time" << FROM << "usergroups_blockchain" << WHERE << "usergroupUuid" << EQUALS << usergroupUuid.GetAsByteVector()
-		  << AND << "version" << EQUALS << (Int64)version;
-	auto res = query.Exec();
-
-	if (res && res.RowCount() == 1)
-	{
-		UsergroupBlock block{};
-		block.version = version;
-		block.blockRawBytes = res[0][0].GetByteArray();
-		block.mac = res[0][1].GetByteArray();
-		block.dateTime = res[0][2].GetText();
-
-		const MessagePackDeserializer blockMsgPack(block.blockRawBytes);
-
-		if (!ReadRawBlock(blockMsgPack, block, usergrpManager))
-			return std::optional<UsergroupBlock>();
-
-		return block;
-	}
-	else
-	{
-		return std::optional<UsergroupBlock>();
-	}
-}
-
-bool UsergroupBlock::CheckBlockMessagePackFields(const MessagePackDeserializer& blockMsgPack)
-{
-	if (!blockMsgPack.GetValueOptional<UInt64>("version")
-		|| !blockMsgPack.GetValueOptional<std::string>("date_time")
-		|| !blockMsgPack.GetValueOptional<std::string>("keypair_algorithm")
-		|| !blockMsgPack.GetValueOptional<ByteContainer>("public_key")
-		|| !blockMsgPack.GetValueOptional<std::string>("private_key.algorithm")
-		|| !blockMsgPack.GetValueOptional<ByteContainer>("private_key.encrypted")
-		|| !blockMsgPack.GetArrayOptional<ByteContainer>("users")
-		|| !blockMsgPack.GetArrayOptional<std::string>("permissions")
-		|| !blockMsgPack.GetValueOptional<std::string>("mac_algorithm")
-		|| !blockMsgPack.GetValueOptional<ByteContainer>("mac_user_signer")
-		|| !blockMsgPack.GetValueOptional<std::string>("previous_block.hash_algorithm")
-		|| !blockMsgPack.GetValueOptional<ByteContainer>("previous_block.hash"))
-	{
-		return false;
-	}
-
-	if (!DateTimeUtils::UTCDateTime::ValidateFormat(blockMsgPack.GetValue<std::string>("date_time")))
-		return false;
-
-	if (blockMsgPack.GetValue<std::string>("keypair_algorithm") != "RSA2048")
-		return false;
-
-	if (blockMsgPack.GetValue<std::string>("private_key.algorithm") != "AES256")
-		return false;
-
-	if (blockMsgPack.GetValue<std::string>("mac_algorithm") != "RSA SHA256")
-		return false;
-
-	if (blockMsgPack.GetValue<std::string>("previous_block.hash_algorithm") != "SHA3 256")
-		return false;
-
-	if (!Username::IsValid(blockMsgPack.GetValue<ByteContainer>("mac_user_signer")))
-		return false;
-
-	if (blockMsgPack.GetValue<ByteContainer>("previous_block.hash").size() != sha256Length)
-		return false;
-
-	return true;
-}
-
-bool UsergroupBlock::ReadRawBlock(const MessagePackDeserializer& blockMsgPack, UsergroupBlock& block, UsergroupsManager& usergrpManager)
-{
-	if (!CheckBlockMessagePackFields(blockMsgPack))
-		return false;
-
-	block.version = blockMsgPack.GetValue<UInt64>("version");
-	block.dateTime = DateTimeUtils::UTCDateTime(blockMsgPack.GetValue<std::string>("date_time"));
-	block.publicKey = blockMsgPack.GetValue<ByteContainer>("public_key");
-	block.encryptedPrivateKey = blockMsgPack.GetValue<ByteContainer>("private_key.encrypted");
-	block.userList = ReadUsernamesFromField(blockMsgPack.GetArray<ByteContainer>("users"));
-	block.permissions = blockMsgPack.GetArray<std::string>("permissions");
-	block.previousBlockHash = VectorToArray<byte, sha256Length>(blockMsgPack.GetValue<ByteContainer>("previous_block.hash"));
-	block.macSigner = Username(blockMsgPack.GetValue<ByteContainer>("mac_user_signer"));
-	block.usersKeys = ReadUserKeysFromCmd(blockMsgPack);
-
-	if (block.dateTime > DateTimeUtils::UTCDateTime::CurrentTime())
-	{
-		LOG << LogSeverity::error << "The block datetime is greater than the current time (on this machine)";
-		return false;
-	}
-
-	if (!CheckPermissions(block) || !CheckUsers(block, usergrpManager) || !CheckUsersKeys(block, usergrpManager))
-		return false;
-
-	return true;
-}
-
-bool UsergroupBlock::CheckPermissions(const UsergroupBlock& block)
-{
-	for (const auto& perm : block.permissions)
-	{
-		if (!UsergroupsManager::DoesPermissionExist(perm))
-		{
-			LOG << LogSeverity::error << "One of the permissions of the usergroup block is not present in the whitelist";
-			return false;
-		}
-	}
-
-	return true;
-}
-
-bool UsergroupBlock::CheckUsers(const UsergroupBlock& block, UsergroupsManager& usergrpManager)
-{
-	// Check the user list
-	for (const auto& username : block.userList)
-	{
-		if (!usergrpManager.usersManager.DoesUserExist(username))
-		{
-			LOG << LogSeverity::error << "One of the users of the usergroup block cannot be found on this server";
-			return false;
-		}
-	}
-
-	// Check the signer user
-	if (!usergrpManager.usersManager.DoesUserExist(block.macSigner))
-	{
-		LOG << LogSeverity::error << "The mac signer username cannot be found on the database";
-		return false;
-	}
-
-	return true;
-}
-
-bool UsergroupBlock::CheckUsersKeys(const UsergroupBlock& block, UsergroupsManager& usergrpManager)
-{
-	if (block.usersKeys.empty())
-	{
-		LOG << LogSeverity::error << "The users keys list is empty";
-		return false;
-	}
-
-	if (block.usersKeys.size() != block.userList.size())
-	{
-		LOG << LogSeverity::error << "The number of users keys does not match the number of users defined in the usergroup block";
-		return false;
-	}
-
-	for (const auto& username : block.userList)
-	{
-		const auto res = std::find_if(block.usersKeys.begin(), block.usersKeys.end(), [&username](const UserKeys& userKeys)
-		{
-			return (userKeys.username == username);
-		});
-
-		if (res == block.usersKeys.end())
-		{
-			LOG << LogSeverity::error << "One of the users of the block does not have a corresponding encrypted private key";
-			return false;
-		}
-	}
-
-	return true;
-}
-
-std::vector<UsergroupBlock::UserKeys> UsergroupBlock::ReadUserKeysFromCmd(const MessagePackDeserializer& msgPack)
-{
-	std::vector<UsergroupBlock::UserKeys> output;
-
-	if (auto fields = msgPack.GetArrayOptional<MessagePackDeserializer>("users_keys"))
-	{
-		for (const auto& item : *fields)
-		{
-			if (!item.GetValueOptional<ByteContainer>("username") || !item.GetValueOptional<ByteContainer>("decryption_key"))
-				return std::vector<UsergroupBlock::UserKeys>();
-
-			if (!Username::IsValid(item.GetValue<ByteContainer>("username")))
-				return std::vector<UsergroupBlock::UserKeys>();
-
-			if (item.GetValue<ByteContainer>("decryption_key").empty())
-				return std::vector<UsergroupBlock::UserKeys>();
-
-			UsergroupBlock::UserKeys keyDef;
-			keyDef.username = Username(item.GetValue<ByteContainer>("username"));
-			keyDef.encryptedDecryptionKey = item.GetValue<ByteContainer>("decryption_key");
-
-			output.push_back(keyDef);
-		}
-	}
-
-	return output;
-}
-
-bool UsergroupBlock::HasPermission(const std::string& perm) const
-{
-	ASSERT_MSG(UsergroupsManager::DoesPermissionExist(perm), "Trying to compare a permission that does not exist.");
-
-	return (std::find(permissions.begin(), permissions.end(), perm) != permissions.end());
-}
-
-std::vector<Username> UsergroupBlock::ReadUsernamesFromField(std::vector<ByteContainer> arr)
-{
-	std::vector<Username> usernamesList;
-
-	for (const auto& userHash : arr)
-	{
-		if (!Username::IsValid(userHash))
-			throw std::exception("Username invalid");
-
-		usernamesList.emplace_back(userHash);
-	}
-
-	return usernamesList;
-}
-
 
 Usergroup::Usergroup(const Uuid& uuid, UsergroupsManager* usergrpManager)
 	: uuid(uuid)
@@ -306,7 +49,7 @@ void Usergroup::ConstructFromDatabase()
 			block.usergroupUuid = uuid;
 
 			MessagePackDeserializer deserializer(rawblock);
-			if (!UsergroupBlock::ReadRawBlock(deserializer, block, *usergroupsManager))
+			if (!UsergroupBlock::ReadRawBlock(deserializer, block, usergroupsManager->usersManager))
 				std::exception("Invalid usergroup block");
 
 			if (ValidateBlockInContext(block, previousBlock))
@@ -399,7 +142,10 @@ void Usergroup::InsertNewBlock(const UsergroupBlock& block)
 
 bool Usergroup::ComparePreviousBlockHash(const UsergroupBlock& block, const UsergroupBlock* previousBlock)
 {
-	return (Cryptography::SHA3_256(previousBlock->blockRawBytes) == block.previousBlockHash);
+	SECURITY_ASSERT(block.previousBlockHash.has_value());
+	SECURITY_ASSERT(previousBlock->previousBlockHash.has_value());
+
+	return (UsergroupBlock::HashBlock(*previousBlock) == block.previousBlockHash.value());
 }
 
 bool Usergroup::ValidateBlockMac(const UsergroupBlock& block, const PublicKeyBytes& signerPublicKey)
@@ -420,6 +166,11 @@ bool Usergroup::CheckIfUserPresent(const UsergroupBlock& block, const Username& 
 bool Usergroup::operator==(const Usergroup& other) const
 {
 	return (other.uuid == uuid);
+}
+
+Uuid Usergroup::GetUuid() const
+{
+	return uuid;
 }
 
 const UsergroupBlock& Usergroup::GetCurrentVersionBlock() const

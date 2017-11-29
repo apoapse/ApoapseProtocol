@@ -2,6 +2,21 @@
 #include <iostream>
 #include <string>
 
+class ExceptionDynMsg : public std::exception
+{
+	const std::string m_msg;
+
+public:
+	ExceptionDynMsg(const std::string& msg) : m_msg(msg)
+	{
+	}
+
+	virtual char const* what() const override
+	{
+		return m_msg.c_str();
+	}
+};
+
 #ifdef DEBUG
 
 #define ASSERT_MSG(_exp, _msg) \
@@ -29,7 +44,7 @@
 
 #ifdef ENABLE_SECURITY_ASSERTS
 
-#define SECURITY_ASSERT(_exp)	if (!(_exp))	throw std::exception(std::string("SECURITY ASSERT: " + ExtractClassName(__FUNCTION__)).c_str());	// #TODO design so that we can use it outside of the debug mode
+#define SECURITY_ASSERT(_exp)	if (!(_exp))	throw ExceptionDynMsg(std::string("SECURITY ASSERT [" + ExtractClassName(__FUNCTION__) + ":" + std::to_string(__LINE__) + "] " + #_exp));
 
 #else
 

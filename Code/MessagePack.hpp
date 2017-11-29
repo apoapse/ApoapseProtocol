@@ -100,8 +100,6 @@ public:
 #define MSGPK_ORDERED_END_GROUP											); },
 #define MSGPK_ORDERED_APPEND_ARRAY(_serializer, _type, _name, _vector)	[&] { _serializer.OrderedAppendArray<_type>(_name, _vector); }
 
-using ByteContainer = std::vector<byte>;
-
 class MessagePackSerializer
 {
 	std::vector<byte> m_data;

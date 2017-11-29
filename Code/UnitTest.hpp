@@ -3,6 +3,8 @@
 #include <functional>
 #include <exception>
 
+#define TEST_REQUIRE(_exp)	UnitTest::Require(_exp, #_exp);
+
 class SuccessException : public std::exception {};
 
 class FailException : public std::exception
@@ -42,7 +44,8 @@ public:
 		try
 		{
 			m_testCode();
-			throw FailException("No unit test check reached");
+			return true;
+			//throw FailException("No unit test check reached");
 		}
 		catch (const SuccessException&)
 		{
@@ -98,5 +101,11 @@ public:
 			throw SuccessException();
 		else
 			throw FailException(msg);
+	}
+
+	static void Require(bool expression, const std::string& exprCode)
+	{
+		if (!expression)
+			throw FailException("Expression " + exprCode + " failed");
 	}
 };

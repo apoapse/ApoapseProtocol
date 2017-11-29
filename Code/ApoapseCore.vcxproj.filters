@@ -154,6 +154,9 @@
     <ClInclude Include="Random.hpp">
       <Filter>Cryptography\Algorithms</Filter>
     </ClInclude>
+    <ClInclude Include="UsergroupBlock.h">
+      <Filter>UsersSystem\UsergroupBlockchain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -250,6 +253,9 @@
     </ClCompile>
     <ClCompile Include="CmdError.cpp">
       <Filter>CommandSystem\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="UsergroupBlock.cpp">
+      <Filter>UsersSystem\UsergroupBlockchain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

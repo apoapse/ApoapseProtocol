@@ -61,7 +61,7 @@ bool UsergroupsManager::DoesPermissionExist(const std::string& permission)
 
 bool UsergroupsManager::TryCommitNewBlockFromCommand(const MessagePackDeserializer& msgPack, IUser* author /*= nullptr*/)
 {
-	if (auto block = UsergroupBlock::CreateFromCommand(msgPack, *this))
+	if (auto block = UsergroupBlock::CreateFromCommand(msgPack, this->usersManager))
 	{
 		if (!DoesUsergroupExist(block->usergroupUuid))
 		{

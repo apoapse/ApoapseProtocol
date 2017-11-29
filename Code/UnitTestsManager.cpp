@@ -19,7 +19,7 @@ void UnitTestsManager::RunTests(const std::string& testsPath /*= ""*/)
 
 	for (const UnitTest& test : m_registeredUnitTests)
 	{
-		std::this_thread::sleep_for(3ms);	// Weirds things happen when all the function follow themselves too fast
+		//std::this_thread::sleep_for(3ms);	// Weirds things happen when all the function follow themselves too fast
 
 		std::string errorMsg = "";
 		bool testResult = test.Run(errorMsg);

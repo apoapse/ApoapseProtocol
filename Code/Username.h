@@ -8,10 +8,10 @@ class Username
 
 public:
 	Username() = default;
-	Username(const hash_SHA3_256& hash);
+	Username(const hash_SHA256& hash);
 	Username(const std::vector<byte>& hash);
 
-	const hash_SHA3_256& GetRaw() const;
+	const hash_SHA256& GetRaw() const;
 	std::string ToStr() const;
 
 	friend std::ostream& operator<<(std::ostream& stream, const Username& username)

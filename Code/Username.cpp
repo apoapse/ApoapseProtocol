@@ -3,7 +3,7 @@
 #include "Common.h"
 #include "ByteUtils.hpp"
 
-Username::Username(const hash_SHA3_256& hash) : m_usernameHash(hash)
+Username::Username(const hash_SHA256& hash) : m_usernameHash(hash)
 {
 }
 
@@ -14,7 +14,7 @@ Username::Username(const std::vector<byte>& hash) : m_usernameHash()
 	std::copy(hash.begin(), hash.end(), m_usernameHash.begin());
 }
 
-const hash_SHA3_256& Username::GetRaw() const
+const hash_SHA256& Username::GetRaw() const
 {
 	return m_usernameHash;
 }

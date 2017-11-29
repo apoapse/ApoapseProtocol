@@ -8,12 +8,12 @@
 
 namespace Cryptography::AES_CBC
 {
-	inline std::tuple<PrivateKeyBytes, IV, std::vector<byte>> Encrypt(const std::vector<byte>& msg)
+	inline std::tuple<PrivateKeyBytes, IV, std::vector<byte>> Encrypt(const std::vector<byte>& msg, UInt32 keylength = CryptoPP::AES::DEFAULT_KEYLENGTH)
 	{
 		CryptoPP::AutoSeededRandomPool rng;
 
 		//Gen key
-		PrivateKeyBytes key(CryptoPP::AES::DEFAULT_KEYLENGTH);
+		PrivateKeyBytes key(keylength);
 		rng.GenerateBlock(key.data(), key.size());
 
 		//Gen random IV
@@ -30,6 +30,26 @@ namespace Cryptography::AES_CBC
 		encryptedMsg.resize(sink.TotalPutLength());
 
 		return std::make_tuple(key, iv, encryptedMsg);
+	}
+
+	inline std::tuple<std::vector<byte>, IV> EncryptWithKey(const std::vector<byte>& msg, const PrivateKeyBytes& key)
+	{
+		CryptoPP::AutoSeededRandomPool rng;
+
+		//Gen random IV
+		IV iv;
+		rng.GenerateBlock(iv.data(), iv.size());
+
+		CryptoPP::CBC_Mode<CryptoPP::AES>::Encryption encryptor;
+		encryptor.SetKeyWithIV(key.data(), key.size(), iv.data(), iv.size());
+
+		std::vector<byte> encryptedMsg(msg.size() + CryptoPP::AES::BLOCKSIZE);	// Make room for padding
+		CryptoPP::ArraySink sink(encryptedMsg.data(), encryptedMsg.size());
+		CryptoPP::ArraySource arrSource(msg.data(), msg.size(), true, new CryptoPP::StreamTransformationFilter(encryptor, new CryptoPP::Redirector(sink)));
+
+		encryptedMsg.resize(sink.TotalPutLength());
+
+		return std::make_tuple(encryptedMsg, iv);
 	}
 
 	inline std::vector<byte> Decrypt(const PrivateKeyBytes& key, const IV& iv, const std::vector<byte>& encryptedMsg)

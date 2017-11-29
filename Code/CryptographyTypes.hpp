@@ -17,6 +17,9 @@ using hash_SHA3_256 = std::array<byte, sha256Length>;
 using hash_SHA3_384 = std::array<byte, sha384Length>;
 using hash_SHA3_512 = std::array<byte, sha512Length>;
 
+// General hash
+using hashSecBytes = CryptoPP::SecBlock<byte>;
+
 // Asymmetric keys
 using PrivateKeyBytes = CryptoPP::SecBlock<byte>;
 using PublicKeyBytes = std::vector<byte>;
