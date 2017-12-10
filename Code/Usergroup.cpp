@@ -24,7 +24,7 @@ Usergroup Usergroup::CreateFromDatabase(const Uuid& uuid, UsergroupsManager& use
 void Usergroup::ConstructFromDatabase()
 {
 	SQLQuery query(*global->database);
-	query << SELECT << "version, block, mac, date_time" << FROM << "usergroups_blockchain" << WHERE << "uuid" << EQUALS << uuid.GetAsByteVector() << ORDER_BY << "version" << ASC;
+	query << SELECT << "version, block, mac, date_time" << FROM << "usergroups_blockchain" << WHERE << "usergroup_uuid" << EQUALS << uuid.GetAsByteVector() << ORDER_BY << "version" << ASC;
 	auto res = query.Exec();
 
 	if (!res)
@@ -47,6 +47,7 @@ void Usergroup::ConstructFromDatabase()
 			block.dateTime = DateTimeUtils::UTCDateTime(dateTimeRaw);
 			block.mac = mac;
 			block.usergroupUuid = uuid;
+			block.blockRawBytes = rawblock;
 
 			MessagePackDeserializer deserializer(rawblock);
 			if (!UsergroupBlock::ReadRawBlock(deserializer, block, usergroupsManager->usersManager))
@@ -135,7 +136,7 @@ void Usergroup::InsertNewBlock(const UsergroupBlock& block)
 	SQLQuery query(*global->database);
 	query << INSERT_INTO << "usergroups_blockchain" << "(usergroup_uuid, version, block, mac, date_time)" <<
 			 VALUES<< "(" << block.usergroupUuid.GetAsByteVector() << "," << static_cast<Int64>(block.version) << "," << block.blockRawBytes << "," << block.mac << "," << block.dateTime.str() << ")";
-	query.ExecAsync();
+	query.Exec();
 
 	LOG << LogSeverity::verbose << "Added a new block to the usergroup " << uuid.GetAsByteVector() << " version: " << block.version;
 }
@@ -173,7 +174,14 @@ Uuid Usergroup::GetUuid() const
 	return uuid;
 }
 
+const UInt64 Usergroup::GetVersionsCount() const
+{
+	return m_blockchain.size();
+}
+
 const UsergroupBlock& Usergroup::GetCurrentVersionBlock() const
 {
+	ASSERT(GetVersionsCount() > 0);
+
 	return m_blockchain.at(m_blockchain.size() - 1);
 }

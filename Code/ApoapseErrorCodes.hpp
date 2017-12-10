@@ -11,6 +11,7 @@ enum class ApoapseErrorCode : UInt16
 	wrong_network_payload_length = 5,
 	cannot_processs_cmd_from_this_connection_type = 6,
 	protocol_version_not_supported = 7,
+	unable_to_register_user = 8,
 };
 
 // See SecurityAlert.cpp to associate an error code to a security alert

@@ -19,7 +19,10 @@ const SQLPackagedResult SQLQuery::Exec()
 	const auto result = m_database.ExecQuery(preparedQuery.c_str(), valuesArray, m_values.size());
 
 	if (!result)
-		throw DBException("SQL error on query [" + preparedQuery + "] - " + std::string(m_database.GetLastError()));
+	{
+		const auto strError = std::string(m_database.GetLastError());
+		throw DBException("SQL error on query [" + preparedQuery + "] - " + strError);
+	}
 
 	return result;
 }

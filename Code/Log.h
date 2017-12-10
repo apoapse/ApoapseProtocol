@@ -56,7 +56,7 @@ public:
 
 	Log& operator<<(const std::exception& e)
 	{
-		m_stream << e.what();
+		m_stream << "Exception: " << e.what();
 		return *this;
 	}
 

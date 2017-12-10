@@ -26,6 +26,7 @@ public:
 	bool operator==(const Usergroup& other) const;
 
 	Uuid GetUuid() const;
+	const UInt64 GetVersionsCount() const;
 	const UsergroupBlock& GetCurrentVersionBlock() const;
 
 	bool ValidateBlockInContext(const UsergroupBlock& block, const UsergroupBlock* previousBlock);

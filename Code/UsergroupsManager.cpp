@@ -71,8 +71,11 @@ bool UsergroupsManager::TryCommitNewBlockFromCommand(const MessagePackDeserializ
 
 		Usergroup& usergroup = GetUsergroupByUuid(block->usergroupUuid);
 		
-		if (!usergroup.ValidateBlockInContext(block.value(), &usergroup.GetCurrentVersionBlock()))
-			return false;
+		if (usergroup.currentVersion > 0)
+		{
+			if (!usergroup.ValidateBlockInContext(block.value(), &usergroup.GetCurrentVersionBlock()))
+				return false;
+		}
 
 		if (author && block->macSigner != author->GetUsername())
 		{
@@ -105,7 +108,7 @@ bool UsergroupsManager::TryCreateNewUsergroup(const Uuid& uuid, const std::vecto
 	{
 		SQLQuery query(*global->database);
 		query << INSERT_INTO << "usergroups" << "(uuid)" << VALUES << "(" << uuid.GetAsByteVector() << ")";
-		query.ExecAsync();
+		query.Exec();
 
 		return true;
 	}
@@ -155,7 +158,7 @@ void UsergroupsManager::DeleteUsergroup(const Uuid& uuid)
 
 	SQLQuery query(*global->database);
 	query << DELETE_FROM << "usergroups" << WHERE << "uuid" << EQUALS << uuid.GetAsByteVector();
-	query.ExecAsync();
+	query.Exec();
 }
 
 UsergroupBlock UsergroupsManager::GetBlockInEffectAtTheTime(const Uuid& usergroupUuid, const DateTimeUtils::UTCDateTime& dateTime)
