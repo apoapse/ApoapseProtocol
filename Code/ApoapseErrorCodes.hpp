@@ -12,6 +12,7 @@ enum class ApoapseErrorCode : UInt16
 	cannot_processs_cmd_from_this_connection_type = 6,
 	protocol_version_not_supported = 7,
 	unable_to_register_user = 8,
+	unable_to_authenticate_user = 9,
 };
 
 // See SecurityAlert.cpp to associate an error code to a security alert
