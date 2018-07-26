@@ -145,9 +145,6 @@
     <ClCompile Include="CmdUnitTest.cpp" />
     <ClCompile Include="ProtectedByteContainer.cpp" />
     <ClCompile Include="SecurityAlert.cpp" />
-    <ClCompile Include="Usergroup.cpp" />
-    <ClCompile Include="UsergroupBlock.cpp" />
-    <ClCompile Include="UsergroupsManager.cpp" />
     <ClCompile Include="Username.cpp" />
     <ClCompile Include="UT_CommandSystem.cpp" />
     <ClCompile Include="UT_Cryptography.cpp" />
@@ -162,8 +159,6 @@
     <ClInclude Include="Hash.hpp" />
     <ClInclude Include="CryptographyTypes.hpp" />
     <ClInclude Include="HMAC.hpp" />
-    <ClInclude Include="IUser.hpp" />
-    <ClInclude Include="IUsersManager.h" />
     <ClInclude Include="Json.hpp" />
     <ClInclude Include="ProtectedByteContainer.h" />
     <ClInclude Include="ProtocolVersion.hpp" />
@@ -225,9 +220,6 @@
     <ClCompile Include="UT_StringExtensions.cpp">
       <FileType>CppHeader</FileType>
     </ClCompile>
-    <ClInclude Include="Usergroup.h" />
-    <ClInclude Include="UsergroupBlock.h" />
-    <ClInclude Include="UsergroupsManager.h" />
     <ClInclude Include="Username.h" />
     <ClInclude Include="Uuid.h" />
   </ItemGroup>
