@@ -16,7 +16,7 @@ SecurityLog::SecurityAlert SecurityLog::GetAlertFromErrorCode(ApoapseErrorCode e
 		{ ApoapseErrorCode::invalid_cmd, SecurityAlert::Severity::medium, "The received command fields are invalid" },
 		{ ApoapseErrorCode::protocol_version_not_supported, SecurityAlert::Severity::medium, "The requested protocol version is not supported by the server", SecurityAlert::AdditionalAction::notify_sender },
 		{ ApoapseErrorCode::unable_to_register_user, SecurityAlert::Severity::major, "Unable to register the user", SecurityAlert::AdditionalAction::notify_sender },
-		{ ApoapseErrorCode::unable_to_authenticate_user, SecurityAlert::Severity::minor, "Unable to authenticate the user", SecurityAlert::AdditionalAction::notify_sender },
+		{ ApoapseErrorCode::unable_to_authenticate_user, SecurityAlert::Severity::medium, "Unable to authenticate the user", SecurityAlert::AdditionalAction::notify_sender },	// #MVP set to minor severity when server will support security alerts
 	};
 
 	const auto result = std::find_if(errors.begin(), errors.end(), [&](const auto& item)

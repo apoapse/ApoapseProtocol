@@ -8,5 +8,6 @@ enum class CommandId : UInt16
 	unit_test_cmd						= 3,
 	server_info							= 4,
 	create_usergroup					= 5,
-	create_initial_admin				= 6
+	//create_initial_admin				= 6
+	register_new_user					= 7
 };

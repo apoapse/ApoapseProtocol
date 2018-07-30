@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CmdUnitTest.cpp" />
+    <ClCompile Include="Operation.cpp" />
     <ClCompile Include="ProtectedByteContainer.cpp" />
     <ClCompile Include="SecurityAlert.cpp" />
     <ClCompile Include="Username.cpp" />
@@ -155,13 +156,15 @@
       <FileType>CppHeader</FileType>
     </ClCompile>
     <ClCompile Include="Uuid.cpp" />
+    <ClInclude Include="AbstractUser.h" />
     <ClInclude Include="AES.hpp" />
     <ClInclude Include="Hash.hpp" />
     <ClInclude Include="CryptographyTypes.hpp" />
     <ClInclude Include="HMAC.hpp" />
     <ClInclude Include="Json.hpp" />
+    <ClInclude Include="Operation.h" />
     <ClInclude Include="ProtectedByteContainer.h" />
-    <ClInclude Include="ProtocolVersion.hpp" />
+    <ClInclude Include="GlobalVarDefines.hpp" />
     <ClInclude Include="Random.hpp" />
     <ClInclude Include="RSA.hpp" />
     <ClInclude Include="SecurityAlert.h" />

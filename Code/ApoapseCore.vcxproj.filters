@@ -118,9 +118,6 @@
     <ClInclude Include="Hash.hpp">
       <Filter>Cryptography\Algorithms</Filter>
     </ClInclude>
-    <ClInclude Include="ProtocolVersion.hpp">
-      <Filter>Network\Protocol</Filter>
-    </ClInclude>
     <ClInclude Include="RSA.hpp">
       <Filter>Cryptography\Algorithms</Filter>
     </ClInclude>
@@ -141,6 +138,15 @@
     </ClInclude>
     <ClInclude Include="Random.hpp">
       <Filter>Cryptography\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Operation.h">
+      <Filter>OperationSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractUser.h">
+      <Filter>UsersSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalVarDefines.hpp">
+      <Filter>Network\Protocol</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -233,6 +239,9 @@
     <ClCompile Include="CmdError.cpp">
       <Filter>CommandSystem\Commands</Filter>
     </ClCompile>
+    <ClCompile Include="Operation.cpp">
+      <Filter>OperationSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Parsers">
@@ -297,6 +306,9 @@
     </Filter>
     <Filter Include="UsersSystem">
       <UniqueIdentifier>{c14b3976-2e18-4ab4-a312-fc215ab57c61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OperationSystem">
+      <UniqueIdentifier>{7c365284-72ae-4b5b-9966-01d1a4efb2e4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
