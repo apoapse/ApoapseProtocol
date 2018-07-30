@@ -14,7 +14,7 @@ class TCPConnection : public std::enable_shared_from_this<TCPConnection>, public
 	friend class TCPServer;
 
 private:
-	boostTCP::socket m_socket;
+	std::unique_ptr<boostTCP::socket> m_socket;
 	std::atomic<bool> m_isConnected = { false };
 	//boost::asio::io_service::strand m_writeStrand;
 
@@ -28,7 +28,7 @@ public:
 
 	boostTCP::socket& GetSocket()
 	{
-		return m_socket;
+		return *m_socket;
 	}
 
 	boost::asio::ip::tcp::endpoint GetEndpoint() const;
@@ -68,7 +68,7 @@ protected:
 	{
 		auto handler = boost::bind(&TCPConnection::HandleReadInternal, shared_from_this(), externalHandler, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
 
-		m_socket.async_read_some(boost::asio::buffer(buffer), handler);
+		m_socket->async_read_some(boost::asio::buffer(buffer), handler);
 	}
 
 	virtual bool OnConnectedToServerInternal() = 0;

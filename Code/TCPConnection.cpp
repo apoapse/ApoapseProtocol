@@ -3,9 +3,9 @@
 #include "TCPConnection.h"
 
 TCPConnection::TCPConnection(boost::asio::io_service& io_service)
-	: m_socket(io_service)
 	//, m_writeStrand(io_service)
 {
+	m_socket = std::make_unique<boostTCP::socket>(io_service);
 }
 
 void TCPConnection::Connect(const std::string& ipAddress, const UInt16 port)
@@ -13,7 +13,7 @@ void TCPConnection::Connect(const std::string& ipAddress, const UInt16 port)
 	ASSERT(!IsConnected());
 	auto destination = boostTCP::endpoint(boost::asio::ip::address::from_string(ipAddress), port);
 
-	m_socket.async_connect(destination, boost::bind(&TCPConnection::HandleConnectAsync, shared_from_this(), boost::asio::placeholders::error));
+	m_socket->async_connect(destination, boost::bind(&TCPConnection::HandleConnectAsync, shared_from_this(), boost::asio::placeholders::error));
 }
 
 bool TCPConnection::IsConnected() const
@@ -26,14 +26,20 @@ void TCPConnection::Close()
 	LOG << "Manual closing of the TCP connection socket " << GetEndpoint();
 
 	m_isConnected = false;
-	m_socket.close();
+
+	m_socket->get_io_service().post([this]()
+	{
+		m_socket->shutdown(boostTCP::socket::shutdown_both);
+		m_socket->close();
+		m_socket.release();
+	});
 }
 
 boost::asio::ip::tcp::endpoint TCPConnection::GetEndpoint() const
 {
 	try
 	{
-		return m_socket.remote_endpoint();
+		return m_socket->remote_endpoint();
 	}
 	catch (const std::exception&)
 	{
@@ -148,15 +154,15 @@ void TCPConnection::InternalSend()
 	{	
 		//auto data = ;//TEMP ???
 
-		boost::asio::async_write(m_socket, boost::asio::buffer(std::get<std::unique_ptr<NetworkPayload>>(item)->GetRawData()), handler);
+		boost::asio::async_write(GetSocket(), boost::asio::buffer(std::get<std::unique_ptr<NetworkPayload>>(item)->GetRawData()), handler);
 	}
 	else if (std::holds_alternative<StrWrapper>(item))
 	{
-		boost::asio::async_write(m_socket, boost::asio::buffer(*std::get<StrWrapper>(item)), handler);
+		boost::asio::async_write(GetSocket(), boost::asio::buffer(*std::get<StrWrapper>(item)), handler);
 	}
 	else
 	{
-		boost::asio::async_write(m_socket, boost::asio::buffer(*std::get<BytesWrapper>(item)), handler);
+		boost::asio::async_write(GetSocket(), boost::asio::buffer(*std::get<BytesWrapper>(item)), handler);
 	}
 	
 }
