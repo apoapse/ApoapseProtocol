@@ -61,6 +61,20 @@ void Command::Send(MessagePackSerializer& data, INetworkSender& destination, TCP
 	destination.Send(std::move(payload), excludedConnection);
 }
 
+void Command::Propagate(INetworkSender& destination, TCPConnection* excludedConnection /*= nullptr*/)
+{
+	LOG << "The command " << static_cast<int>(GetInfo().command) << " is being propagated to " << destination.GetEndpointStr();
+	
+	Send(m_deserializedData->ToSerializer(), destination, excludedConnection);
+}
+
+void Command::Propagate(MessagePackSerializer ser, INetworkSender& destination, TCPConnection* excludedConnection /*= nullptr*/)
+{
+	LOG << "The command " << static_cast<int>(GetInfo().command) << " is being propagated to " << destination.GetEndpointStr();
+
+	Send(ser, destination, excludedConnection);
+}
+
 const MessagePackDeserializer& Command::GetFieldsData() const
 {
 	return *m_deserializedData;

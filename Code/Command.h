@@ -114,7 +114,6 @@ struct CommandInfo
 	bool clientOnly = { false };
 	bool requireAuthentication = { false };
 	bool onlyNonAuthenticated = { false };
-	bool propagateToSenderConnections = { false }; // #TODO 
 
 	~CommandInfo()
 	{
@@ -142,6 +141,9 @@ public:
 
 	// Use to send from the outside a command where the content has already been set internally in m_serializedData
 	void Send(INetworkSender& destination, TCPConnection* excludedConnection = nullptr);
+
+	void Propagate(INetworkSender& destination, TCPConnection* excludedConnection = nullptr);	// Propagate using the command original data
+	void Propagate(MessagePackSerializer ser, INetworkSender& destination, TCPConnection* excludedConnection = nullptr);	// Propagate using custom/new data
 
 protected:
 	std::optional<MessagePackSerializer> m_serializedData;

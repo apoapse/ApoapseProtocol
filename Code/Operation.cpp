@@ -13,6 +13,13 @@ Operation::Operation(OperationType type, OperationDirection direction, const Use
 
 }
 
+// void Operation::SaveAndSend(INetworkSender& destination)
+// {
+// 	Save();
+// 
+// 	//TODO
+// }
+
 void Operation::Save()
 {
 	if (m_dbId != -1)
@@ -23,9 +30,9 @@ void Operation::Save()
 
 	SQLQuery query(*global->database);
 	if (itemUuid.has_value())
-		query << INSERT_INTO << "operations" << " (id, type, direction, time, user, item_uuid)" << VALUES << "(" << m_dbId << "," << static_cast<Int32>(type) << "," << static_cast<Int8>(direction) << "," << time << "," << user.GetRaw() << "," << itemUuid.value().GetInRawFormat() << ")";
+		query << INSERT_INTO << "operations" << " (id, type, direction, time, user, item_uuid)" << VALUES << "(" << m_dbId << "," << static_cast<Int32>(type) << "," << static_cast<Int32>(direction) << "," << time << "," << user.GetRaw() << "," << itemUuid.value().GetInRawFormat() << ")";
  	else
- 		query << INSERT_INTO << "operations" << " (id, type, direction, time, user)" << VALUES << "(" << m_dbId << "," << static_cast<Int32>(type) << "," << static_cast<Int8>(direction) << "," << time << "," << user.GetRaw() << ")";
+ 		query << INSERT_INTO << "operations" << " (id, type, direction, time, user)" << VALUES << "(" << m_dbId << "," << static_cast<Int32>(type) << "," << static_cast<Int32>(direction) << "," << time << "," << user.GetRaw() << ")";
 
 	query.Exec();
 }
@@ -37,7 +44,7 @@ DbId Operation::GetPreviousDbId()
 	auto res = query.Exec();
 
 	if (res && res.RowCount() == 1)
-		return res[0][0].GetInt64();
+		return (res[0][0].GetInt64() + 1);
 	else
 		return 0;
 }

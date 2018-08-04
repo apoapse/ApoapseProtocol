@@ -4,11 +4,13 @@
 #include "AbstractUser.h"
 #include <optional>
 #include "Username.h"
+#include "INetworkSender.h"
 
 enum class OperationType : UInt32
 {
 	none,
-	new_user
+	new_user,
+	new_room,
 };
 
 enum class OperationDirection : UInt8
@@ -30,6 +32,7 @@ public:
 	Int64 time = -1;
 
 	Operation(OperationType type, OperationDirection direction, const Username& user, std::optional<Uuid> itemUuid);
+	//void SaveAndSend(INetworkSender& destination);
 	void Save();
 	//virtual ~Operation();
 	

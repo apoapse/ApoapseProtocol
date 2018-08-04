@@ -485,6 +485,33 @@ public:
 		Parse();
 	}
 
+	MessagePackSerializer ToSerializer() const
+	{
+		MessagePackSerializer ser;
+
+		for (const auto& item : m_parsedDataLocations)
+		{
+			if (item.second.type == ItemType::boolean)
+			{
+				ser.UnorderedAppend(item.first, GetValue<bool>(item.first));
+			}
+			else if (item.second.type == ItemType::text)
+			{
+				ser.UnorderedAppend(item.first, GetValue<std::string>(item.first));
+			}
+			else if (item.second.type == ItemType::bytes_blob)
+			{
+				ser.UnorderedAppend(item.first, GetValue<std::vector<byte>>(item.first));
+			}
+			else
+			{
+				ser.UnorderedAppend(item.first, GetValue<Int64>(item.first));
+			}
+		}
+		
+		return ser;
+	}
+
 	template <typename T, typename = std::enable_if<std::is_integral<T>::value>>
 	T GetValue(const std::string& key) const
 	{

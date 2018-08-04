@@ -9,5 +9,6 @@ enum class CommandId : UInt16
 	server_info							= 4,
 	create_usergroup					= 5,
 	//create_initial_admin				= 6
-	register_new_user					= 7
+	register_new_user					= 7,
+	create_room							= 8,
 };

@@ -165,4 +165,23 @@ UNIT_TEST("MessagePack:serialize:nested_serializer:array")
 	UnitTest::Assert(deserializersArray[0].GetValue<std::string>("test_str") == "test_str_0" && deserializersArray[1].GetValue<std::string>("test_str") == "test_str_1");
 } UNIT_TEST_END
 
+UNIT_TEST("MessagePack:ToSerializer")
+{
+	MessagePackSerializer ser;
+	{
+		MessagePackSerializer nestedSer;
+		nestedSer.UnorderedAppend("str", "test string"s);
+
+		ser.UnorderedAppend("nested", nestedSer);
+		ser.UnorderedAppend("simple", 58);
+	}
+
+	MessagePackDeserializer deserializer(ser.GetMessagePackBytes());
+	auto serializerFinal = deserializer.ToSerializer();
+	MessagePackDeserializer deserializerFinal(serializerFinal.GetMessagePackBytes());
+
+
+	UnitTest::Assert(deserializerFinal.GetValue<int>("simple") == 58 && deserializerFinal.GetValue<MessagePackDeserializer>("nested").GetValue<std::string>("str") == "test string");
+} UNIT_TEST_END
+
 #endif	// UNIT_TESTS
