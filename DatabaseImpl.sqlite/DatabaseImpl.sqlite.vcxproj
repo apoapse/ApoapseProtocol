@@ -82,7 +82,7 @@
     <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
     <IncludePath>..\ThirdParty\sqlite\include;C:\Program Files\boost\boost_1_64_0;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
-    <LibraryPath>..\ThirdParty\sqlite\sqlite-dll-win64-x64-3160200;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <LibraryPath>..\ThirdParty\sqlite\dll_win64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IntDir>$(SolutionDir)vs_build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
@@ -97,8 +97,8 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Code\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\sqlite-dll-win64-x64-3160200</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(SolutionDir)ThirdParty\sqlite-dll-win64-x64-3160200\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\dll_win64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)ThirdParty\dll_win64\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -129,8 +129,8 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\sqlite-dll-win64-x64-3160200</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(SolutionDir)ThirdParty\sqlite-dll-win64-x64-3160200\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\dll_win64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)ThirdParty\dll_win64\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,8 +146,8 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\sqlite-dll-win64-x64-3160200</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(SolutionDir)ThirdParty\sqlite-dll-win64-x64-3160200\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\dll_win64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)ThirdParty\dll_win64\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
