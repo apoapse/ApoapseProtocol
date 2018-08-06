@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CmdUnitTest.cpp" />
+    <ClCompile Include="DatabaseIntegrityPatcher.cpp" />
     <ClCompile Include="Operation.cpp" />
     <ClCompile Include="ProtectedByteContainer.cpp" />
     <ClCompile Include="SecurityAlert.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="Uuid.cpp" />
     <ClInclude Include="AbstractUser.h" />
     <ClInclude Include="AES.hpp" />
+    <ClInclude Include="DatabaseIntegrityPatcher.h" />
     <ClInclude Include="Hash.hpp" />
     <ClInclude Include="CryptographyTypes.hpp" />
     <ClInclude Include="HMAC.hpp" />
