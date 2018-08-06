@@ -9,7 +9,7 @@
 #include "Maths.hpp"
 #include "Range.hpp"
 #include "ByteUtils.hpp"
-#include "StringExtensions.hpp"
+#include "StringExtensions.h"
 #include "Diagnostic.hpp"
 
 #ifdef _MSC_VER

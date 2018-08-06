@@ -14,6 +14,10 @@
 #include <atomic>
 #include <deque>
 #include <regex>
+#include <algorithm>
 #include <functional>
 
 #include <boost/asio.hpp>
+
+#include "MessagePack.hpp"
+#include "Json.hpp"

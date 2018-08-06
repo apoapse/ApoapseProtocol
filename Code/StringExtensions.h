@@ -1,7 +1,5 @@
 #pragma once
 #include <string>
-#include <boost/algorithm/string.hpp>
-#include <regex>
 
 namespace StringExtensions
 {
@@ -13,7 +11,7 @@ namespace StringExtensions
 	// Parameter: bool trimDelimiter - define if the delimiter character should be erased or not
 	//************************************
 	template <typename T>
-	void erase_left(std::basic_string<T>& str, const char delimiter, bool trimDelimiter = false)
+	inline void erase_left(std::basic_string<T>& str, const char delimiter, bool trimDelimiter = false)
 	{
 		const auto result = str.find(delimiter);
 
@@ -32,7 +30,7 @@ namespace StringExtensions
 	// Parameter: bool trimDelimiter - define if the delimiter character should be erased or not
 	//************************************
 	template <typename T>
-	void erase_right(std::basic_string<T>& str, const char delimiter, bool trimDelimiter = false)
+	inline void erase_right(std::basic_string<T>& str, const char delimiter, bool trimDelimiter = false)
 	{
 		const size_t result = str.find_last_of(delimiter);
 
@@ -50,44 +48,27 @@ namespace StringExtensions
 	// Parameter: const char character - character to be removed
 	//************************************
 	template <typename T>
-	void erase_all(std::basic_string<T>& str, const char character)
+	inline void erase_all(std::basic_string<T>& str, const char character)
 	{
 		str.erase(std::remove(str.begin(), str.end(), character), str.end());
 	}
 
-	template <typename T>
-	void trim_left(std::basic_string<T>& str)
-	{
-		boost::trim_left(str);
-	}
+	void trim_left(std::string& str);
+
+	void trim_right(std::string& str);
+
+	void split(const std::string& str, std::vector<std::string>& output, const std::string& separator);
 
 	template <typename T>
-	void trim_right(std::basic_string<T>& str)
-	{
-		boost::trim_right(str);
-	}
-
-	template <typename T>
-	void split(const std::basic_string<T>& str, std::vector<std::basic_string<T>>& output, const std::string& separator)
-	{
-		boost::split(output, str, boost::is_any_of(separator));
-	}
-
-	template <typename T>
-	std::basic_string<T> get_last_chars(const std::basic_string<T>& str, size_t nb_of_chars)
+	inline std::basic_string<T> get_last_chars(const std::basic_string<T>& str, size_t nb_of_chars)
 	{
 		return str.substr(str.length() - nb_of_chars);
 	}
 
-	template <typename T>
-	bool contains(const std::basic_string<T>& str, char character)
+	template <typename T, typename T_SEARCH>
+	inline bool contains(const std::basic_string<T>& str, const T_SEARCH& toSearch)
 	{
-		const size_t result = str.find(character);
-
-		if (result != std::string::npos)
-			return true;
-		else
-			return false;
+		return (str.find(toSearch) != std::string::npos);
 	}
 
 	//************************************
@@ -95,10 +76,7 @@ namespace StringExtensions
 	// Returns:   bool
 	// Parameter: const std::basic_string<T> & str - input string
 	//************************************
-	template <typename T>
-	bool IsOnlyAlphanumeric(const std::basic_string<T>& str)
-	{
-		std::regex expr("[a-zA-Z0-9]*");
-		return std::regex_match(str, expr);
-	}
+	bool IsOnlyAlphanumeric(const std::string& str);
+
+	std::string ToLowercase(const std::string& str);
 }

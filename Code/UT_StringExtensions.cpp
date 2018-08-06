@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "UnitTestsManager.h"
-#include "StringExtensions.hpp"
+#include "StringExtensions.h"
 
 UNIT_TEST("StringExtensions:erase_left")
 {

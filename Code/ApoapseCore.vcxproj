@@ -146,6 +146,7 @@
     <ClCompile Include="Operation.cpp" />
     <ClCompile Include="ProtectedByteContainer.cpp" />
     <ClCompile Include="SecurityAlert.cpp" />
+    <ClCompile Include="StringExtensions.cpp" />
     <ClCompile Include="Username.cpp" />
     <ClCompile Include="UT_CommandSystem.cpp" />
     <ClCompile Include="UT_Cryptography.cpp" />
@@ -197,7 +198,7 @@
     <ClInclude Include="SQLQuery.h" />
     <ClInclude Include="SQLValue.hpp" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="StringExtensions.hpp" />
+    <ClInclude Include="StringExtensions.h" />
     <ClInclude Include="TCPConnection.h" />
     <ClInclude Include="TCPServer.h" />
     <ClInclude Include="ThreadPool.h" />

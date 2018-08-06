@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SQLQuery.h"
 #include "Common.h"
-#include "StringExtensions.hpp"
+#include "StringExtensions.h"
 
 SQLQuery::~SQLQuery()
 {
