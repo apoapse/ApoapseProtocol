@@ -21,6 +21,11 @@ public:
 		boost::property_tree::read_json(stream, m_properties);
 	}
 
+	JsonHelper(boost::property_tree::ptree node)
+	{
+		m_properties = node;
+	}
+
 	void Insert(const std::string& path, const JsonHelper& writer)
 	{
 		const bool childExist = m_properties.get_child_optional(path).is_initialized();
@@ -80,6 +85,20 @@ public:
 		}
 
 		return outputArray;
+	}
+
+	template <>
+	std::vector<JsonHelper> ReadFieldArray(const std::string& name) const
+	{
+		std::vector<JsonHelper> output;
+
+		for (const auto& item : m_properties.get_child(name))
+		{
+			auto test = item.second;
+			output.push_back(JsonHelper(item.second));
+		}
+
+		return output;
 	}
 
 	const boost::property_tree::ptree& GetPropertyTree() const
