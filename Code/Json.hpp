@@ -8,6 +8,12 @@
 
 class JsonHelper
 {
+	struct StringTranslator
+	{
+		boost::optional<std::string> get_value(const std::string& str) { return  str.substr(1, str.size() - 2); }
+		boost::optional<std::string> put_value(const std::string& str) { return '"' + str + '"'; }
+	};
+
 	boost::property_tree::ptree m_properties;
 
 public:
@@ -50,6 +56,12 @@ public:
 		m_properties.add(path, value);
 	}
 
+	template <>
+	void Insert(const std::string& path, const std::string& value)
+	{
+		m_properties.add(path, value, StringTranslator());
+	}
+
 	template <typename T>
 	void InsertArray(const std::string& path, const std::vector<T>& values)
 	{
@@ -60,6 +72,22 @@ public:
 			boost::property_tree::ptree arrayItem;
 
 			arrayItem.put("", value);
+			childTree.push_back(std::make_pair("", arrayItem));
+		}
+
+		m_properties.add_child(path, childTree);
+	}
+
+	template <>
+	void InsertArray(const std::string& path, const std::vector<std::string>& values)
+	{
+		boost::property_tree::ptree childTree;
+
+		for (auto& value : values)
+		{
+			boost::property_tree::ptree arrayItem;
+
+			arrayItem.put("", value, StringTranslator());
 			childTree.push_back(std::make_pair("", arrayItem));
 		}
 
