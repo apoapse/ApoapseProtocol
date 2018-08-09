@@ -198,6 +198,7 @@
     <ClInclude Include="ReadBufferSize.hpp" />
     <ClInclude Include="SQLPackagedResult.hpp" />
     <ClInclude Include="SQLQuery.h" />
+    <ClInclude Include="SQLUtils.hpp" />
     <ClInclude Include="SQLValue.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StringExtensions.h" />

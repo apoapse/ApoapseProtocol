@@ -54,8 +54,10 @@ void Command::Send(INetworkSender& destination, TCPConnection* excludedConnectio
 
 void Command::Send(MessagePackSerializer& data, INetworkSender& destination, TCPConnection* excludedConnection/* = nullptr*/)
 {
-	auto bytes = std::vector<byte>(NetworkPayload::headerLength + data.GetMessagePackBytes().size());
-	bytes.insert(bytes.begin() + NetworkPayload::headerLength, data.GetMessagePackBytes().begin(), data.GetMessagePackBytes().end());
+	const auto& msgPackBytes = data.GetMessagePackBytes();
+	auto bytes = std::vector<byte>(NetworkPayload::headerLength + msgPackBytes.size());
+
+	std::copy(msgPackBytes.begin(), msgPackBytes.end(), bytes.begin() + NetworkPayload::headerLength);
 
 	auto payload = std::make_unique<NetworkPayload>(GetInfo().command, std::move(bytes));
 	destination.Send(std::move(payload), excludedConnection);

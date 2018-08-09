@@ -151,6 +151,9 @@
     <ClInclude Include="StringExtensions.h">
       <Filter>TypeUtils</Filter>
     </ClInclude>
+    <ClInclude Include="SQLUtils.hpp">
+      <Filter>DatabaseAbstractionLayer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
