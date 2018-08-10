@@ -48,7 +48,7 @@ public:
 		if constexpr (std::is_same<T, std::vector<byte>>::value)
 			return ValueType::BYTE_ARRAY;
 
-		else
+		else constexpr
 			return ValueType::UNSUPPORTED;
 	}
 
