@@ -96,6 +96,16 @@ public:
 		return *this;
 	}
 
+
+
+// 	template <typename T>
+// 	SQLQuery& operator,(const T& value)
+// 	{
+// 		m_query << "," << value;
+// 
+// 		return *this;
+// 	}
+
 	template <typename T>
 	static std::string FormatArray(const std::vector<T> values)
 	{

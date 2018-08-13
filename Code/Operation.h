@@ -12,6 +12,7 @@ enum class OperationType : UInt32
 	new_user,
 	new_room,
 	new_thread,
+	new_message,
 };
 
 enum class OperationDirection : UInt8

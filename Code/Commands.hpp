@@ -12,4 +12,5 @@ enum class CommandId : UInt16
 	register_new_user					= 7,
 	create_room							= 8,
 	create_thread						= 9,
+	apoapse_message						= 10,
 };
