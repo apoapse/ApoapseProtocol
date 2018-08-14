@@ -11,7 +11,7 @@ class JsonHelper
 	struct StringTranslator
 	{
 		boost::optional<std::string> get_value(const std::string& str) { return  str.substr(1, str.size() - 2); }
-		boost::optional<std::string> put_value(const std::string& str) { return '"' + str + '"'; }
+		boost::optional<std::string> put_value(const std::string& str) { return '"' + HtmlSpecialChars(str) + '"'; }
 	};
 
 	boost::property_tree::ptree m_properties;
@@ -149,4 +149,18 @@ public:
 
 		return outputStr;
 	}
+
+	private:
+		static std::string HtmlSpecialChars(const std::string& str)
+		{
+			std::string ouput = str;
+
+			ouput = std::regex_replace(ouput, std::regex("&"), "&amp;");
+			ouput = std::regex_replace(ouput, std::regex("\""), "&quot;");
+			ouput = std::regex_replace(ouput, std::regex("'"), "&apos;");
+			ouput = std::regex_replace(ouput, std::regex("<"), "&lt;");
+			ouput = std::regex_replace(ouput, std::regex(">"), "&gt;");
+
+			return ouput;
+		}
 };

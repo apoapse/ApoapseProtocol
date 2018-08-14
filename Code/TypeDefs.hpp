@@ -19,6 +19,7 @@ using byte			 = unsigned char;
 using ByteContainer	 = std::vector<byte>;
 
 using DbId			 = Int64;
+using UIId			 = Int64;
 
 // Literals
 using namespace std::literals::string_literals;	// for the string literal 's' suffix
