@@ -1,10 +1,11 @@
 #pragma once
 #include <string>
 #include "CryptographyTypes.hpp"
+#include <optional>
 
 class Username
 {
-	hash_SHA3_256 m_usernameHash;
+	std::optional<hash_SHA3_256> m_usernameHash;
 
 public:
 	Username() = default;

@@ -7,36 +7,37 @@ Username::Username(const hash_SHA256& hash) : m_usernameHash(hash)
 {
 }
 
-Username::Username(const std::vector<byte>& hash) : m_usernameHash()
+Username::Username(const std::vector<byte>& hash)
 {
 	SECURITY_ASSERT(hash.size() == sha256Length);
+	m_usernameHash = hash_SHA3_256();
 
-	std::copy(hash.begin(), hash.end(), m_usernameHash.begin());
+	std::copy(hash.begin(), hash.end(), m_usernameHash->begin());
 }
 
 const hash_SHA256& Username::GetRaw() const
 {
-	return m_usernameHash;
+	return m_usernameHash.value();
 }
 
 std::string Username::ToStr() const
 {
-	return BytesToHexString(m_usernameHash);
+	return (m_usernameHash.has_value()) ? BytesToHexString(m_usernameHash.value()) : ""s;
 }
 
 bool Username::operator<(const Username& other) const
 {
-	return (m_usernameHash < other.GetRaw());
+	return (m_usernameHash.value() < other.GetRaw());
 }
 
 bool Username::operator==(const Username& other) const
 {
-	return (m_usernameHash == other.GetRaw());
+	return (m_usernameHash.value() == other.GetRaw());
 }
 
 bool Username::operator!=(const Username& other) const
 {
-	return (m_usernameHash != other.GetRaw());
+	return (m_usernameHash.value() != other.GetRaw());
 }
 
 bool Username::IsValid(const std::vector<byte>& usernameHash)
