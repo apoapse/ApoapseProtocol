@@ -2,6 +2,7 @@
 #include <vector>
 #include <sstream>
 #include <string>
+#include <regex>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -11,7 +12,7 @@ class JsonHelper
 	struct StringTranslator
 	{
 		boost::optional<std::string> get_value(const std::string& str) { return  str.substr(1, str.size() - 2); }
-		boost::optional<std::string> put_value(const std::string& str) { return '"' + HtmlSpecialChars(str) + '"'; }
+		boost::optional<std::string> put_value(const std::string& str) { return '"' + EscapeDoubleQuotes(str) + '"'; }
 	};
 
 	boost::property_tree::ptree m_properties;
@@ -156,16 +157,13 @@ public:
 	}
 
 	private:
-		static std::string HtmlSpecialChars(const std::string& str)
+		static std::string EscapeDoubleQuotes(const std::string& str)
 		{
-			std::string ouput = str;
+			std::string output = str;
 
-			ouput = std::regex_replace(ouput, std::regex("&"), "&amp;");
-			ouput = std::regex_replace(ouput, std::regex("\""), "&quot;");
-			ouput = std::regex_replace(ouput, std::regex("'"), "&apos;");
-			ouput = std::regex_replace(ouput, std::regex("<"), "&lt;");
-			ouput = std::regex_replace(ouput, std::regex(">"), "&gt;");
+			output = std::regex_replace(output, std::regex("\\\\"), "\\\\");
+			output = std::regex_replace(output, std::regex("\""), "\\\"");
 
-			return ouput;
+			return output;
 		}
 };

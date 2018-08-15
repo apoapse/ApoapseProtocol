@@ -18,6 +18,7 @@
 #include <functional>
 
 #include <boost/asio.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/config.hpp>
 
 #include "MessagePack.hpp"
-#include "Json.hpp"
