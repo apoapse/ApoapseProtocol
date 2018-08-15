@@ -83,10 +83,17 @@ public:
 			throw std::bad_typeid();
 	}
 
-	const std::string& GetText() const
+	std::string GetText() const
 	{
 		if (GetType() == ValueType::TEXT)
+		{
 			return std::get<std::string>(m_data);
+		}
+		else if (GetType() == ValueType::BYTE_ARRAY)
+		{
+			const auto bytes = std::get<std::vector<byte>>(m_data);
+			return std::string(bytes.begin(), bytes.end());
+		}
 		else
 			throw std::bad_typeid();
 	}
@@ -99,10 +106,17 @@ public:
 			throw std::bad_typeid();
 	}
 
-	const std::vector<byte>& GetByteArray() const
+	std::vector<byte> GetByteArray() const
 	{
 		if (GetType() == ValueType::BYTE_ARRAY)
+		{
 			return std::get<std::vector<byte>>(m_data);
+		}
+		else if (GetType() == ValueType::TEXT)
+		{
+			const std::string text = std::get<std::string>(m_data);
+			return std::vector<byte>(text.begin(), text.end());
+		}
 		else
 			throw std::bad_typeid();
 	}
