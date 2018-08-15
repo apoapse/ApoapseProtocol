@@ -62,6 +62,11 @@ public:
 		m_properties.add(path, value, StringTranslator());
 	}
 
+	void Insert(const std::string& path, const char* value)
+	{
+		m_properties.add(path, std::string(value), StringTranslator());
+	}
+
 	template <typename T>
 	void InsertArray(const std::string& path, const std::vector<T>& values)
 	{
