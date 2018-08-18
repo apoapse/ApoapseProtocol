@@ -59,8 +59,8 @@ void Command::Send(MessagePackSerializer& data, INetworkSender& destination, TCP
 
 	std::copy(msgPackBytes.begin(), msgPackBytes.end(), bytes.begin() + NetworkPayload::headerLength);
 
-	auto payload = std::make_unique<NetworkPayload>(GetInfo().command, std::move(bytes));
-	destination.Send(std::move(payload), excludedConnection);
+	auto payload = std::make_shared<NetworkPayload>(GetInfo().command, std::move(bytes));
+	destination.Send(payload, excludedConnection);
 }
 
 void Command::Propagate(INetworkSender& destination, TCPConnection* excludedConnection /*= nullptr*/)

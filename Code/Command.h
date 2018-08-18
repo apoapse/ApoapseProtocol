@@ -114,6 +114,7 @@ struct CommandInfo
 	bool clientOnly = { false };
 	bool requireAuthentication = { false };
 	bool onlyNonAuthenticated = { false };
+	bool allowForUsersRequiredToChangePassword = { false };
 
 	~CommandInfo()
 	{

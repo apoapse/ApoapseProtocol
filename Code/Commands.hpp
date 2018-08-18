@@ -13,4 +13,6 @@ enum class CommandId : UInt16
 	create_room							= 8,
 	create_thread						= 9,
 	apoapse_message						= 10,
+	apoapse_install						= 11,
+	first_user_connection				= 12,
 };

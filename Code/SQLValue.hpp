@@ -45,7 +45,7 @@ public:
 		else if constexpr (std::is_same<T, Int64>::value)
 			return ValueType::INT_64;
 
-		if constexpr (std::is_same<T, std::vector<byte>>::value)
+		else if constexpr (std::is_same<T, std::vector<byte>>::value)
 			return ValueType::BYTE_ARRAY;
 
 		else constexpr

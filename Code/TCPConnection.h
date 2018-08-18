@@ -18,7 +18,7 @@ private:
 	std::atomic<bool> m_isConnected = { false };
 	//boost::asio::io_service::strand m_writeStrand;
 
-	std::deque<std::variant<BytesWrapper, StrWrapper, std::unique_ptr<NetworkPayload>>> m_sendQueue;
+	std::deque<std::variant<BytesWrapper, StrWrapper, std::shared_ptr<NetworkPayload>>> m_sendQueue;
 
 public:
 	using TCPConnection_ptr = std::shared_ptr<TCPConnection>;
@@ -40,7 +40,7 @@ public:
 
 	void Send(BytesWrapper bytesPtr, TCPConnection* excludedConnection = nullptr) override;
 	void Send(StrWrapper strPtr, TCPConnection* excludedConnection = nullptr) override;
-	void Send(std::unique_ptr<NetworkPayload> payload, TCPConnection* excludedConnection = nullptr) override;
+	void Send(std::shared_ptr<NetworkPayload> payload, TCPConnection* excludedConnection = nullptr) override;
 
 	std::string GetEndpointStr() const override;
 

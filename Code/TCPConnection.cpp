@@ -121,13 +121,13 @@ void TCPConnection::Send(StrWrapper strPtr, TCPConnection* excludedConnection/* 
 	// 	}));
 }
 
-void TCPConnection::Send(std::unique_ptr<NetworkPayload> payload, TCPConnection* excludedConnection /*= nullptr*/)
+void TCPConnection::Send(std::shared_ptr<NetworkPayload> payload, TCPConnection* excludedConnection /*= nullptr*/)
 {
 	if (excludedConnection == this)
 		return;
 
 	const bool isWriteInProgress = !m_sendQueue.empty();
-	m_sendQueue.emplace_back(std::move(payload));
+	m_sendQueue.emplace_back(payload);
 
 	if (!isWriteInProgress)
 		InternalSend();
@@ -150,11 +150,11 @@ void TCPConnection::InternalSend()
 
 	auto handler = boost::bind(&TCPConnection::HandleWriteAsync, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
 
-	if (std::holds_alternative<std::unique_ptr<NetworkPayload>>(item))
+	if (std::holds_alternative<std::shared_ptr<NetworkPayload>>(item))
 	{	
 		//auto data = ;//TEMP ???
 
-		boost::asio::async_write(GetSocket(), boost::asio::buffer(std::get<std::unique_ptr<NetworkPayload>>(item)->GetRawData()), handler);
+		boost::asio::async_write(GetSocket(), boost::asio::buffer(std::get<std::shared_ptr<NetworkPayload>>(item)->GetRawData()), handler);
 	}
 	else if (std::holds_alternative<StrWrapper>(item))
 	{
@@ -178,9 +178,9 @@ void TCPConnection::HandleWriteAsync(const boost::system::error_code& error, siz
 
 		size_t itemRealSize = 0;
 
-		if (std::holds_alternative<std::unique_ptr<NetworkPayload>>(item))
+		if (std::holds_alternative<std::shared_ptr<NetworkPayload>>(item))
 		{
-			auto& payload = std::get<std::unique_ptr<NetworkPayload>>(item);
+			auto& payload = std::get<std::shared_ptr<NetworkPayload>>(item);
 			itemRealSize = (NetworkPayload::headerLength + payload->headerInfo->payloadLength);
 		}
 		else if (std::holds_alternative<StrWrapper>(item))
