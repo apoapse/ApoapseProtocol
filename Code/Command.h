@@ -8,6 +8,8 @@
 #include "INetworkSender.h"
 #include "Commands.hpp"
 
+#pragma warning( disable : 4266)
+
 class NetworkPayload;
 class User;
 class GenericConnection;

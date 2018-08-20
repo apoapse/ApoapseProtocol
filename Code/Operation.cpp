@@ -3,14 +3,12 @@
 #include "Common.h"
 #include "SQLQuery.h"
 #include "DateTimeUtils.h"
+#include "SQLUtils.hpp"
 
-Operation::Operation(OperationType type, OperationDirection direction, const Username& user, std::optional<Uuid> itemUuid)
-	: type(type)
-	, direction(direction)
-	, user(user)
-	, itemUuid(itemUuid)
+Operation::Operation(OperationType type, const Username& user, std::optional<DbId> itemDbId) : type(type), user(user)
 {
-
+	if (itemDbId.has_value())
+		this->itemDbId = itemDbId.value();
 }
 
 // void Operation::SaveAndSend(INetworkSender& destination)
@@ -22,29 +20,26 @@ Operation::Operation(OperationType type, OperationDirection direction, const Use
 
 void Operation::Save()
 {
-	if (m_dbId != -1)
+	if (dbId != -1)
 		throw std::exception("This operation is already saved");
 
-	m_dbId = GetPreviousDbId();
+	dbId = SQLUtils::CountRows("operations");
 	time = DateTimeUtils::UnixTimestampNow();
 
 	SQLQuery query(*global->database);
-	if (itemUuid.has_value())
-		query << INSERT_INTO << "operations" << " (id, type, direction, time, user, item_uuid)" << VALUES << "(" << m_dbId << "," << static_cast<Int32>(type) << "," << static_cast<Int32>(direction) << "," << time << "," << user.GetRaw() << "," << itemUuid.value().GetInRawFormat() << ")";
- 	else
- 		query << INSERT_INTO << "operations" << " (id, type, direction, time, user)" << VALUES << "(" << m_dbId << "," << static_cast<Int32>(type) << "," << static_cast<Int32>(direction) << "," << time << "," << user.GetRaw() << ")";
-
+	query << INSERT_INTO << "operations" << " (id, type, time, item_dbid)" << VALUES << "(" << dbId << "," << static_cast<Int32>(type) << "," << time << "," << itemDbId << ")";
+	
 	query.Exec();
 }
 
-DbId Operation::GetPreviousDbId()
+Int64 Operation::GetMostRecentOperationTime()
 {
 	SQLQuery query(*global->database);
-	query << SELECT << "id" << FROM << "operations" << ORDER_BY << "id" << DESC << LIMIT << "1";
+	query << SELECT << "time" << FROM << "operations" << ORDER_BY << "time" << DESC << LIMIT << 1;
 	auto res = query.Exec();
 
-	if (res && res.RowCount() == 1)
-		return (res[0][0].GetInt64() + 1);
-	else
+	if (res.RowCount() == 0)
 		return 0;
+	else
+		return res[0][0].GetInt64();
 }

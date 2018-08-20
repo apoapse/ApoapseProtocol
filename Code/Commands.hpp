@@ -15,4 +15,5 @@ enum class CommandId : UInt16
 	apoapse_message						= 10,
 	apoapse_install						= 11,
 	first_user_connection				= 12,
+	sync_request						= 13,
 };

@@ -57,3 +57,4 @@ public:
 	}
 };
 #define OBJECTS_FACTORY_REGISTER(_factoryInstance, _baseClass, _class, _indexType, _index)	static ObjectAutoRegister<_baseClass, _class, _indexType> objRegistration(_factoryInstance, _index);
+#define OBJECTS_FACTORY_REGISTER_2(_factoryInstance, _baseClass, _class, _indexType, _index)	static ObjectAutoRegister<_baseClass, _class, _indexType> objRegistration2(_factoryInstance, _index);

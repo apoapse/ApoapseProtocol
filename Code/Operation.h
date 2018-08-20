@@ -15,29 +15,20 @@ enum class OperationType : UInt32
 	new_message,
 };
 
-enum class OperationDirection : UInt8
-{
-	none,
-	sent,
-	received
-};
-
 class Operation
 {
-	DbId m_dbId = -1;
-
 public:
+	DbId dbId = -1;
 	OperationType type = OperationType::none;
-	OperationDirection direction = OperationDirection::none;
 	Username user;
-	std::optional<Uuid> itemUuid;
+	DbId itemDbId = -1;
 	Int64 time = -1;
 
-	Operation(OperationType type, OperationDirection direction, const Username& user, std::optional<Uuid> itemUuid);
+	Operation(OperationType type, const Username& user, std::optional<DbId> itemDbId);
 	//void SaveAndSend(INetworkSender& destination);
 	void Save();
 	//virtual ~Operation();
-	
+	static Int64 GetMostRecentOperationTime();
 private:
-	static DbId GetPreviousDbId();
+
 };
