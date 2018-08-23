@@ -16,4 +16,6 @@ enum class CommandId : UInt16
 	apoapse_install						= 11,
 	first_user_connection				= 12,
 	sync_request						= 13,
+	mark_message_as_read				= 14,
+	notify_new_user							= 15,
 };
