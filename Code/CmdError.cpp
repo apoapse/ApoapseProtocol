@@ -11,8 +11,8 @@ CommandInfo& CmdError::GetInfo() const
 	info.command = CommandId::error_msg;
 	info.fields =
 	{
-		CommandField{ "error_code", FieldRequirement::any_optional, FIELD_VALUE(UInt16) },
-		CommandField{ "related_item", FieldRequirement::any_optional, FIELD_VALUE_VALIDATOR(std::vector<byte>, Uuid::IsValid) },
+		Field{ "error_code", FieldRequirement::any_optional, FIELD_VALUE(UInt16) },
+		Field{ "related_item", FieldRequirement::any_optional, FIELD_VALUE_VALIDATOR(std::vector<byte>, Uuid::IsValid) },
 	};
 
 	return info;

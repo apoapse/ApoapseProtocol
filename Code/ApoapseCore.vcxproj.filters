@@ -154,6 +154,12 @@
     <ClInclude Include="SQLUtils.hpp">
       <Filter>DatabaseAbstractionLayer</Filter>
     </ClInclude>
+    <ClInclude Include="ApoapseMetadata.h">
+      <Filter>ApoapseSystems</Filter>
+    </ClInclude>
+    <ClInclude Include="FieldValidator.h">
+      <Filter>CommandSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -254,6 +260,12 @@
     <ClCompile Include="StringExtensions.cpp">
       <Filter>TypeUtils</Filter>
     </ClCompile>
+    <ClCompile Include="ApoapseMetadata.cpp">
+      <Filter>ApoapseSystems</Filter>
+    </ClCompile>
+    <ClCompile Include="FieldValidator.cpp">
+      <Filter>CommandSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Parsers">
@@ -321,6 +333,9 @@
     </Filter>
     <Filter Include="UserSystem">
       <UniqueIdentifier>{c14b3976-2e18-4ab4-a312-fc215ab57c61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ApoapseSystems">
+      <UniqueIdentifier>{4a465be0-0c08-4963-bab8-e67937c69908}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

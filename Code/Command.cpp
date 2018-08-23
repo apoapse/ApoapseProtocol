@@ -82,9 +82,35 @@ const MessagePackDeserializer& Command::GetFieldsData() const
 	return *m_deserializedData;
 }
 
+ApoapseMetadata Command::GetMetadataField(MetadataAcess metadataType)
+{
+	switch (metadataType)
+	{
+		case self:
+			return ApoapseMetadata(GetFieldsData().GetValue<ByteContainer>("metadata_self"), MetadataAcess::self);
+
+		case usergroup:
+			return ApoapseMetadata(GetFieldsData().GetValue<ByteContainer>("metadata_usergroup"), MetadataAcess::usergroup);
+
+		case all:
+			return ApoapseMetadata(GetFieldsData().GetValue<ByteContainer>("metadata_all"), MetadataAcess::all);
+
+		default:
+			return ApoapseMetadata();
+	}
+}
+
 void Command::AutoValidate()
 {
 	m_isValid = true;
+
+	if (!ValidateMetadataFields())
+	{
+		LOG << LogSeverity::error << "Command auto validate: at least a required metadata field does not exist";
+		m_isValid = false;
+		return;
+	}
+
 	const auto fields = GetInfo().fields;
 
 	for (const auto& field : fields)
@@ -94,7 +120,7 @@ void Command::AutoValidate()
 
 		try
 		{
-			valueExist = DoesFieldHaveValue(field);
+			valueExist = Field::DoesFieldHaveValue(field, *m_deserializedData);
 		}
 		catch (const std::exception& e)
 		{
@@ -107,9 +133,9 @@ void Command::AutoValidate()
 #endif // DEBUG
 		}
 
-		const bool IsInvalidField = !ValidateField(field, valueExist);
+		const bool isInvalidField = !Field::ValidateField(field, valueExist, *m_deserializedData);
 
-		if (IsInvalidField)
+		if (isInvalidField)
 		{			
 			m_isValid = false;
 #ifndef DEBUG
@@ -121,24 +147,48 @@ void Command::AutoValidate()
 	}
 }
 
-bool Command::DoesFieldHaveValue(const CommandField &field) const
+bool Command::ValidateMetadataFields() const
 {
-	return field.fieldValueValidator->HasValue(field.name, *m_deserializedData);
-}
+	const int metadataTypes = GetInfo().metadataTypes;
 
-bool Command::ValidateField(const CommandField& field, bool valueExist)
-{
-	if (field.requirement == FieldRequirement::any_mendatory && !valueExist)
+	if (metadataTypes == 0)
+		return true;
+
+	if ((metadataTypes & MetadataAcess::self) == MetadataAcess::self)
 	{
-		LOG << "Command auto validate: required field " << field.name << " on command " << (UInt16)GetInfo().command << " is missing" << LogSeverity::warning;
-		return false;
+		if (GetFieldsData().GetValueOptional<ByteContainer>("metadata_self").has_value())
+		{
+			if (!ApoapseMetadata::ValidateMetadataFields(ApoapseMetadata(GetFieldsData().GetValue<ByteContainer>("metadata_self"), MetadataAcess::self), GetInfo().metadataSelfFields))
+				return false;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
-	if (valueExist)
+	if ((metadataTypes & MetadataAcess::usergroup) == MetadataAcess::usergroup)
 	{
-		if (!field.fieldValueValidator->ExecValidator(field.name, *m_deserializedData))
+		if (GetFieldsData().GetValueOptional<ByteContainer>("metadata_usergroup").has_value())
 		{
-			LOG << "Command auto validate: the field " << field.name << " on command " << (UInt16)GetInfo().command << " is invalid according to an user provided check function" << LogSeverity::warning;
+			if (!ApoapseMetadata::ValidateMetadataFields(ApoapseMetadata(GetFieldsData().GetValue<ByteContainer>("metadata_usergroup"), MetadataAcess::usergroup), GetInfo().metadataUsergroupFields))
+				return false;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	if ((metadataTypes & MetadataAcess::all) == MetadataAcess::all)
+	{
+		if (GetFieldsData().GetValueOptional<ByteContainer>("metadata_all").has_value())
+		{
+			if (!ApoapseMetadata::ValidateMetadataFields(ApoapseMetadata(GetFieldsData().GetValue<ByteContainer>("metadata_all"), MetadataAcess::all), GetInfo().metadataAllFields))
+				return false;
+		}
+		else
+		{
 			return false;
 		}
 	}

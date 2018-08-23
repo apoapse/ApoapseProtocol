@@ -14,8 +14,8 @@ public:
 		info.command = CommandId::unit_test_cmd;
 		info.fields =
 		{
-			CommandField{ "optional_field", FieldRequirement::any_optional, FIELD_VALUE(UInt16) },
-			CommandField{ "mendatory_field_uuid_validator", FieldRequirement::any_mendatory, FIELD_VALUE_VALIDATOR(std::vector<byte>, Uuid::IsValid) },
+			Field{ "optional_field", FieldRequirement::any_optional, FIELD_VALUE(UInt16) },
+			Field{ "mendatory_field_uuid_validator", FieldRequirement::any_mendatory, FIELD_VALUE_VALIDATOR(std::vector<byte>, Uuid::IsValid) },
 		};
 
 		return info;
