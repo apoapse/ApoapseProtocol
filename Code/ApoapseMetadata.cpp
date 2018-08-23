@@ -44,12 +44,13 @@ bool ApoapseMetadata::ValidateMetadataFields(const ApoapseMetadata& metadata, co
 		{
 			doesValueExist = Field::DoesFieldHaveValue(field, source);
 		}
-		catch (const std::exception& e)
+		catch (const std::exception&)
 		{
 			return false;
 		}
 
-		const bool isInvalidField = !Field::ValidateField(field, doesValueExist, source);
+		if (!Field::ValidateField(field, doesValueExist, source))
+			return false;
 	}
 
 	return true;
