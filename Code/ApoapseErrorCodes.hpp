@@ -14,6 +14,7 @@ enum class ApoapseErrorCode : UInt16
 	unable_to_register_user = 8,
 	unable_to_authenticate_user = 9,
 	future_datetime = 10,
+	related_item_does_not_exist = 11,
 };
 
 // See SecurityAlert.cpp to associate an error code to a security alert

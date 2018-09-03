@@ -18,6 +18,7 @@ SecurityLog::SecurityAlert SecurityLog::GetAlertFromErrorCode(ApoapseErrorCode e
 		{ ApoapseErrorCode::unable_to_register_user, SecurityAlert::Severity::major, "Unable to register the user", SecurityAlert::AdditionalAction::notify_sender },
 		{ ApoapseErrorCode::unable_to_authenticate_user, SecurityAlert::Severity::medium, "Unable to authenticate the user", SecurityAlert::AdditionalAction::notify_sender },	// #MVP set to minor severity when server will support security alerts
 		{ ApoapseErrorCode::future_datetime, SecurityAlert::Severity::minor, "The datetime provided is in the future", SecurityAlert::AdditionalAction::notify_sender },	// #MVP set to minor severity when server will support security alerts
+		{ ApoapseErrorCode::related_item_does_not_exist, SecurityAlert::Severity::medium, "The item related to the user provided command does not exist", SecurityAlert::AdditionalAction::notify_sender },
 	};
 
 	const auto result = std::find_if(errors.begin(), errors.end(), [&](const auto& item)

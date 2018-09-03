@@ -318,6 +318,9 @@ std::string DatabaseIntegrityPatcher::GenerateCreateTableQuery(const DbTable& ta
 		if (field.primary)
 			strQuery += " PRIMARY KEY";
 
+		if (!field.defaultValue.empty())
+			strQuery += " DEFAULT " + field.defaultValue;
+
 		if (i < (table.fields.size() - 1))
 			strQuery += ",";
 

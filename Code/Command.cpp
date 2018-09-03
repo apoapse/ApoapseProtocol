@@ -154,6 +154,8 @@ bool Command::ValidateMetadataFields() const
 	if (metadataTypes == 0)
 		return true;
 
+	return true;//TEMPPPPPPPPPPPPPPPPPPP
+
 	if ((metadataTypes & MetadataAcess::self) == MetadataAcess::self)
 	{
 		if (GetFieldsData().GetValueOptional<ByteContainer>("metadata_self").has_value())
