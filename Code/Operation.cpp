@@ -31,7 +31,7 @@ void Operation::Save()
 	LOG_DEBUG << "Saved operation " << (int)type << " for user " << relatedUser.ToStr();
 }
 
-Int64 Operation::GetMostRecentOperationTime(const Username& relatedUser)
+Int64 Operation::GetMostRecentOperationTime(const Username& relatedUser)	// On the client everything is stored as OperationOwnership::all so the relatedUser param is here just in case this function would have any use in the future
 {
 	SQLQuery query(*global->database);// #TODO #USERGROUP
 	query << SELECT << "time" << FROM << "operations" << WHERE << "(" << "ownership" << EQUALS << static_cast<Int32>(OperationOwnership::all) << ")"
