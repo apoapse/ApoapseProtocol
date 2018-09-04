@@ -13,6 +13,14 @@ enum class OperationType : UInt32
 	new_room,
 	new_thread,
 	new_message,
+	mark_message_as_read,
+};
+
+enum class OperationOwnership
+{
+	all,
+	sender_user,
+	usergroup,
 };
 
 class Operation
@@ -20,15 +28,14 @@ class Operation
 public:
 	DbId dbId = -1;
 	OperationType type = OperationType::none;
-	Username user;
+	OperationOwnership ownership = OperationOwnership::all;
+	Username relatedUser;
 	DbId itemDbId = -1;
 	Int64 time = -1;
 
-	Operation(OperationType type, const Username& user, std::optional<DbId> itemDbId);
-	//void SaveAndSend(INetworkSender& destination);
+	Operation(OperationType type, const Username& relatedUser, std::optional<DbId> itemDbId, OperationOwnership ownership = OperationOwnership::all);
 	void Save();
-	//virtual ~Operation();
-	static Int64 GetMostRecentOperationTime();
+	static Int64 GetMostRecentOperationTime(const Username& relatedUser);
 private:
 
 };
