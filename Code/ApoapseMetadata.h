@@ -3,12 +3,13 @@
 #include "MessagePack.hpp"
 #include "FieldValidator.h"
 
+#define BIT(x)    (1u << (x))
 enum MetadataAcess
 {
-	undefined		= 0x00,
-	self			= 0x01,
-	usergroup		= 0x02,
-	all				= 0x03,
+	undefined		= BIT(0),
+	self			= BIT(1),
+	usergroup		= BIT(2),
+	all				= BIT(3),
 };
 
 class ApoapseMetadata

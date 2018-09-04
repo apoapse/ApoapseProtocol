@@ -154,9 +154,7 @@ bool Command::ValidateMetadataFields() const
 	if (metadataTypes == 0)
 		return true;
 
-	return true;//TEMPPPPPPPPPPPPPPPPPPP
-
-	if ((metadataTypes & MetadataAcess::self) == MetadataAcess::self)
+	if (metadataTypes & MetadataAcess::self)
 	{
 		if (GetFieldsData().GetValueOptional<ByteContainer>("metadata_self").has_value())
 		{
@@ -169,7 +167,7 @@ bool Command::ValidateMetadataFields() const
 		}
 	}
 
-	if ((metadataTypes & MetadataAcess::usergroup) == MetadataAcess::usergroup)
+	if (metadataTypes & MetadataAcess::usergroup)
 	{
 		if (GetFieldsData().GetValueOptional<ByteContainer>("metadata_usergroup").has_value())
 		{
@@ -182,7 +180,7 @@ bool Command::ValidateMetadataFields() const
 		}
 	}
 
-	if ((metadataTypes & MetadataAcess::all) == MetadataAcess::all)
+	if (metadataTypes & MetadataAcess::all)
 	{
 		if (GetFieldsData().GetValueOptional<ByteContainer>("metadata_all").has_value())
 		{
