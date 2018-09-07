@@ -2,10 +2,10 @@
 #include "Common.h"
 #include "TCPConnection.h"
 
-TCPConnection::TCPConnection(boost::asio::io_service& io_service)
+TCPConnection::TCPConnection(boost::asio::io_service& io_service, ssl::context& context)
 	//, m_writeStrand(io_service)
 {
-	m_socket = std::make_unique<boostTCP::socket>(io_service);
+	m_socket = std::make_unique<SSLSocket>(io_service, context);
 }
 
 void TCPConnection::Connect(const std::string& ipAddress, const UInt16 port)
@@ -13,7 +13,7 @@ void TCPConnection::Connect(const std::string& ipAddress, const UInt16 port)
 	ASSERT(!IsConnected());
 	auto destination = boostTCP::endpoint(boost::asio::ip::address::from_string(ipAddress), port);
 
-	m_socket->async_connect(destination, boost::bind(&TCPConnection::HandleConnectAsync, shared_from_this(), boost::asio::placeholders::error));
+	GetSocket().async_connect(destination, boost::bind(&TCPConnection::HandleConnectAsync, shared_from_this(), boost::asio::placeholders::error, Device::client));
 }
 
 bool TCPConnection::IsConnected() const
@@ -29,9 +29,9 @@ void TCPConnection::Close()
 
 	m_socket->get_io_service().post([this]()
 	{
-		m_socket->shutdown(boostTCP::socket::shutdown_both);
-		m_socket->close();
-		m_socket.release();
+		GetSocket().shutdown(boostTCP::socket::shutdown_both);
+		GetSocket().close();
+		//GetSocket().release();
 	});
 }
 
@@ -39,7 +39,7 @@ boost::asio::ip::tcp::endpoint TCPConnection::GetEndpoint() const
 {
 	try
 	{
-		return m_socket->remote_endpoint();
+		return m_socket->lowest_layer().remote_endpoint();
 	}
 	catch (const std::exception&)
 	{
@@ -48,27 +48,52 @@ boost::asio::ip::tcp::endpoint TCPConnection::GetEndpoint() const
 	}
 }
 
-void TCPConnection::HandleConnectAsync(const boost::system::error_code& error)
+void TCPConnection::HandleConnectAsync(const boost::system::error_code& error, Device device)
 {
 	if (error)
+	{
 		OnReceivedErrorInternal(error);
+	}
 	else
 	{
-		this->OnConnectedToServerInternal();
-		m_isConnected = true;
+		if (device == Device::server)
+		{
+			SendTLSHandshake(ssl::stream_base::handshake_type::server);
+		}
+		else
+		{
+			SendTLSHandshake(ssl::stream_base::handshake_type::client);
+		}
 	}
 }
 
 void TCPConnection::HandleAcceptedAsync(const boost::system::error_code& error)
 {
 	LOG_DEBUG << "TCPConnection accepted from " << GetEndpoint();
-	HandleConnectAsync(error);
+	HandleConnectAsync(error, Device::server);
 }
 
 void TCPConnection::OnReceivedErrorInternal(const boost::system::error_code& error)
 {
 	if (!this->OnReceivedError(error))
 		Close();
+}
+
+void TCPConnection::SendTLSHandshake(ssl::stream_base::handshake_type handshakeType)
+{
+	m_socket->async_handshake(handshakeType, boost::bind(&TCPConnection::HandleHandshake, shared_from_this(), boost::asio::placeholders::error));
+}
+
+void TCPConnection::HandleHandshake(const boost::system::error_code& error)
+{
+	if (error)
+	{
+		LOG << LogSeverity::error << "TLS Handshake failed";
+		Close();
+	}
+
+	this->OnConnectedToServerInternal();
+	m_isConnected = true;
 }
 
 void TCPConnection::HandleReadInternal(const std::function<void(size_t)>& handler, const boost::system::error_code& error, size_t bytesTransferred)
@@ -153,16 +178,18 @@ void TCPConnection::InternalSend()
 	if (std::holds_alternative<std::shared_ptr<NetworkPayload>>(item))
 	{	
 		//auto data = ;//TEMP ???
-
-		boost::asio::async_write(GetSocket(), boost::asio::buffer(std::get<std::shared_ptr<NetworkPayload>>(item)->GetRawData()), handler);
+		m_socket->async_write_some(boost::asio::buffer(std::get<std::shared_ptr<NetworkPayload>>(item)->GetRawData()), handler);
+		//boost::asio::async_write(GetSocket(), boost::asio::buffer(std::get<std::shared_ptr<NetworkPayload>>(item)->GetRawData()), handler);
 	}
 	else if (std::holds_alternative<StrWrapper>(item))
 	{
-		boost::asio::async_write(GetSocket(), boost::asio::buffer(*std::get<StrWrapper>(item)), handler);
+		m_socket->async_write_some(boost::asio::buffer(*std::get<StrWrapper>(item)), handler);
+		//boost::asio::async_write(GetSocket(), boost::asio::buffer(*std::get<StrWrapper>(item)), handler);
 	}
 	else
 	{
-		boost::asio::async_write(GetSocket(), boost::asio::buffer(*std::get<BytesWrapper>(item)), handler);
+		//boost::asio::async_write(GetSocket(), boost::asio::buffer(*std::get<BytesWrapper>(item)), handler);
+		m_socket->async_write_some(boost::asio::buffer(*std::get<BytesWrapper>(item)), handler);
 	}
 	
 }

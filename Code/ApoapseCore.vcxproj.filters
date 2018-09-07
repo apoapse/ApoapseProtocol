@@ -160,6 +160,9 @@
     <ClInclude Include="FieldValidator.h">
       <Filter>CommandSystem</Filter>
     </ClInclude>
+    <ClInclude Include="TLSCertificate.h">
+      <Filter>Cryptography\TLS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -266,6 +269,9 @@
     <ClCompile Include="FieldValidator.cpp">
       <Filter>CommandSystem</Filter>
     </ClCompile>
+    <ClCompile Include="TLSCertificate.cpp">
+      <Filter>Cryptography\TLS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Parsers">
@@ -336,6 +342,9 @@
     </Filter>
     <Filter Include="ApoapseSystems">
       <UniqueIdentifier>{4a465be0-0c08-4963-bab8-e67937c69908}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cryptography\TLS">
+      <UniqueIdentifier>{3d559e0a-46e5-4ffa-b61c-f6bd9a9b081b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

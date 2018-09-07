@@ -13,7 +13,7 @@ class GenericConnection : public TCPConnection
 	std::array<byte, READ_BUFFER_SIZE> m_readBuffer; // #THREADING
 	std::chrono::steady_clock::time_point m_lastActivityTime;// #TODO USE #THREADING
 public:
-	GenericConnection(boost::asio::io_service& ioService);
+	GenericConnection(boost::asio::io_service& ioService, ssl::context& context);
 	virtual ~GenericConnection() override = default;
 	
 private:

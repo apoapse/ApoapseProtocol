@@ -6,7 +6,7 @@
 #include "SecurityAlert.h"
 #include "CommandsManager.h"
 
-GenericConnection::GenericConnection(boost::asio::io_service& ioService) : TCPConnection(ioService)
+GenericConnection::GenericConnection(boost::asio::io_service& ioService, ssl::context& context) : TCPConnection(ioService, context)
 {
 
 }

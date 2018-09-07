@@ -29,7 +29,7 @@ public:
 		TCPConnection::TCPConnection_ptr newConnection = std::make_shared<T_CONNECTION>(m_ioservice, std::forward<T_Args>(args)...);	//TODO: HAVE A FLAG TO SPECIFY THAT THIS CONNECTION IS THE SERVER ITSELF?
 
 		auto handler = boost::bind(&TCPServer::HandleAcceptAsync<T_CONNECTION, T_Args&...>, this, newConnection, boost::asio::placeholders::error, args...);
-		m_acceptor->async_accept(newConnection->GetSocket(), handler);
+		m_acceptor->async_accept(newConnection->GetSocket().lowest_layer(), handler);
 	}
 
 private:

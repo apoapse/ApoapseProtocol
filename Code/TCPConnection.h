@@ -7,14 +7,24 @@
 #include <deque>
 #include <variant>
 #include "NetworkPayload.h"
+#include <boost/asio/ssl.hpp>
+using namespace boost::asio;
 
 class TCPConnection : public std::enable_shared_from_this<TCPConnection>, public INetworkSender
 {
 	using boostTCP = boost::asio::ip::tcp;
+	using SSLSocket = boost::asio::ssl::stream<boost::asio::ip::tcp::socket>;
+
 	friend class TCPServer;
 
+	enum class Device
+	{
+		server,
+		client,
+	};
+
 private:
-	std::unique_ptr<boostTCP::socket> m_socket;
+	std::unique_ptr<SSLSocket> m_socket;
 	std::atomic<bool> m_isConnected = { false };
 	//boost::asio::io_service::strand m_writeStrand;
 
@@ -23,12 +33,12 @@ private:
 public:
 	using TCPConnection_ptr = std::shared_ptr<TCPConnection>;
 
-	TCPConnection(boost::asio::io_service& io_service);
+	TCPConnection(boost::asio::io_service& io_service, ssl::context& context);
 	virtual ~TCPConnection() override = default;
 
-	boostTCP::socket& GetSocket()
+	SSLSocket::lowest_layer_type& GetSocket()
 	{
-		return *m_socket;
+		return m_socket->lowest_layer();
 	}
 
 	boost::asio::ip::tcp::endpoint GetEndpoint() const;
@@ -45,9 +55,12 @@ public:
 	std::string GetEndpointStr() const override;
 
 private:
-	void HandleConnectAsync(const boost::system::error_code& error);
+	void HandleConnectAsync(const boost::system::error_code& error, Device device);
 	void HandleAcceptedAsync(const boost::system::error_code& error);
 	void OnReceivedErrorInternal(const boost::system::error_code& error);
+
+	void SendTLSHandshake(ssl::stream_base::handshake_type handshakeType);
+	void HandleHandshake(const boost::system::error_code& error);
 
 	void HandleReadInternal(const std::function<void(size_t)>& handler, const boost::system::error_code& error, size_t bytesTransferred);
 
