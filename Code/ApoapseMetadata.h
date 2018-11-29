@@ -30,5 +30,6 @@ public:
 	//virtual ~ApoapseMetadata();
 	
 	static bool ValidateMetadataFields(const ApoapseMetadata& metadata, const std::vector<Field>& fieldValidators);
+	static std::string TypeToDbFieldName(MetadataAcess type);
 private:
 };

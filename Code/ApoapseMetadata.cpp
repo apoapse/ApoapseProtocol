@@ -55,3 +55,24 @@ bool ApoapseMetadata::ValidateMetadataFields(const ApoapseMetadata& metadata, co
 
 	return true;
 }
+
+std::string ApoapseMetadata::TypeToDbFieldName(MetadataAcess type)
+{
+	switch (type)
+	{
+		case undefined:
+			return "";
+
+		case self:
+			return "metadata_self";
+
+		case usergroup:
+			return "metadata_usergroup";
+
+		case all:
+			return "metadata_all";
+
+		default:
+			return "";
+	}
+}
