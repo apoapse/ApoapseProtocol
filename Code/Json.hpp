@@ -60,6 +60,11 @@ public:
 	template <>
 	void Insert(const std::string& path, const std::string& value)
 	{
+		m_properties.add(path, std::string(value), StringTranslator());
+	}
+
+	void Insert(const std::string& path, const std::string& value)
+	{
 		m_properties.add(path, value, StringTranslator());
 	}
 
