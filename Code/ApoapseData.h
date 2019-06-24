@@ -9,7 +9,7 @@ enum class DataFieldType
 	integer,
 	boolean,
 	text,
-	blob,
+	byte_blob,
 	uuid,
 	username
 };
@@ -19,7 +19,7 @@ class ApoapseData
 	struct DataField
 	{
 		std::string name;
-		DataFieldType type;
+		DataFieldType type = DataFieldType::undefined;
 		bool isRequired = true;
 		bool isDataUnique = false;
 
@@ -56,6 +56,7 @@ class ApoapseData
 	std::vector<DataStructure> m_registeredDataStructures;
 
 public:
-	void ReadRegisteredDataStructures(const std::string& jsonStr);
+	ApoapseData(const std::string& dataSchemeJson);
+
 	static DataFieldType GetTypeByTypeName(const std::string& typeStr);
 };

@@ -7,12 +7,14 @@
 #include "ThreadPool.h"
 #include "MemoryUtils.hpp"
 #include "Database.hpp"
+#include "ApoapseData.h"
 
 struct Global
 {
 	std::unique_ptr<ThreadPool> threadPool;
 	std::unique_ptr<Logger> logger;
 	IDatabase* database = nullptr;
+	std::unique_ptr<ApoapseData> apoapseData;
 
 #ifdef APOAPSE_SERVER
 	class ServerSettings* settings = nullptr;

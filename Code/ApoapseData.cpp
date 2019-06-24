@@ -1,10 +1,11 @@
 #include "stdafx.h"
+#include "Common.h"
 #include "ApoapseData.h"
 #include "Json.hpp"
 
-void ApoapseData::ReadRegisteredDataStructures(const std::string& jsonStr)
+ApoapseData::ApoapseData(const std::string& dataSchemeJson)
 {
-	JsonHelper json(jsonStr);
+	JsonHelper json(dataSchemeJson);
 
 	for (const auto& dser : json.ReadFieldArray<JsonHelper>("data_structures"))
 	{
@@ -21,6 +22,8 @@ void ApoapseData::ReadRegisteredDataStructures(const std::string& jsonStr)
 			field.usedInServerDb = fieldDser.ReadFieldValue<bool>("uses.server_storage").value_or(false);
 			field.usedInClientDb = fieldDser.ReadFieldValue<bool>("uses.client_storage").value_or(false);
 			field.usedInCommad = fieldDser.ReadFieldValue<bool>("uses.command").value_or(false);
+
+			dataStructure.fields.push_back(field);
 		}
 
 		m_registeredDataStructures.push_back(dataStructure);
@@ -39,12 +42,13 @@ DataFieldType ApoapseData::GetTypeByTypeName(const std::string& typeStr)
 		return DataFieldType::text;
 
 	else if (typeStr == "blob")
-		return DataFieldType::blob;
+		return DataFieldType::byte_blob;
 
 	else if (typeStr == "uuid")
 		return DataFieldType::uuid;
 
 	else if (typeStr == "username")
 		return DataFieldType::username;
-	//TODODOQZDZQDZD
+
+	return DataFieldType::undefined;
 }
