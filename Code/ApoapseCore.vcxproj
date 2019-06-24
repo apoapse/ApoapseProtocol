@@ -142,6 +142,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ApoapseData.cpp" />
     <ClCompile Include="ApoapseMetadata.cpp" />
     <ClCompile Include="CmdUnitTest.cpp" />
     <ClCompile Include="DatabaseIntegrityPatcher.cpp" />
@@ -163,8 +164,10 @@
     <ClCompile Include="Uuid.cpp" />
     <ClInclude Include="AbstractUser.h" />
     <ClInclude Include="AES.hpp" />
+    <ClInclude Include="ApoapseData.h" />
     <ClInclude Include="DatabaseIntegrityPatcher.h" />
     <ClInclude Include="ApoapseMetadata.h" />
+    <ClInclude Include="DataStructures.hpp" />
     <ClInclude Include="FieldValidator.h" />
     <ClInclude Include="Hash.hpp" />
     <ClInclude Include="CryptographyTypes.hpp" />

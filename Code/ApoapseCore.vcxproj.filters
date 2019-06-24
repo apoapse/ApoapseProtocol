@@ -163,6 +163,12 @@
     <ClInclude Include="TLSCertificate.h">
       <Filter>Cryptography\TLS</Filter>
     </ClInclude>
+    <ClInclude Include="DataStructures.hpp">
+      <Filter>DataSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ApoapseData.h">
+      <Filter>DataSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -345,6 +351,9 @@
     </Filter>
     <Filter Include="Cryptography\TLS">
       <UniqueIdentifier>{3d559e0a-46e5-4ffa-b61c-f6bd9a9b081b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataSystem">
+      <UniqueIdentifier>{eb1c04b1-22ca-4f71-9ef5-baa518d4c581}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
