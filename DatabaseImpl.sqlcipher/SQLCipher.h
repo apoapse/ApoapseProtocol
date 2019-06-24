@@ -1,5 +1,6 @@
 #pragma once
 #include "TypeDefs.hpp"
+#include <stdexcept>
 #include "Database.hpp"
 #include <boost/config.hpp>
 

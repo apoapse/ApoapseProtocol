@@ -458,9 +458,9 @@ class MessagePackDeserializer
 
 	struct ItemLocation
 	{
-		size_t pos;
+		size_t pos = 0;
 		size_t length = 0;
-		ItemType type;
+		ItemType type = ItemType::undefined;
 	};
 
 	const std::vector<byte>& m_rawData;

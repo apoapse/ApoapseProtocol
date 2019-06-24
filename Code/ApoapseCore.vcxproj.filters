@@ -278,6 +278,7 @@
     <ClCompile Include="TLSCertificate.cpp">
       <Filter>Cryptography\TLS</Filter>
     </ClCompile>
+    <ClCompile Include="ApoapseData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Parsers">
