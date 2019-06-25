@@ -30,6 +30,52 @@ ApoapseData::ApoapseData(const std::string& dataSchemeJson)
 	}
 }
 
+const std::vector<DataStructure>& ApoapseData::GetRegisteredStructures() const
+{
+	return m_registeredDataStructures;
+}
+
+bool ApoapseData::IsStoredOnTheDatabase(const DataStructure& dataStructure)
+{
+	return std::count_if(dataStructure.fields.begin(), dataStructure.fields.end(), [](const DataField& field)
+	{
+		if (global->isClient && field.usedInClientDb || global->isServer && field.usedInServerDb)
+			return true;
+		else
+			return false;
+	});
+}
+
+SqlValueType ApoapseData::ConvertFieldTypeToSqlType(const DataField& field)
+{
+	switch (field.type)
+	{
+	case DataFieldType::integer:
+		return SqlValueType::INT_64;
+
+	case DataFieldType::boolean:
+		return SqlValueType::INT;
+
+	case DataFieldType::byte_blob:
+		return SqlValueType::BYTE_ARRAY;
+
+	case DataFieldType::text:
+		return SqlValueType::TEXT;
+
+	case DataFieldType::datetime:
+		return SqlValueType::TEXT;
+
+	case DataFieldType::username:
+		return SqlValueType::BYTE_ARRAY;
+
+	case DataFieldType::uuid:
+		return SqlValueType::BYTE_ARRAY;
+
+	default:
+		return SqlValueType::UNSUPPORTED;
+	}
+}
+
 DataFieldType ApoapseData::GetTypeByTypeName(const std::string& typeStr)
 {
 	if (typeStr == "integer")
@@ -49,6 +95,9 @@ DataFieldType ApoapseData::GetTypeByTypeName(const std::string& typeStr)
 
 	else if (typeStr == "username")
 		return DataFieldType::username;
+
+	else if (typeStr == "datetime")
+		return DataFieldType::datetime;
 
 	return DataFieldType::undefined;
 }

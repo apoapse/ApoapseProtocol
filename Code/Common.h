@@ -11,6 +11,9 @@
 
 struct Global
 {
+	bool isServer = false;
+	bool isClient = false;
+
 	std::unique_ptr<ThreadPool> threadPool;
 	std::unique_ptr<Logger> logger;
 	IDatabase* database = nullptr;

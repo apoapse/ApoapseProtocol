@@ -5,59 +5,51 @@
 #include <variant>
 #include <string>
 #include "Maths.hpp"
-
-enum class ValueType
-{
-	UNSUPPORTED,
-	TEXT,
-	INT,
-	INT_64,
-	BYTE_ARRAY
-};
+#include "SQLValueType.hpp"
 
 class SQLValue
 {
 	std::variant<std::string, int, Int64, std::vector<byte>> m_data;
-	ValueType m_type;
+	SqlValueType m_type;
 
 public:
 	template <typename T>
-	SQLValue(const T& value, ValueType type)
+	SQLValue(const T& value, SqlValueType type)
 		: m_type(type)
 		, m_data(value)
 	{
 	}
 
-	ValueType GetType() const
+	SqlValueType GetType() const
 	{
 		return m_type;
 	}
 
 	template <typename T>
-	static ValueType GenerateType()
+	static SqlValueType GenerateType()
 	{
 		if constexpr (std::is_same<T, std::string>::value)
-			return ValueType::TEXT;
+			return SqlValueType::TEXT;
 
 		else if constexpr (std::is_same<T, int>::value)
-			return ValueType::INT;
+			return SqlValueType::INT;
 
 		else if constexpr (std::is_same<T, Int64>::value)
-			return ValueType::INT_64;
+			return SqlValueType::INT_64;
 
 		else if constexpr (std::is_same<T, std::vector<byte>>::value)
-			return ValueType::BYTE_ARRAY;
+			return SqlValueType::BYTE_ARRAY;
 
 		else
-			return ValueType::UNSUPPORTED;
+			return SqlValueType::UNSUPPORTED;
 	}
 
 	int GetInt32() const
 	{
-		if (GetType() == ValueType::INT)
+		if (GetType() == SqlValueType::INT)
 			return std::get<int>(m_data);
 
-		else if (GetType() == ValueType::INT_64)
+		else if (GetType() == SqlValueType::INT_64)
 		{
 			const auto val = std::get<Int64>(m_data);
 
@@ -73,10 +65,10 @@ public:
 
 	Int64 GetInt64() const
 	{
-		if (GetType() == ValueType::INT_64)
+		if (GetType() == SqlValueType::INT_64)
 			return std::get<Int64>(m_data);
 
-		else if (GetType() == ValueType::INT)
+		else if (GetType() == SqlValueType::INT)
 			return static_cast<Int64>(GetInt32());
 
 		else
@@ -85,11 +77,11 @@ public:
 
 	std::string GetText() const
 	{
-		if (GetType() == ValueType::TEXT)
+		if (GetType() == SqlValueType::TEXT)
 		{
 			return std::get<std::string>(m_data);
 		}
-		else if (GetType() == ValueType::BYTE_ARRAY)
+		else if (GetType() == SqlValueType::BYTE_ARRAY)
 		{
 			const auto bytes = std::get<std::vector<byte>>(m_data);
 			return std::string(bytes.begin(), bytes.end());
@@ -100,7 +92,7 @@ public:
 
 	bool GetBoolean() const
 	{
-		if (GetType() == ValueType::INT_64 || GetType() == ValueType::INT)
+		if (GetType() == SqlValueType::INT_64 || GetType() == SqlValueType::INT)
 			return (GetInt32() == 1);
 		else
 			throw std::bad_typeid();
@@ -108,11 +100,11 @@ public:
 
 	std::vector<byte> GetByteArray() const
 	{
-		if (GetType() == ValueType::BYTE_ARRAY)
+		if (GetType() == SqlValueType::BYTE_ARRAY)
 		{
 			return std::get<std::vector<byte>>(m_data);
 		}
-		else if (GetType() == ValueType::TEXT)
+		else if (GetType() == SqlValueType::TEXT)
 		{
 			const std::string text = std::get<std::string>(m_data);
 			return std::vector<byte>(text.begin(), text.end());

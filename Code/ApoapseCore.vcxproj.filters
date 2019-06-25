@@ -169,6 +169,9 @@
     <ClInclude Include="ApoapseData.h">
       <Filter>DataSystem</Filter>
     </ClInclude>
+    <ClInclude Include="SQLValueType.hpp">
+      <Filter>DatabaseAbstractionLayer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">

@@ -42,19 +42,19 @@ SQLPackagedResult SQLCipher::ExecQuery(const char* preparedQuery, const SQLValue
 
 			switch (value->GetType())
 			{
-				case ValueType::INT:
+				case SqlValueType::INT:
 					sqlite3_bind_int(preparedStm, (int)i + 1, value->GetInt32());
 					break;
 
-				case ValueType::INT_64:
+				case SqlValueType::INT_64:
 					sqlite3_bind_int64(preparedStm, (int)i + 1, value->GetInt64());
 					break;
 
-				case ValueType::TEXT:
+				case SqlValueType::TEXT:
 					sqlite3_bind_text(preparedStm, (int)i + 1, value->GetText().c_str(), -1, SQLITE_TRANSIENT);
 					break;
 
-				case ValueType::BYTE_ARRAY:
+				case SqlValueType::BYTE_ARRAY:
 					auto data = value->GetByteArray();
 					sqlite3_bind_blob(preparedStm, (int)i + 1, data.data(), (int)data.size(), SQLITE_TRANSIENT);
 					break;
@@ -85,18 +85,18 @@ SQLPackagedResult SQLCipher::ExecQuery(const char* preparedQuery, const SQLValue
 				switch (sqlite3_column_type(preparedStm, i))
 				{
 					case SQLITE_INTEGER:
-						currentRow.AddValue(SQLValue((Int64)sqlite3_column_int64(preparedStm, i), ValueType::INT_64));
+						currentRow.AddValue(SQLValue((Int64)sqlite3_column_int64(preparedStm, i), SqlValueType::INT_64));
 						break;
 
 					case SQLITE_TEXT:
-						currentRow.AddValue(SQLValue(std::move(std::string((const char*)sqlite3_column_text(preparedStm, i))), ValueType::TEXT));
+						currentRow.AddValue(SQLValue(std::move(std::string((const char*)sqlite3_column_text(preparedStm, i))), SqlValueType::TEXT));
 						break;
 
 					case SQLITE_BLOB:
 						auto rawdata = (byte*)sqlite3_column_blob(preparedStm, i);
 						int size = sqlite3_column_bytes(preparedStm, i);
 
-						currentRow.AddValue(SQLValue(std::move(std::vector<byte>(rawdata, rawdata + size)), ValueType::BYTE_ARRAY));
+						currentRow.AddValue(SQLValue(std::move(std::vector<byte>(rawdata, rawdata + size)), SqlValueType::BYTE_ARRAY));
 						break;
 				}
 			}

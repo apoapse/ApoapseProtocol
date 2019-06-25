@@ -65,39 +65,36 @@ bool DatabaseIntegrityPatcher::DbField::operator==(const DbField& other) const
 }
 
 
-DatabaseIntegrityPatcher::DatabaseIntegrityPatcher(const std::string& dbSchemeJson)
+DatabaseIntegrityPatcher::DatabaseIntegrityPatcher()
 {
-	JsonHelper json(dbSchemeJson);
-
-	const auto tablesArr = json.ReadFieldArray<JsonHelper>("tables");
-	for (const auto& tableJson : tablesArr)
+	for (const auto& dataStructure : global->apoapseData->GetRegisteredStructures())
 	{
+		if (!ApoapseData::IsStoredOnTheDatabase(dataStructure))
+			continue;
+
 		DbTable table;
-		table.name = tableJson.ReadFieldValue<std::string>("name").value();
+		table.name = dataStructure.name;
 
-		const auto fieldsArr = tableJson.ReadFieldArray<JsonHelper>("fields");
-		for (const auto& fieldJson : fieldsArr)
+		// Id field
 		{
-			DbField field;
-			field.name = fieldJson.ReadFieldValue<std::string>("name").value();
-			field.type = ReadFieldType(fieldJson.ReadFieldValue<std::string>("type").value());
+			DbField dbField;
+			dbField.name = "id";
+			dbField.type = SqlValueType::INT_64;
+			dbField.primary = true;
 
-			if (fieldJson.ReadFieldValue<std::string>("defaultValue").is_initialized())
-				field.defaultValue = fieldJson.ReadFieldValue<std::string>("defaultValue").value();
+			table.fields.push_back(dbField);
+		}
 
-			if (fieldJson.ReadFieldValue<bool>("unique").is_initialized())
-				field.unique = fieldJson.ReadFieldValue<bool>("unique").value();
+		for (const auto& field : dataStructure.fields)
+		{
+			DbField dbField;
+			dbField.name = field.name;
+			dbField.canBeNull = !field.isRequired;
+			dbField.unique = field.isDataUnique;
+			dbField.primary = false;
+			dbField.type = ApoapseData::ConvertFieldTypeToSqlType(field);
 
-			if (fieldJson.ReadFieldValue<bool>("canBeNull").is_initialized())
-				field.canBeNull = fieldJson.ReadFieldValue<bool>("canBeNull").value();
-
-			if (fieldJson.ReadFieldValue<bool>("primary").is_initialized() && (fieldJson.ReadFieldValue<bool>("primary").value() == true))
-			{
-				field.primary = true;
-				field.canBeNull = false;
-			}
-
-			table.fields.push_back(field);
+			table.fields.push_back(dbField);
 		}
 
 		m_SqlTables.push_back(table);
@@ -196,44 +193,44 @@ bool DatabaseIntegrityPatcher::CheckAndResolve()
 	return true;
 }
 
-DatabaseIntegrityPatcher::DbField::Type DatabaseIntegrityPatcher::ReadFieldType(const std::string& rawType)
+SqlValueType DatabaseIntegrityPatcher::ReadFieldType(const std::string& rawType)
 {
 	const std::string strType = StringExtensions::ToLowercase(rawType);
 
 	if (strType == "integer" || strType == "int")
-		return DbField::Type::integer;
+		return SqlValueType::INT;
 
 	else if (strType == "text")
-		return DbField::Type::text;
+		return SqlValueType::TEXT;
 
 	else if (strType == "blob")
-		return DbField::Type::byte_blob;
+		return SqlValueType::BYTE_ARRAY;
 
 	else if (strType == "bool")
-		return DbField::Type::boolean;
+		return SqlValueType::INT;
 
 	else
 	{
 		LOG << LogSeverity::error << "Database scheme: Unsupported field type " << rawType;
-		return DbField::Type::unknown;
+		return SqlValueType::UNSUPPORTED;
 	}
 }
 
-std::string DatabaseIntegrityPatcher::FieldTypeToStr(const DbField::Type& type)
+std::string DatabaseIntegrityPatcher::FieldTypeToStr(SqlValueType type)
 {
 	switch (type)
 	{
-		case DbField::Type::integer:
+		case SqlValueType::INT:
 			return "INTEGER";
 
-		case DbField::Type::text:
+		case SqlValueType::INT_64:
+			return "INTEGER";
+
+		case SqlValueType::TEXT:
 			return "TEXT";
 
-		case DbField::Type::byte_blob:
+		case SqlValueType::BYTE_ARRAY:
 			return "BLOB";
-
-		case DbField::Type::boolean:
-			return "INTEGER";
 
 		default:
 			return "UNKNOWN";
