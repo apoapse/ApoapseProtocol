@@ -642,6 +642,11 @@ public:
 		return output;
 	}
 
+	bool Exist(const std::string& key) const
+	{
+		return (m_parsedDataLocations.count(key) > 0);
+	}
+
 private:
 	void Parse()
 	{

@@ -20,6 +20,12 @@ public:
 	{
 	}
 
+	SQLValue(const SQLValue& sqlValue)
+		: m_type(sqlValue.m_type)
+		, m_data(sqlValue.m_data)
+	{
+	}
+
 	SqlValueType GetType() const
 	{
 		return m_type;

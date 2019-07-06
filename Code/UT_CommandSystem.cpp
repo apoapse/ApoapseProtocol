@@ -32,7 +32,7 @@ UNIT_TEST("Command:Parse:Validate:valid")
 	std::vector<byte> data(msgpkData.size() + NetworkPayload::headerLength);
 	std::copy(msgpkData.begin(), msgpkData.end(), data.begin() + NetworkPayload::headerLength);
 
-	auto payload = std::make_shared<NetworkPayload>(CommandId::unit_test_cmd, std::move(data));
+	auto payload = std::make_shared<NetworkPayload>("er", std::move(data));
 	auto cmd = CommandsManager::GetInstance().CreateCommand(CommandId::unit_test_cmd);
 	cmd->Parse(payload);
 
@@ -49,7 +49,7 @@ UNIT_TEST("Command:Parse:Validate:invalid:validator_fail")
 	std::vector<byte> data(msgpkData.size() + NetworkPayload::headerLength);
 	std::copy(msgpkData.begin(), msgpkData.end(), data.begin() + NetworkPayload::headerLength);
 
-	auto payload = std::make_shared<NetworkPayload>(CommandId::unit_test_cmd, std::move(data));
+	auto payload = std::make_shared<NetworkPayload>("er", std::move(data));
 	auto cmd = CommandsManager::GetInstance().CreateCommand(CommandId::unit_test_cmd);
 	cmd->Parse(payload);
 
@@ -66,7 +66,7 @@ UNIT_TEST("Command:Parse:Validate:invalid:mendatory_value_missing")
 	std::vector<byte> data(msgpkData.size() + NetworkPayload::headerLength);
 	std::copy(msgpkData.begin(), msgpkData.end(), data.begin() + NetworkPayload::headerLength);
 
-	auto payload = std::make_shared<NetworkPayload>(CommandId::unit_test_cmd, std::move(data));
+	auto payload = std::make_shared<NetworkPayload>("er", std::move(data));
 	auto cmd = CommandsManager::GetInstance().CreateCommand(CommandId::unit_test_cmd);
 	cmd->Parse(payload);
 
@@ -84,7 +84,7 @@ UNIT_TEST("Command:Parse:Validate:invalid:wrong_optional_value")
 	std::vector<byte> data(msgpkData.size() + NetworkPayload::headerLength);
 	std::copy(msgpkData.begin(), msgpkData.end(), data.begin() + NetworkPayload::headerLength);
 
-	auto payload = std::make_shared<NetworkPayload>(CommandId::unit_test_cmd, std::move(data));
+	auto payload = std::make_shared<NetworkPayload>("er", std::move(data));
 	auto cmd = CommandsManager::GetInstance().CreateCommand(CommandId::unit_test_cmd);
 	cmd->Parse(payload);
 

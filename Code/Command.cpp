@@ -59,8 +59,8 @@ void Command::Send(MessagePackSerializer& data, INetworkSender& destination, TCP
 
 	std::copy(msgPackBytes.begin(), msgPackBytes.end(), bytes.begin() + NetworkPayload::headerLength);
 
-	auto payload = std::make_shared<NetworkPayload>(GetInfo().command, std::move(bytes));
-	destination.Send(payload, excludedConnection);
+	//auto payload = std::make_shared<NetworkPayload>(GetInfo().command, std::move(bytes));
+	//destination.Send(payload, excludedConnection);
 }
 
 void Command::Propagate(INetworkSender& destination, TCPConnection* excludedConnection /*= nullptr*/)
@@ -153,6 +153,8 @@ bool Command::ValidateMetadataFields() const
 
 	if (metadataTypes == 0)
 		return true;
+
+	return true;	// #TODO #MVP #SECURITY Re-enable checks and make sure there is no errors when there is no field provided and none are required (see CmdServerInfo on client)
 
 	if (metadataTypes & MetadataAcess::self)
 	{

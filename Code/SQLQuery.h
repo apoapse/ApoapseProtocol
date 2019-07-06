@@ -89,6 +89,14 @@ public:
 		return *this;
 	}
 
+	SQLQuery& operator<<(const SQLValue& value)
+	{
+		AddValue(new SQLValue(value));
+
+		return *this;
+	}
+
+
 	template <size_t SIZE>
 	SQLQuery& operator<<(const std::array<byte, SIZE>& array)
 	{

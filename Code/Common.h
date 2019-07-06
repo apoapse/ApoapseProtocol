@@ -8,6 +8,7 @@
 #include "MemoryUtils.hpp"
 #include "Database.hpp"
 #include "ApoapseData.h"
+#include "ICommandManager.hpp"
 
 struct Global
 {
@@ -18,6 +19,7 @@ struct Global
 	std::unique_ptr<Logger> logger;
 	IDatabase* database = nullptr;
 	std::unique_ptr<ApoapseData> apoapseData;
+	std::unique_ptr<ICommandManager> cmdManager;
 
 #ifdef APOAPSE_SERVER
 	class ServerSettings* settings = nullptr;

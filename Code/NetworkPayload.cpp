@@ -4,13 +4,13 @@
 #include "Diagnostic.hpp"
 #include "Maths.hpp"
 
-NetworkPayload::NetworkPayload(CommandId command, std::vector<byte>&& data)
+NetworkPayload::NetworkPayload(const std::string& cmdShortName, std::vector<byte>&& data)
 {
 	m_rawPayloadData = std::move(data);
-	WriteHeader(command, m_rawPayloadData);
+	WriteHeader(cmdShortName, m_rawPayloadData);
 
 	headerInfo = NetworkMessageHeader();
-	headerInfo->command = command;
+	headerInfo->cmdShortName = cmdShortName;
 	headerInfo->payloadLength = (static_cast<UInt32>(m_rawPayloadData.size()) - headerLength);
 }
 
@@ -61,9 +61,10 @@ void NetworkPayload::ReadHeader()
 	Range<std::vector<byte>> range(m_rawPayloadData);
 
 	headerInfo = NetworkMessageHeader();
+
 	{
-		headerInfo->command = static_cast<CommandId>(FromBytes<UInt16>(range, Endianness::BIG_ENDIAN));
-		range.Consume(sizeof(UInt16));
+		headerInfo->cmdShortName = std::string(range.begin(), range.begin() + 2);
+		range.Consume(2);
 	}
 
 	{
@@ -75,17 +76,16 @@ void NetworkPayload::ReadHeader()
 	//range.Consume(sizeof(UInt32));	// Not needed since it's the last operatation on the temporary Range
 }
 
-void NetworkPayload::WriteHeader(CommandId command, std::vector<byte>& data)
+void NetworkPayload::WriteHeader(const std::string& cmdShortName, std::vector<byte>& data)
 {
 	ASSERT(data.size() > headerLength);
 	ASSERT_MSG(CanFit<UInt32>(data.size()) , "The vector provided is to big for its size to fit into a UInt32");
 
-	const auto cmdId = ToBytes<UInt16>(static_cast<UInt16>(command), Endianness::BIG_ENDIAN);
-	std::copy(cmdId.begin(), cmdId.end(), data.begin());
+	std::copy(cmdShortName.begin(), cmdShortName.end(), data.begin());
 
 	{
 		const UInt32 pyaloadContentSize = (static_cast<UInt32>(data.size()) - headerLength);
 		const auto payloadLength = ToBytes<UInt32>(static_cast<UInt32>(pyaloadContentSize), Endianness::BIG_ENDIAN);
-		std::copy(payloadLength.begin(), payloadLength.end(), data.begin() + cmdId.size());
+		std::copy(payloadLength.begin(), payloadLength.end(), data.begin() + cmdShortName.size());
 	}
 }

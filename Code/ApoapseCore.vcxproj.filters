@@ -172,6 +172,18 @@
     <ClInclude Include="SQLValueType.hpp">
       <Filter>DatabaseAbstractionLayer</Filter>
     </ClInclude>
+    <ClInclude Include="CommandsManagerV2.h">
+      <Filter>CommandSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandV2.h">
+      <Filter>CommandSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ICommandManager.hpp">
+      <Filter>CommandSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandsDef.hpp">
+      <Filter>CommandSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -281,7 +293,15 @@
     <ClCompile Include="TLSCertificate.cpp">
       <Filter>Cryptography\TLS</Filter>
     </ClCompile>
-    <ClCompile Include="ApoapseData.cpp" />
+    <ClCompile Include="CommandsManagerV2.cpp">
+      <Filter>CommandSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandV2.cpp">
+      <Filter>CommandSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ApoapseData.cpp">
+      <Filter>DataSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Parsers">

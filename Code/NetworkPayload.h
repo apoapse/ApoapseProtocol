@@ -7,7 +7,8 @@
 
 struct NetworkMessageHeader
 {
-	CommandId command;
+	CommandId command;	//TO REMOVE
+	std::string cmdShortName;
 	UInt32 payloadLength = 0;
 };
 
@@ -21,7 +22,7 @@ public:
 	std::optional<NetworkMessageHeader> headerInfo;
 
 	NetworkPayload() = default;
-	NetworkPayload(CommandId command, std::vector<byte>&& data);	// WARNING: Make sure to pass the data with an std::move
+	NetworkPayload(const std::string& cmdShortName, std::vector<byte>&& data);	// WARNING: Make sure to pass the data with an std::move
 
 	void Insert(Range<std::array<byte, READ_BUFFER_SIZE>>& data, size_t length);
 	Range<std::vector<byte>> GetPayloadContent() const;
@@ -32,5 +33,5 @@ public:
 	void ReadHeader();
 
 private:
-	static void WriteHeader(CommandId command, std::vector<byte>& data);
+	static void WriteHeader(const std::string& cmdShortName, std::vector<byte>& data);
 };

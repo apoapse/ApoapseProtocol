@@ -13,6 +13,7 @@ public:
 	Username(const std::vector<byte>& hash);
 
 	const hash_SHA256& GetRaw() const;
+	ByteContainer GetBytes() const;
 	std::string ToStr() const;
 
 	friend std::ostream& operator<<(std::ostream& stream, const Username& username)

@@ -6,7 +6,7 @@
 #include "UnitTestsManager.h"
 #include "NetworkPayload.h"
 
-const std::vector<byte> srcData{ 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x01, 0x02 };
+const std::vector<byte> srcData{ 0x65, 0x72, 0x00, 0x00, 0x00, 0x02, 0x01, 0x02 };
 
 UNIT_TEST("NetworkPayload:Insert:ReadHeader")
 {
@@ -19,7 +19,7 @@ UNIT_TEST("NetworkPayload:Insert:ReadHeader")
 
 	payload.Insert(range, 4);
 
-	UnitTest::Assert(payload.headerInfo->payloadLength == 2 && payload.headerInfo->command == CommandId::connect, std::to_string(payload.headerInfo->payloadLength));
+	UnitTest::Assert(payload.headerInfo->payloadLength == 2 && payload.headerInfo->cmdShortName == "er", std::to_string(payload.headerInfo->payloadLength));
 } UNIT_TEST_END
 
 UNIT_TEST("NetworkPayload:Insert:BytesLeft")
@@ -64,10 +64,10 @@ UNIT_TEST("NetworkPayload:WriteHeader")
 	testVec[6] = 0x01;
 	testVec[7] = 0x02;
 
-	NetworkPayload payload(CommandId::error_msg, std::move(testVec));
+	NetworkPayload payload("er", std::move(testVec));
 	payload.ReadHeader();
 
-	UnitTest::Assert(payload.headerInfo->payloadLength == 2 && payload.headerInfo->command == CommandId::error_msg);
+	UnitTest::Assert(payload.headerInfo->payloadLength == 2 && payload.headerInfo->cmdShortName == "er");
 } UNIT_TEST_END
 
 #endif	// UNIT_TESTS

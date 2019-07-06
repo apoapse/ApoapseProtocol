@@ -4,7 +4,7 @@
 #include "MessagePack.hpp"
 #include "NetworkPayload.h"
 #include "SecurityAlert.h"
-#include "CommandsManager.h"
+#include "CommandV2.h"
 
 GenericConnection::GenericConnection(boost::asio::io_service& ioService, ssl::context& context) : TCPConnection(ioService, context)
 {
@@ -100,24 +100,18 @@ void GenericConnection::OnReceivedPayloadData(size_t bytesTransferred, std::shar
 
 void GenericConnection::OnReceivedPayload(std::shared_ptr<NetworkPayload> payload)
 {
-// 	if (payload->headerInfo->payloadLength != payload->m_rawPayloadData.size())
-// 	{
-// 		SecurityLog::LogAlert(ApoapseErrorCode::wrong_network_payload_length, *this);
-// 		return;
-// 	}
-
-	if (!CommandsManager::GetInstance().CommandExist(payload->headerInfo->command))
+	if (!global->cmdManager->CommandExist(payload->headerInfo->cmdShortName))
 	{
 		SecurityLog::LogAlert(ApoapseErrorCode::unknown_cmd, *this);
 		return;
 	}
 
-	auto cmd = CommandsManager::GetInstance().CreateCommand(payload->headerInfo->command);
-	LOG_DEBUG << "Received command " << static_cast<UInt16>(cmd->GetInfo().command) << " from payload total size: " << payload->GetRawData().size();
-	cmd->Parse(payload);
-
-	if (cmd->IsValid())
-		OnReceivedValidCommand(std::move(cmd));
+	auto cmd = global->cmdManager->CreateCommand(payload);
+	LOG_DEBUG << "Received command " << cmd.name << " from payload total size: " << payload->GetRawData().size();
+	
+	if (cmd.IsValid())
+		LOG_DEBUG << "CMD VALID";
+		//OnReceivedValidCommand(std::move(cmd));
 	else
 		SecurityLog::LogAlert(ApoapseErrorCode::invalid_cmd, *this);
 }

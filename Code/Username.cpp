@@ -20,6 +20,12 @@ const hash_SHA256& Username::GetRaw() const
 	return m_usernameHash.value();
 }
 
+ByteContainer Username::GetBytes() const
+{
+	const auto& val = m_usernameHash.value();
+	return ByteContainer(val.begin(), val.end());
+}
+
 std::string Username::ToStr() const
 {
 	return (m_usernameHash.has_value()) ? BytesToHexString(m_usernameHash.value()) : ""s;

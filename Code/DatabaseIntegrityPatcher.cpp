@@ -73,7 +73,7 @@ DatabaseIntegrityPatcher::DatabaseIntegrityPatcher()
 			continue;
 
 		DbTable table;
-		table.name = dataStructure.name;
+		table.name = dataStructure.name + "s"; // We set the table name as plurial
 
 		// Id field
 		{
