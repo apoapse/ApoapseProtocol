@@ -2,8 +2,9 @@
 #include <string>
 #include "CryptographyTypes.hpp"
 #include <optional>
+#include "CustomDataType.h"
 
-class Username
+class Username : public ICustomDataType
 {
 	std::optional<hash_SHA3_256> m_usernameHash;
 
@@ -13,7 +14,7 @@ public:
 	Username(const std::vector<byte>& hash);
 
 	const hash_SHA256& GetRaw() const;
-	ByteContainer GetBytes() const;
+	ByteContainer GetBytes() const override;
 	std::string ToStr() const;
 
 	friend std::ostream& operator<<(std::ostream& stream, const Username& username)

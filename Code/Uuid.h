@@ -3,10 +3,11 @@
 #include <vector>
 #include "TypeDefs.hpp"
 #include "Range.hpp"
+#include "CustomDataType.h"
 
 constexpr size_t uuidLengthInBytes = 16;
 
-class Uuid
+class Uuid : public ICustomDataType
 {
 	std::array<byte, uuidLengthInBytes> m_uuidRawFormat;
 
@@ -18,7 +19,7 @@ public:
 	Uuid(Range<std::vector<byte>>& range);
 
 	const std::array<byte, uuidLengthInBytes>& GetInRawFormat() const;
-	std::vector<byte> GetAsByteVector() const;
+	std::vector<byte> GetBytes() const override;
 
 	bool operator==(const Uuid& other) const;
 	bool operator<(const Uuid& other) const;

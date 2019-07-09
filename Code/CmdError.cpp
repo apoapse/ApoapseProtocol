@@ -27,7 +27,7 @@ void CmdError::SendError(ApoapseErrorCode error, INetworkSender& destination, co
 		serializer.Group("",
 		{
 			MSGPK_ORDERED_APPEND(serializer, "error", (UInt16)error),
-			MSGPK_ORDERED_APPEND(serializer, "related_item",  relatedElement->GetAsByteVector()),
+			MSGPK_ORDERED_APPEND(serializer, "related_item",  relatedElement->GetBytes()),
 		});
 	}
 	else

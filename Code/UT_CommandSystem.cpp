@@ -25,7 +25,7 @@ UNIT_TEST("CommandsManager:CreateCommand_GetInfo")
 UNIT_TEST("Command:Parse:Validate:valid")
 {
 	MessagePackSerializer serializer;
-	serializer.UnorderedAppend("mendatory_field_uuid_validator", Uuid::Generate().GetAsByteVector());
+	serializer.UnorderedAppend("mendatory_field_uuid_validator", Uuid::Generate().GetBytes());
 
 	auto msgpkData = serializer.GetMessagePackBytes();
 
@@ -77,7 +77,7 @@ UNIT_TEST("Command:Parse:Validate:invalid:wrong_optional_value")
 {
 	MessagePackSerializer serializer;
 	serializer.UnorderedAppend<std::string>("optional_field", "should be a UInt16");
-	serializer.UnorderedAppend("mendatory_field_uuid_validator", Uuid::Generate().GetAsByteVector());
+	serializer.UnorderedAppend("mendatory_field_uuid_validator", Uuid::Generate().GetBytes());
 
 	auto msgpkData = serializer.GetMessagePackBytes();
 

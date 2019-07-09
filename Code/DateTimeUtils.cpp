@@ -11,19 +11,19 @@ DateTimeUtils::UTCDateTime::UTCDateTime(const std::string& dateTime) : m_dateTim
 		throw std::exception("Text of unexpected format for a ISO-8601 date time");
 }
 
-std::string DateTimeUtils::UTCDateTime::str() const
+std::string DateTimeUtils::UTCDateTime::GetStr() const
 {
 	return m_dateTimeStr;
 }
 
 bool DateTimeUtils::UTCDateTime::operator<(const UTCDateTime& foreignDateTime) const
 {
-	return (str() < foreignDateTime.str());
+	return (GetStr() < foreignDateTime.GetStr());
 }
 
 bool DateTimeUtils::UTCDateTime::operator>(const UTCDateTime& foreignDateTime) const
 {
-	return (str() > foreignDateTime.str());
+	return (GetStr() > foreignDateTime.GetStr());
 }
 
 DateTimeUtils::UTCDateTime DateTimeUtils::UTCDateTime::CurrentTime()

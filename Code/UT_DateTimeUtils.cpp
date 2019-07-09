@@ -25,7 +25,7 @@ UNIT_TEST("DateTimeUtils:UTCDateTime:GenerateCurrentTime")
 {
 	auto t = UTCDateTime::CurrentTime();
 
-	UnitTest::Assert(UTCDateTime::ValidateFormat(t.str()));
+	UnitTest::Assert(UTCDateTime::ValidateFormat(t.GetStr()));
 } UNIT_TEST_END
 
 UNIT_TEST("DateTimeUtils:UTCDateTime:CompareLess")

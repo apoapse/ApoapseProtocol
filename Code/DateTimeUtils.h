@@ -1,10 +1,11 @@
 #pragma once
 #include "TypeDefs.hpp"
 #include <string>
+#include "CustomDataType.h"
 
 namespace DateTimeUtils
 {
-	class UTCDateTime	// ISO 8601
+	class UTCDateTime : public ICustomDataType	// ISO 8601
 	{
 		std::string m_dateTimeStr;
 
@@ -12,7 +13,7 @@ namespace DateTimeUtils
 		UTCDateTime(const std::string& dateTime);
 		UTCDateTime() = default;
 
-		std::string str() const;
+		std::string GetStr() const override;
 
 		bool operator<(const UTCDateTime& foreignDateTime) const;
 		bool operator>(const UTCDateTime& foreignDateTime) const;

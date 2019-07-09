@@ -9,6 +9,19 @@ namespace DateTimeUtils
 	class UTCDateTime;
 }
 
+struct ICustomDataType
+{
+	virtual std::vector<byte> GetBytes() const
+	{
+		throw std::exception("ICustomDataType members should not be called directly");
+	}
+
+	virtual std::string GetStr() const
+	{
+		throw std::exception("ICustomDataType members should not be called directly");
+	}
+};
+
 namespace CustomDataType
 {
 	bool ValidateCustomType(const CustomFieldType& typeDef, const std::any& value);

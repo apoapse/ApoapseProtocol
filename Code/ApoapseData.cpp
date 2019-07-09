@@ -32,7 +32,13 @@ void ApoapseData::ReadDataStructures(const JsonHelper& json)
 			field.usedInClientDb = fieldDser.ReadFieldValue<bool>("uses.client_storage").value_or(false);
 			field.usedInCommad = fieldDser.ReadFieldValue<bool>("uses.command").value_or(false);
 
-			field.basicType = GetTypeByTypeName(fieldDser.ReadFieldValue<std::string>("type").value());
+			bool useCustomType = false;
+			field.basicType = GetTypeByTypeName(fieldDser.ReadFieldValue<std::string>("type").value(), &useCustomType);
+			
+			if (useCustomType)
+			{
+				field.customType = fieldDser.ReadFieldValue<std::string>("type").value();
+			}
 
 			if (field.basicType != DataFieldType::undefined)
 				dataStructure.fields.push_back(field);
@@ -52,8 +58,10 @@ void ApoapseData::ReadCustomTypes(const JsonHelper& json)
 	{
 		CustomFieldType customType;
 		
+		bool useCustomType = false;
+
 		customType.name = dser.ReadFieldValue<std::string>("name").value();
-		customType.underlyingType = GetTypeByTypeName(dser.ReadFieldValue<std::string>("underlying_type").value());
+		customType.underlyingType = GetTypeByTypeName(dser.ReadFieldValue<std::string>("underlying_type").value(), &useCustomType);
 		customType.minLength = dser.ReadFieldValue<int>("min_length").value_or(-1);
 		customType.maxLength = dser.ReadFieldValue<int>("max_length").value_or(-1);
 
@@ -210,8 +218,10 @@ SqlValueType ApoapseData::ConvertFieldTypeToSqlType(const DataField& field)
 	}
 }
 
-DataFieldType ApoapseData::GetTypeByTypeName(const std::string& typeStr) const
+DataFieldType ApoapseData::GetTypeByTypeName(const std::string& typeStr, bool* isCustomType) const
 {
+	*isCustomType = false;
+
 	if (typeStr == "integer")
 		return DataFieldType::integer;
 
@@ -225,7 +235,10 @@ DataFieldType ApoapseData::GetTypeByTypeName(const std::string& typeStr) const
 		return DataFieldType::byte_blob;
 
 	else
+	{
+		*isCustomType = true;
 		return GetCustomTypeInfo(typeStr).underlyingType;
+	}
 }
 
 DataStructure ApoapseData::ReadItemFromDatabaseInternal(const std::string& name, const std::string& searchBy, const SQLValue& searchValue)

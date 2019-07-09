@@ -32,7 +32,7 @@ const std::array<byte, uuidLengthInBytes>& Uuid::GetInRawFormat() const
 	return m_uuidRawFormat;
 }
 
-std::vector<byte> Uuid::GetAsByteVector() const
+std::vector<byte> Uuid::GetBytes() const
 {
 	std::vector<byte> output(m_uuidRawFormat.begin(), m_uuidRawFormat.end());
 

@@ -51,6 +51,38 @@ struct DataField
 			return optional;
 	}
 
+	void SetValue(Int64 val)
+	{
+		value = val;
+	}
+
+	void SetValue(bool val)
+	{
+		value = val;
+	}
+
+	void SetValue(const std::string& val)
+	{
+		value = val;
+	}
+
+	void SetValue(const ByteContainer& val)
+	{
+		value = val;
+	}
+
+	void SetValue(const ICustomDataType& val)
+	{
+		if (basicType == DataFieldType::text)
+			value = val.GetStr();
+
+		else if (basicType == DataFieldType::byte_blob)
+			value = val.GetBytes();
+
+		else
+			throw std::exception("DataField:SetValue no ICustomDataType converter defined for this base type");
+	}
+
 	bool HasValue() const
 	{
 		return value.has_value();
@@ -134,7 +166,7 @@ public:
 
 	std::vector<DataStructure> ReadListFromDatabase(const std::string& name, const std::string& seachFieldName) const
 	{
-		return std::vector<DataStructure>();
+		return std::vector<DataStructure>();//TODODODODODODDODODOODOD
 	}
 
 private:
@@ -142,6 +174,6 @@ private:
 	void ReadCustomTypes(const JsonHelper& json);
 
 	DataStructureDef& GetStructureDefinition(const std::string& name);
-	DataFieldType GetTypeByTypeName(const std::string& typeStr) const;
+	DataFieldType GetTypeByTypeName(const std::string& typeStr, bool* isCustomType) const;
 	DataStructure ReadItemFromDatabaseInternal(const std::string& name, const std::string& seachFieldName, const SQLValue& searchValue);
 };

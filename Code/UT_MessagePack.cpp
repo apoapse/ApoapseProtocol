@@ -112,7 +112,7 @@ UNIT_TEST("MessagePack:serialize:ordered:bytes")
 
 	serializer.Group("",
 	{
-		MSGPK_ORDERED_APPEND(serializer, "related_item", Uuid::Generate().GetAsByteVector()),
+		MSGPK_ORDERED_APPEND(serializer, "related_item", Uuid::Generate().GetBytes()),
 		MSGPK_ORDERED_APPEND(serializer, "test_int", 32)
 	});
 
