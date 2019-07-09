@@ -3,9 +3,6 @@
 #include "ApoapseData.h"
 #include "Json.hpp"
 #include "SQLQuery.h"
-#include "DateTimeUtils.h"
-#include "Uuid.h"
-#include "Username.h"
 #include "NetworkPayload.h"
 #include "CommandsManagerV2.h"
 
@@ -13,6 +10,12 @@ ApoapseData::ApoapseData(const std::string& dataSchemeJson)
 {
 	JsonHelper json(dataSchemeJson);
 
+	ReadCustomTypes(json);
+	ReadDataStructures(json);
+}
+
+void ApoapseData::ReadDataStructures(const JsonHelper& json)
+{
 	for (const auto& dser : json.ReadFieldArray<JsonHelper>("data_structures"))
 	{
 		DataStructureDef dataStructure;
@@ -23,14 +26,15 @@ ApoapseData::ApoapseData(const std::string& dataSchemeJson)
 			DataField field;
 
 			field.name = fieldDser.ReadFieldValue<std::string>("name").value();
-			field.type = GetTypeByTypeName(fieldDser.ReadFieldValue<std::string>("type").value());
 			field.isRequired = fieldDser.ReadFieldValue<bool>("required").value_or(false);
 			field.isDataUnique = fieldDser.ReadFieldValue<bool>("unique").value_or(false);
 			field.usedInServerDb = fieldDser.ReadFieldValue<bool>("uses.server_storage").value_or(false);
 			field.usedInClientDb = fieldDser.ReadFieldValue<bool>("uses.client_storage").value_or(false);
 			field.usedInCommad = fieldDser.ReadFieldValue<bool>("uses.command").value_or(false);
 
-			if (field.type != DataFieldType::undefined)
+			field.basicType = GetTypeByTypeName(fieldDser.ReadFieldValue<std::string>("type").value());
+
+			if (field.basicType != DataFieldType::undefined)
 				dataStructure.fields.push_back(field);
 			else
 				LOG << LogSeverity::error << "Type " << fieldDser.ReadFieldValue<std::string>("type").value() << " used on the structure " << dataStructure.name << " does not exist";
@@ -40,6 +44,23 @@ ApoapseData::ApoapseData(const std::string& dataSchemeJson)
 	}
 
 	LOG << "Registered " << m_registeredDataStructures.size() << " data structures";
+}
+
+void ApoapseData::ReadCustomTypes(const JsonHelper& json)
+{
+	for (const auto& dser : json.ReadFieldArray<JsonHelper>("custom_types"))
+	{
+		CustomFieldType customType;
+		
+		customType.name = dser.ReadFieldValue<std::string>("name").value();
+		customType.underlyingType = GetTypeByTypeName(dser.ReadFieldValue<std::string>("underlying_type").value());
+		customType.minLength = dser.ReadFieldValue<int>("min_length").value_or(-1);
+		customType.maxLength = dser.ReadFieldValue<int>("max_length").value_or(-1);
+
+		m_customTypes.push_back(customType);
+	}
+
+	LOG << "Registered " << m_customTypes.size() << " custom data structure types";
 }
 
 DataStructureDef& ApoapseData::GetStructureDefinition(const std::string& name)
@@ -69,6 +90,19 @@ const DataStructureDef& ApoapseData::GetStructure(const std::string& name) const
 
 	if (res == m_registeredDataStructures.end())
 		throw std::exception("The requested data structure do not exist");
+
+	return *res;
+}
+
+const CustomFieldType& ApoapseData::GetCustomTypeInfo(const std::string& name) const
+{
+	auto& res = std::find_if(m_customTypes.begin(), m_customTypes.end(), [&name](const CustomFieldType& fieldType)
+		{
+			return (fieldType.name == name);
+		});
+
+	if (res == m_customTypes.end())
+		throw std::exception("The requested custom filed type do not exist");
 
 	return *res;
 }
@@ -103,62 +137,43 @@ DataStructure ApoapseData::ParseFromNetwork(const std::string& relatedDataStruct
 			data.isValid = false;
 		}
 
-		if (field.type == DataFieldType::boolean)
+		if (field.basicType == DataFieldType::boolean)
+		{
 			field.value = payloadData.GetValue<bool>(field.name);
-
-		else if (field.type == DataFieldType::byte_blob)
+		}
+		else if (field.basicType == DataFieldType::byte_blob)
+		{
 			field.value = payloadData.GetValue<ByteContainer>(field.name);
-
-		if (field.type == DataFieldType::datetime)
-		{
-			const auto val = payloadData.GetValue<std::string>(field.name);
-
-			if (DateTimeUtils::UTCDateTime::ValidateFormat(val))
-				field.value = DateTimeUtils::UTCDateTime(val);
-			else
-			{
-				LOG << "The datatime of the field " << field.name << " from the net payload is not valid" << LogSeverity::error;
-				data.isValid = false;
-			}
 		}
-
-		if (field.type == DataFieldType::integer)
+		else if (field.basicType == DataFieldType::integer)
+		{
 			field.value = payloadData.GetValue<Int64>(field.name);
-
-		if (field.type == DataFieldType::text)
+		}
+		else if (field.basicType == DataFieldType::text)
+		{
 			field.value = payloadData.GetValue<std::string>(field.name);
-
-		if (field.type == DataFieldType::timestamp)
-			field.value = payloadData.GetValue<Int64>(field.name);
-
-		if (field.type == DataFieldType::username)
-		{
-			const auto val = payloadData.GetValue<ByteContainer>(field.name);
-
-			if (Username::IsValid(val))
-				field.value = Username(val);
-			else
-			{
-				LOG << "The Username of the field " << field.name << " from the net payload is not valid" << LogSeverity::error;
-				data.isValid = false;
-			}
 		}
 
-		if (field.type == DataFieldType::uuid)
-		{
-			const auto val = payloadData.GetValue<ByteContainer>(field.name);
-
-			if (Uuid::IsValid(val))
-				field.value = Uuid(val);
-			else
-			{
-				LOG << "The Username of the field " << field.name << " from the net payload is not valid" << LogSeverity::error;
-				data.isValid = false;
-			}
-		}
+		data.isValid = field.Validate();
 	}
 
 	return data;
+}
+
+void ApoapseData::SaveToDatabase(const DataStructure& data) const
+{
+	const int nbFieldToSave = std::count_if(data.fields.begin(), data.fields.end(), [](const DataField& field)
+	{
+		return (field.usedInClientDb == global->isClient || field.usedInServerDb && global->isServer);
+	});
+
+	if (nbFieldToSave == 0)
+	{
+		LOG << LogSeverity::error << "Trying to save data of type " << data.name << " but none of the fields are set to be saved on the database";
+		return;
+	}
+
+	//TOODODODOD
 }
 
 bool ApoapseData::IsStoredOnTheDatabase(const DataStructure& dataStructure)
@@ -176,7 +191,7 @@ bool ApoapseData::IsStoredOnTheDatabase(const DataField& field)
 
 SqlValueType ApoapseData::ConvertFieldTypeToSqlType(const DataField& field)
 {
-	switch (field.type)
+	switch (field.basicType)
 	{
 	case DataFieldType::integer:
 		return SqlValueType::INT_64;
@@ -190,24 +205,12 @@ SqlValueType ApoapseData::ConvertFieldTypeToSqlType(const DataField& field)
 	case DataFieldType::text:
 		return SqlValueType::TEXT;
 
-	case DataFieldType::datetime:
-		return SqlValueType::TEXT;
-
-	case DataFieldType::username:
-		return SqlValueType::BYTE_ARRAY;
-
-	case DataFieldType::uuid:
-		return SqlValueType::BYTE_ARRAY;
-
-	case DataFieldType::timestamp:
-		return SqlValueType::INT_64;
-
 	default:
 		return SqlValueType::UNSUPPORTED;
 	}
 }
 
-DataFieldType ApoapseData::GetTypeByTypeName(const std::string& typeStr)
+DataFieldType ApoapseData::GetTypeByTypeName(const std::string& typeStr) const
 {
 	if (typeStr == "integer")
 		return DataFieldType::integer;
@@ -221,28 +224,17 @@ DataFieldType ApoapseData::GetTypeByTypeName(const std::string& typeStr)
 	else if (typeStr == "blob")
 		return DataFieldType::byte_blob;
 
-	else if (typeStr == "uuid")
-		return DataFieldType::uuid;
-
-	else if (typeStr == "username")
-		return DataFieldType::username;
-
-	else if (typeStr == "datetime")
-		return DataFieldType::datetime;
-
-	else if (typeStr == "timestamp")
-		return DataFieldType::timestamp;
-
-	return DataFieldType::undefined;
+	else
+		return GetCustomTypeInfo(typeStr).underlyingType;
 }
 
-DataStructure ApoapseData::ReadItemFromDatabaseInternal(const std::string& name, const std::string& seachFieldName, const SQLValue& searchValue)
+DataStructure ApoapseData::ReadItemFromDatabaseInternal(const std::string& name, const std::string& searchBy, const SQLValue& searchValue)
 {
 	auto& structureDef = GetStructureDefinition(name);
 	//auto& fieldInfo = structureDef.GetField(seachFieldName);
 
 	SQLQuery query(*global->database);
-	query << SELECT << ALL << FROM << std::string(name + "s").c_str() << WHERE << seachFieldName.c_str() << EQUALS << searchValue;
+	query << SELECT << ALL << FROM << std::string(name + "s").c_str() << WHERE << searchBy.c_str() << EQUALS << searchValue;
 	auto res = query.Exec();
 
 	DataStructure data = structureDef;
@@ -254,29 +246,17 @@ DataStructure ApoapseData::ReadItemFromDatabaseInternal(const std::string& name,
 	{
 		if (IsStoredOnTheDatabase(field))
 		{
-			if (field.type == DataFieldType::boolean)
+			if (field.basicType == DataFieldType::boolean)
 				field.value = res[0][dbValueId].GetBoolean();
 
-			if (field.type == DataFieldType::byte_blob)
+			if (field.basicType == DataFieldType::byte_blob)
 				field.value = res[0][dbValueId].GetByteArray();
 
-			if (field.type == DataFieldType::datetime)
-				field.value = DateTimeUtils::UTCDateTime(res[0][dbValueId].GetText());
-
-			if (field.type == DataFieldType::integer)
+			if (field.basicType == DataFieldType::integer)
 				field.value = res[0][dbValueId].GetInt64();
 
-			if (field.type == DataFieldType::text)
+			if (field.basicType == DataFieldType::text)
 				field.value = res[0][dbValueId].GetText();
-
-			if (field.type == DataFieldType::timestamp)
-				field.value = res[0][dbValueId].GetInt64();
-
-			if (field.type == DataFieldType::username)
-				field.value = Username(res[0][dbValueId].GetByteArray());
-
-			if (field.type == DataFieldType::uuid)
-				field.value = Uuid(res[0][dbValueId].GetByteArray());
 
 			dbValueId++;
 		}
@@ -291,30 +271,46 @@ MessagePackSerializer DataStructure::GetMessagePackFormat()
 
 	for (auto& field : fields)
 	{
-		if (field.type == DataFieldType::boolean)
+		if (field.basicType == DataFieldType::boolean)
 			ser.UnorderedAppend<bool>(field.name, field.GetValue<bool>());
 
-		if (field.type == DataFieldType::byte_blob)
+		if (field.basicType == DataFieldType::byte_blob)
 			ser.UnorderedAppend<ByteContainer>(field.name, field.GetValue<ByteContainer>());
 
-		if (field.type == DataFieldType::datetime)
-			ser.UnorderedAppend<std::string>(field.name, field.GetValue<DateTimeUtils::UTCDateTime>().str());
-
-		if (field.type == DataFieldType::integer)
+		if (field.basicType == DataFieldType::integer)
 			ser.UnorderedAppend<Int64>(field.name, field.GetValue<Int64>());
 
-		if (field.type == DataFieldType::text)
+		if (field.basicType == DataFieldType::text)
 			ser.UnorderedAppend<std::string>(field.name, field.GetValue<std::string>());
-
-		if (field.type == DataFieldType::timestamp)
-			ser.UnorderedAppend<Int64>(field.name, field.GetValue<Int64>());
-
-		if (field.type == DataFieldType::username)
-			ser.UnorderedAppend<ByteContainer>(field.name, field.GetValue<Username>().GetBytes());
-
-		if (field.type == DataFieldType::uuid)
-			ser.UnorderedAppend<ByteContainer>(field.name, field.GetValue<Uuid>().GetAsByteVector());
 	}
 
 	return ser;
+}
+
+inline bool DataField::Validate() const
+{
+	bool isValid = true;
+
+	if (customType.has_value())
+	{
+		const auto typeDef = global->apoapseData->GetCustomTypeInfo(customType.value());
+
+		// Validate ranges
+		if (typeDef.minLength != -1 || typeDef.maxLength != -1)
+		{
+			const size_t size = GetLength();
+
+			if (typeDef.minLength != -1 && (size < typeDef.minLength))
+				isValid = false;
+
+			if (typeDef.maxLength != -1 && (size > typeDef.maxLength))
+				isValid = false;
+		}
+
+		// Validate custom types
+		if (!CustomDataType::ValidateCustomType(typeDef, value.value()))
+			isValid = false;
+	}
+
+	return isValid;
 }

@@ -5,6 +5,32 @@ static std::string GetDataStructures()
 {
 	static std::string scheme = R"(
 {
+	"custom_types": [
+		{
+			"name": "uuid",
+			"underlying_type": "blob"
+		},
+		{
+			"name": "username",
+			"underlying_type": "blob"
+		},
+		{
+			"name": "sha256",
+			"underlying_type": "blob",
+			"min_length": 32,
+			"max_length": 32
+		},
+		{
+			"name": "timestamp",
+			"underlying_type": "integer",
+			"min_length": 1
+		},
+		{
+			"name": "datetime",
+			"underlying_type": "text"
+		}
+	],
+
 	"data_structures": [
 		{
 			"name": "error",

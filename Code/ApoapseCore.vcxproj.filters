@@ -184,6 +184,9 @@
     <ClInclude Include="CommandsDef.hpp">
       <Filter>CommandSystem</Filter>
     </ClInclude>
+    <ClInclude Include="CustomDataType.h">
+      <Filter>DataSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -300,6 +303,9 @@
       <Filter>CommandSystem</Filter>
     </ClCompile>
     <ClCompile Include="ApoapseData.cpp">
+      <Filter>DataSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomDataType.cpp">
       <Filter>DataSystem</Filter>
     </ClCompile>
   </ItemGroup>
