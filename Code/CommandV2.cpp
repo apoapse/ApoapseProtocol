@@ -12,9 +12,39 @@ void CommandV2::SetData(const DataStructure& data)
 	m_data = data;
 }
 
-bool CommandV2::IsValid() const
+bool CommandV2::IsValid(bool isAuthenticated) const
 {
-	return m_data.isValid;
+	if (!m_data.isValid)
+	{
+		LOG << LogSeverity::warning << "Command " << name << ": data invalid";
+		return false;
+	}
+
+	if (global->isClient && !receiveOnClient)
+	{
+		LOG << LogSeverity::warning << "Command " << name << ": this command cannot be received on a client";
+		return false;
+	}
+
+	if (global->isServer && !receiveOnServer)
+	{
+		LOG << LogSeverity::warning << "Command " << name << ": this command cannot be received on a server";
+		return false;
+	}
+
+	if (onlyNonAuthenticated && isAuthenticated)
+	{
+		LOG << LogSeverity::warning << "Command " << name << ": this command is only when the user is not authenticated";
+		return false;
+	}
+
+	if (requireAuthentication && !isAuthenticated)
+	{
+		LOG << LogSeverity::warning << "Command " << name << ": this command require the user to be authenticated";
+		return false;
+	}
+
+	return true;
 }
 
 void CommandV2::Send(INetworkSender& destination, TCPConnection* excludedConnection)

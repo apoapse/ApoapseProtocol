@@ -5,7 +5,7 @@
 #include <memory>
 #include "Commands.hpp"
 #include <chrono>
-#include "Command.h"
+#include "CommandV2.h"
 class NetworkPayload;
 
 class GenericConnection : public TCPConnection
@@ -31,6 +31,7 @@ private:
 
 protected:
 	virtual bool OnConnectedToServer() = 0;
-	virtual void OnReceivedValidCommand(std::unique_ptr<Command> cmd) = 0;
+	virtual void OnReceivedValidCommand(CommandV2& cmd) = 0;
+	virtual bool IsAuthenticated() const = 0;
 	//virtual bool CanProcessCommandFromThisConnection(CommandId command) = 0;
 };

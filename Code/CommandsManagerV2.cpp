@@ -3,6 +3,8 @@
 #include "CommandsManagerV2.h"
 #include "Json.hpp"
 #include "NetworkPayload.h"
+#include "SecurityAlert.h"
+#include "GenericConnection.h"
 
 CommandsManagerV2::CommandsManagerV2(const std::string& cmdSchemeJson)
 {
@@ -20,6 +22,8 @@ CommandsManagerV2::CommandsManagerV2(const std::string& cmdSchemeJson)
 		cmd.propagateToClientUI = dser.ReadFieldValue<bool>("propagate_to_client_ui").value_or(false);
 		cmd.operationRegister = dser.ReadFieldValue<bool>("operation.register").value_or(false);
 		cmd.operationOwnership = (OperationOwnership)dser.ReadFieldValue<int>("operation.ownership").value_or(0);
+		cmd.receiveOnClient = dser.ReadFieldValue<bool>("reception.client").value_or(false);
+		cmd.receiveOnServer = dser.ReadFieldValue<bool>("reception.server").value_or(false);
 
 		if (!GetCmdDef(cmd.nameShort).has_value())
 		{
@@ -64,6 +68,21 @@ bool CommandsManagerV2::CommandExist(const std::string& cmdShortName) const
 	{
 		return (cmd.nameShort == cmdShortName);
 	});
+}
+
+void CommandsManagerV2::OnReceivedCmdInternal(CommandV2& cmd, GenericConnection& connection, void* relatedUser)
+{
+	if (OnReceivedCommandPre(cmd, connection))
+	{
+		OnReceivedCommand(cmd, connection);
+
+		// TODO2: Add auto save, net propagation and operation registration
+	}
+	else
+	{
+		LOG << LogSeverity::error << "The command " << cmd.name << " was rejected by the code";
+		SecurityLog::LogAlert(ApoapseErrorCode::invalid_cmd, connection);
+	}
 }
 
 std::optional<CommandV2Def> CommandsManagerV2::GetCmdDef(const std::string& shortName)

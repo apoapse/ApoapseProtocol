@@ -14,6 +14,10 @@ static std::string GetCommandDef()
 			"require_authentication": false,
 			"only_non_authenticated": true,
 			"propagate_to_other_clients": false,
+			"reception": {
+				"server": true,
+				"client": false
+			},
 			"operation": {
 				"register": false
 			}
@@ -25,6 +29,10 @@ static std::string GetCommandDef()
 			"require_authentication": false,
 			"only_non_authenticated": true,
 			"propagate_to_other_clients": false,
+			"reception": {
+				"server": true,
+				"client": false
+			},
 			"operation": {
 				"register": false
 			}
@@ -37,6 +45,10 @@ static std::string GetCommandDef()
 			"propagate_to_other_clients": true,
 			"save_operation": true,
 			"propagate_to_client_ui": true,
+			"reception": {
+				"server": true,
+				"client": true
+			},
 			"operation": {
 				"register": true,
 				"ownership": "all"

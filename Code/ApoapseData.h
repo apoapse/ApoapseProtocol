@@ -103,7 +103,7 @@ private:
 			return std::any_cast<std::string>(value.value()).size();
 
 		else
-			return -1;
+			return (size_t)-1;
 	}
 };
 
@@ -116,7 +116,7 @@ struct DataStructure
 
 	DataField& GetField(const std::string& fieldName)
 	{
-		auto& res = std::find_if(fields.begin(), fields.end(), [&fieldName](DataField& field)
+		auto res = std::find_if(fields.begin(), fields.end(), [&fieldName](DataField& field)
 		{
 			return (field.name == fieldName);
 		});

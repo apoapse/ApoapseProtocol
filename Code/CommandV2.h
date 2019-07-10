@@ -18,12 +18,14 @@ public:
 	bool onlyNonAuthenticated = false;
 	bool propagateToOtherClients = false;
 	bool propagateToClientUI = false;
+	bool receiveOnClient = false;
+	bool receiveOnServer = false;
 
 	bool operationRegister = false;
 	OperationOwnership operationOwnership = OperationOwnership::all;
 
 	void SetData(const DataStructure& data);
-	bool IsValid() const;
+	bool IsValid(bool isAuthenticated) const;
 
 	void Send(INetworkSender& destination, TCPConnection* excludedConnection = nullptr);
 
