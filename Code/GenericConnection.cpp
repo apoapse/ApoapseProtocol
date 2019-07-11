@@ -109,10 +109,24 @@ void GenericConnection::OnReceivedPayload(std::shared_ptr<NetworkPayload> payloa
 	auto cmd = global->cmdManager->CreateCommand(payload);
 	LOG_DEBUG << "Received command " << cmd.name << " from payload total size: " << payload->GetRawData().size();
 	
+#ifndef DEBUG
+	try
+	{
+#endif
+
 	if (cmd.IsValid(IsAuthenticated()))
 		OnReceivedValidCommand(cmd);
 	else
 		SecurityLog::LogAlert(ApoapseErrorCode::invalid_cmd, *this);
+
+#ifndef DEBUG
+	}
+	catch (const std::exception& e)
+	{
+		LOG << LogSeverity::error << "Exception trigged while processing a command of type " << cmd.name << ": " << e;
+		Close();
+	}
+#endif
 }
 
 void GenericConnection::OnSendingSuccessful(size_t bytesTransferred)
