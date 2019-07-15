@@ -139,30 +139,35 @@ DataStructure ApoapseData::ParseFromNetwork(const std::string& relatedDataStruct
 		if (!field.usedInCommad)
 			continue;
 
-		if (field.isRequired && !payloadData.Exist(field.name))
+		const bool valueExist = payloadData.Exist(field.name);
+
+		if (field.isRequired && !valueExist)
 		{
 			LOG << "The field " << field.name << " is required but is not present in the net payload" << LogSeverity::error;
 			data.isValid = false;
 		}
 
-		if (field.basicType == DataFieldType::boolean)
+		if (valueExist)
 		{
-			field.value = payloadData.GetValue<bool>(field.name);
-		}
-		else if (field.basicType == DataFieldType::byte_blob)
-		{
-			field.value = payloadData.GetValue<ByteContainer>(field.name);
-		}
-		else if (field.basicType == DataFieldType::integer)
-		{
-			field.value = payloadData.GetValue<Int64>(field.name);
-		}
-		else if (field.basicType == DataFieldType::text)
-		{
-			field.value = payloadData.GetValue<std::string>(field.name);
-		}
+			if (field.basicType == DataFieldType::boolean)
+			{
+				field.value = payloadData.GetValue<bool>(field.name);
+			}
+			else if (field.basicType == DataFieldType::byte_blob)
+			{
+				field.value = payloadData.GetValue<ByteContainer>(field.name);
+			}
+			else if (field.basicType == DataFieldType::integer)
+			{
+				field.value = payloadData.GetValue<Int64>(field.name);
+			}
+			else if (field.basicType == DataFieldType::text)
+			{
+				field.value = payloadData.GetValue<std::string>(field.name);
+			}
 
-		data.isValid = field.Validate();
+			data.isValid = field.Validate();
+		}
 	}
 
 	return data;
