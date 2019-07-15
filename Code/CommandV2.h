@@ -25,6 +25,7 @@ public:
 	OperationOwnership operationOwnership = OperationOwnership::all;
 
 	void SetData(const DataStructure& data);
+	DataStructure& GetData();
 	bool IsValid(bool isAuthenticated) const;
 
 	void Send(INetworkSender& destination, TCPConnection* excludedConnection = nullptr);

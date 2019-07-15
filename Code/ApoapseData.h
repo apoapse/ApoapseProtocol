@@ -61,6 +61,11 @@ struct DataField
 		value = val;
 	}
 
+	inline void SetValue(const char* val)
+	{
+		value = std::string(val);
+	}
+
 	void SetValue(const std::string& val)
 	{
 		value = val;

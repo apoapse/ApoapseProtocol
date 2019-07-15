@@ -58,3 +58,8 @@ void CommandV2::Send(INetworkSender& destination, TCPConnection* excludedConnect
 	auto payload = std::make_shared<NetworkPayload>(nameShort, std::move(bytes));
 	destination.Send(payload, excludedConnection);
 }
+
+DataStructure& CommandV2::GetData()
+{
+	return m_data;
+}

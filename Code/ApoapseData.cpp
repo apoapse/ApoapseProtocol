@@ -284,6 +284,9 @@ MessagePackSerializer DataStructure::GetMessagePackFormat()
 
 	for (auto& field : fields)
 	{
+		if (!field.HasValue())
+			continue;
+
 		if (field.basicType == DataFieldType::boolean)
 			ser.UnorderedAppend<bool>(field.name, field.GetValue<bool>());
 
