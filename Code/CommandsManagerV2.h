@@ -18,6 +18,8 @@ public:
 
 	void OnReceivedCmdInternal(CommandV2& cmd, GenericConnection& connection, void* relatedUser = nullptr) override;
 
+	void PropagateToClientUI(CommandV2& cmd) const;
+
 private:
 	std::optional<CommandV2Def> GetCmdDef(const std::string& shortName);
 	const CommandV2Def& GetCmdDefByFullName(const std::string& name) const;

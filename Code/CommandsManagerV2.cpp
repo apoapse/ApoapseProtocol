@@ -19,7 +19,8 @@ CommandsManagerV2::CommandsManagerV2(const std::string& cmdSchemeJson)
 		cmd.requireAuthentication = dser.ReadFieldValue<bool>("require_authentication").value();
 		cmd.onlyNonAuthenticated = dser.ReadFieldValue<bool>("only_non_authenticated").value_or(false);
 		cmd.propagateToOtherClients = dser.ReadFieldValue<bool>("propagate_to_other_clients").value_or(false);
-		cmd.propagateToClientUI = dser.ReadFieldValue<bool>("propagate_to_client_ui").value_or(false);
+		cmd.clientUIPropagate = dser.ReadFieldValue<bool>("client_ui.propagate").value_or(false);
+		cmd.clientUISignalName = dser.ReadFieldValue<std::string>("client_ui.signal_name").value_or(std::string());
 		cmd.operationRegister = dser.ReadFieldValue<bool>("operation.register").value_or(false);
 		cmd.operationOwnership = (OperationOwnership)dser.ReadFieldValue<int>("operation.ownership").value_or(0);
 		cmd.receiveOnClient = dser.ReadFieldValue<bool>("reception.client").value_or(false);
@@ -76,6 +77,9 @@ void CommandsManagerV2::OnReceivedCmdInternal(CommandV2& cmd, GenericConnection&
 	{
 		OnReceivedCommand(cmd, connection);
 
+		if (cmd.clientUIPropagate)
+			PropagateToClientUI(cmd);
+
 		// TODO2: Add auto save, net propagation and operation registration
 	}
 	else
@@ -83,6 +87,11 @@ void CommandsManagerV2::OnReceivedCmdInternal(CommandV2& cmd, GenericConnection&
 		LOG << LogSeverity::error << "The command " << cmd.name << " was rejected by the code";
 		SecurityLog::LogAlert(ApoapseErrorCode::invalid_cmd, connection);
 	}
+}
+
+void CommandsManagerV2::PropagateToClientUI(CommandV2& cmd) const
+{
+	cmd.GetData().SendUISignal(cmd.clientUISignalName);
 }
 
 std::optional<CommandV2Def> CommandsManagerV2::GetCmdDef(const std::string& shortName)

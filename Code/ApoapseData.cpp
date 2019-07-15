@@ -30,7 +30,8 @@ void ApoapseData::ReadDataStructures(const JsonHelper& json)
 			field.isDataUnique = fieldDser.ReadFieldValue<bool>("unique").value_or(false);
 			field.usedInServerDb = fieldDser.ReadFieldValue<bool>("uses.server_storage").value_or(false);
 			field.usedInClientDb = fieldDser.ReadFieldValue<bool>("uses.client_storage").value_or(false);
-			field.usedInCommad = fieldDser.ReadFieldValue<bool>("uses.command").value_or(false);
+			field.usedInCommand = fieldDser.ReadFieldValue<bool>("uses.command").value_or(false);
+			field.usedInClientUI = fieldDser.ReadFieldValue<bool>("uses.client_ui").value_or(false);
 
 			bool useCustomType = false;
 			field.basicType = GetTypeByTypeName(fieldDser.ReadFieldValue<std::string>("type").value(), &useCustomType);
@@ -136,7 +137,7 @@ DataStructure ApoapseData::ParseFromNetwork(const std::string& relatedDataStruct
 
 	for (auto& field : data.fields)
 	{
-		if (!field.usedInCommad)
+		if (!field.usedInCommand)
 			continue;
 
 		const bool valueExist = payloadData.Exist(field.name);
@@ -306,6 +307,32 @@ MessagePackSerializer DataStructure::GetMessagePackFormat()
 	}
 
 	return ser;
+}
+
+void DataStructure::SendUISignal(const std::string& signalName)
+{
+	ASSERT(global->isClient);
+	JsonHelper json;
+
+	for (auto& field : fields)
+	{
+		if (field.usedInClientUI && field.HasValue())
+		{
+			if (field.basicType == DataFieldType::boolean)
+				json.Insert(field.name, field.GetValue<bool>());
+
+			//if (field.basicType == DataFieldType::byte_blob)
+			//	json.Insert(field.name, field.GetValue<ByteContainer>());
+
+			if (field.basicType == DataFieldType::integer)
+				json.Insert(field.name, field.GetValue<Int64>());
+
+			if (field.basicType == DataFieldType::text)
+				json.Insert(field.name, field.GetValue<std::string>());
+		}
+	}
+
+	global->htmlUI->SendSignal(signalName, json.Generate());
 }
 
 inline bool DataField::Validate() const

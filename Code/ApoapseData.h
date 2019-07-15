@@ -29,7 +29,8 @@ struct DataField
 
 	bool usedInServerDb = false;
 	bool usedInClientDb = false;
-	bool usedInCommad = false;
+	bool usedInCommand = false;
+	bool usedInClientUI = false;
 
 	std::optional<std::any> value;
 
@@ -133,6 +134,8 @@ struct DataStructure
 	}
 
 	MessagePackSerializer GetMessagePackFormat();
+
+	void SendUISignal(const std::string& signalName);
 };
 
 using DataStructureDef = DataStructure;

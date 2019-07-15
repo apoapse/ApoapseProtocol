@@ -17,7 +17,8 @@ public:
 	bool requireAuthentication = true;
 	bool onlyNonAuthenticated = false;
 	bool propagateToOtherClients = false;
-	bool propagateToClientUI = false;
+	bool clientUIPropagate = false;
+	std::string clientUISignalName;
 	bool receiveOnClient = false;
 	bool receiveOnServer = false;
 

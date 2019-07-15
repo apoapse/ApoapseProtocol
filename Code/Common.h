@@ -9,6 +9,7 @@
 #include "Database.hpp"
 #include "ApoapseData.h"
 #include "ICommandManager.hpp"
+#include "IHtmlUI.hpp"
 
 struct Global
 {
@@ -25,9 +26,7 @@ struct Global
 	class ServerSettings* settings = nullptr;
 #endif // APOAPSE_SERVER
 
-#ifdef APOAPSE_CLIENT
-	class HTMLUI* htmlUI = nullptr;
-#endif // APOAPSE_CLIENT
+	IHtmlUI* htmlUI = nullptr;
 
 	Global() = default;
 	static Global* CreateGlobal()
