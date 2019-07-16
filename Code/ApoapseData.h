@@ -159,7 +159,8 @@ public:
 	const DataStructureDef& GetStructure(const std::string& name) const;	// Return a data structure object with definitions but no data 
 	const CustomFieldType& GetCustomTypeInfo(const std::string& name) const;
 
-	DataStructure ParseFromNetwork(const std::string& relatedDataStructure, std::shared_ptr<NetworkPayload> payload);
+	DataStructure FromNetwork(const std::string& relatedDataStructure, std::shared_ptr<NetworkPayload> payload);
+	DataStructure FromJSON(const std::string& relatedDataStructure, const JsonHelper& json);
 
 	void SaveToDatabase(const DataStructure& data) const;
 	static bool IsStoredOnTheDatabase(const DataStructure& dataStructure);	// Check if the data structure provided has field stored on the database of the current platform (server or client)

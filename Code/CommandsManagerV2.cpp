@@ -48,7 +48,7 @@ CommandV2 CommandsManagerV2::CreateCommand(std::shared_ptr<NetworkPayload> netPa
 	}
 
 	CommandV2 cmd = cmdDef.value();
-	auto data = global->apoapseData->ParseFromNetwork(cmdDef->relatedDataStructure, netPayload);
+	auto data = global->apoapseData->FromNetwork(cmdDef->relatedDataStructure, netPayload);
 
 	cmd.SetData(data);
 

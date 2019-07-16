@@ -2,6 +2,7 @@
 #include "Common.h"
 #include "CommandV2.h"
 #include "NetworkPayload.h"
+#include "CommandsManagerV2.h"
 
 CommandV2::CommandV2(DataStructure& data) : m_data(data)
 {
@@ -49,6 +50,12 @@ bool CommandV2::IsValid(bool isAuthenticated) const
 
 void CommandV2::Send(INetworkSender& destination, TCPConnection* excludedConnection)
 {
+	if (!static_cast<CommandsManagerV2*>(global->cmdManager.get())->OnSendCommandPre(*this))
+	{
+		LOG << LogSeverity::error << "The command send was stopped by CommandsManagerV2::OnSendCommandPre";
+		return;
+	}
+
 	auto msgPack = m_data.GetMessagePackFormat();
 	const auto& msgPackBytes = msgPack.GetMessagePackBytes();
 	auto bytes = std::vector<byte>(NetworkPayload::headerLength + msgPackBytes.size());

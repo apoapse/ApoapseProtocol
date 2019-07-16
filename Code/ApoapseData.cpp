@@ -116,7 +116,7 @@ const CustomFieldType& ApoapseData::GetCustomTypeInfo(const std::string& name) c
 	return *res;
 }
 
-DataStructure ApoapseData::ParseFromNetwork(const std::string& relatedDataStructure, std::shared_ptr<NetworkPayload> payload)
+DataStructure ApoapseData::FromNetwork(const std::string& relatedDataStructure, std::shared_ptr<NetworkPayload> payload)
 {
 	DataStructure data;
 	std::vector<byte> networkPayload;
@@ -168,6 +168,39 @@ DataStructure ApoapseData::ParseFromNetwork(const std::string& relatedDataStruct
 			}
 
 			data.isValid = field.Validate();
+		}
+	}
+
+	return data;
+}
+
+DataStructure ApoapseData::FromJSON(const std::string& relatedDataStructure, const JsonHelper& json)
+{
+	DataStructure data;
+
+	{
+		const auto& dataDef = GetStructureDefinition(relatedDataStructure);
+		data = dataDef;
+	}
+
+	for (auto& field : data.fields)
+	{
+		if (field.usedInCommand && json.ValueExist(field.name))
+		{
+			if (field.basicType == DataFieldType::boolean)
+				field.value = json.ReadFieldValue<bool>(field.name).value();
+
+			else if (field.basicType == DataFieldType::integer)
+				field.value = json.ReadFieldValue<Int64>(field.name).value();
+
+			else if (field.basicType == DataFieldType::text)
+				field.value = json.ReadFieldValue<std::string>(field.name).value();
+
+			else if (field.basicType == DataFieldType::byte_blob)
+			{
+				LOG_DEBUG << "The field " << field.name << " is supposed to be a BLOB but has been set as TEXT. Use CommandsManagerV2::OnSendCommandPre to replace it before sending.";
+				field.value = json.ReadFieldValue<std::string>(field.name).value();
+			}
 		}
 	}
 
