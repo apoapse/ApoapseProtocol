@@ -38,13 +38,31 @@ static std::string GetCommandDef()
 			}
 		},
 		{
+			"name": "server_info",
+			"name_short": "si",
+			"datastructure": "server_info",
+			"require_authentication": false,
+			"only_non_authenticated": true,
+			"propagate_to_other_clients": false,
+			"reception": {
+				"server": false,
+				"client": true
+			},
+			"operation": {
+				"register": false
+			},
+			"client_ui": {
+				"propagate": true,
+				"signal_name": "OnReceivedServerInfo"
+			}
+		},
+		{
 			"name": "create_room",
 			"name_short": "cr",
 			"datastructure": "rooms",
 			"require_authentication": true,
 			"propagate_to_other_clients": true,
 			"save_operation": true,
-			"propagate_to_client_ui": true,
 			"reception": {
 				"server": true,
 				"client": true
@@ -52,6 +70,10 @@ static std::string GetCommandDef()
 			"operation": {
 				"register": true,
 				"ownership": "all"
+			},
+			"client_ui": {
+				"propagate": true,
+				"signal_name": "OnRoomCreated"
 			}
 		}
 	]

@@ -95,6 +95,53 @@ static std::string GetDataStructures()
 			]
 		},
 		{
+			"name": "server_info",
+			"fields": [
+				{
+					"name": "status",
+					"type": "text",
+					"required": true,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true,
+						"client_ui": true
+					}
+				},
+				{
+					"name": "username",
+					"type": "username",
+					"required": true,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true,
+						"client_ui": true
+					}
+				},
+				{
+					"name": "requirePasswordChange",
+					"type": "bool",
+					"required": false,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				},
+				{
+					"name": "nickname",
+					"type": "text",
+					"required": false,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				}
+			]
+		},
+		{
 			"name": "install",
 			"fields": [
 				{
@@ -110,6 +157,16 @@ static std::string GetDataStructures()
 				{
 					"name": "admin_password",
 					"type": "sha256",
+					"required": true,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				},
+				{
+					"name": "admin_nickname",
+					"type": "text",
 					"required": true,
 					"uses":	{
 						"server_storage": false,
@@ -190,7 +247,7 @@ static std::string GetDataStructures()
 					"uses":	{
 						"server_storage": true,
 						"client_storage": true,
-						"command": false
+						"command": true
 					}
 				},
 				{
@@ -234,7 +291,7 @@ static std::string GetDataStructures()
 					"uses":	{
 						"server_storage": true,
 						"client_storage": true,
-						"command": false
+						"command": true
 					}
 				}
 			]
