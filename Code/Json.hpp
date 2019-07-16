@@ -111,6 +111,11 @@ public:
 		return m_properties.get_optional<T>(name);
 	}
 
+	bool ValueExist(const std::string& name) const
+	{
+		return (m_properties.count(name));
+	}
+
 	template <typename T>
 	std::vector<T> ReadFieldArray(const std::string& name) const
 	{
