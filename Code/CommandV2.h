@@ -21,6 +21,7 @@ public:
 	std::string clientUISignalName;
 	bool receiveOnClient = false;
 	bool receiveOnServer = false;
+	bool saveOnReceive = false;
 
 	bool operationRegister = false;
 	OperationOwnership operationOwnership = OperationOwnership::all;

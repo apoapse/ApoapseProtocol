@@ -22,7 +22,8 @@ CommandsManagerV2::CommandsManagerV2(const std::string& cmdSchemeJson)
 		cmd.clientUIPropagate = dser.ReadFieldValue<bool>("client_ui.propagate").value_or(false);
 		cmd.clientUISignalName = dser.ReadFieldValue<std::string>("client_ui.signal_name").value_or(std::string());
 		cmd.operationRegister = dser.ReadFieldValue<bool>("operation.register").value_or(false);
-		cmd.operationOwnership = (OperationOwnership)dser.ReadFieldValue<int>("operation.ownership").value_or(0);
+		cmd.operationOwnership = (OperationOwnership)dser.ReadFieldValue<int>("operation.ownership").value_or(0);	//TODO
+		cmd.saveOnReceive = dser.ReadFieldValue<bool>("save_on_receive").value_or(false);
 		cmd.receiveOnClient = dser.ReadFieldValue<bool>("reception.client").value_or(false);
 		cmd.receiveOnServer = dser.ReadFieldValue<bool>("reception.server").value_or(false);
 
@@ -77,14 +78,17 @@ void CommandsManagerV2::OnReceivedCmdInternal(CommandV2& cmd, GenericConnection&
 	{
 		OnReceivedCommand(cmd, connection);
 
-		if (cmd.clientUIPropagate)
+		if (cmd.saveOnReceive)
+			cmd.GetData().SaveToDatabase();
+
+		if (global->isClient && cmd.clientUIPropagate)
 			PropagateToClientUI(cmd);
 
-		// TODO2: Add auto save, net propagation and operation registration
+		// TODO2: net propagation and operation registration
 	}
 	else
 	{
-		LOG << LogSeverity::error << "The command " << cmd.name << " was rejected by the code";
+		LOG << LogSeverity::error << "The command " << cmd.name << " was rejected by CommandsManagerV2::OnReceivedCommandPre";
 		SecurityLog::LogAlert(ApoapseErrorCode::invalid_cmd, connection);
 	}
 }

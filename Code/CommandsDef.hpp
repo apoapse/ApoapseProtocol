@@ -59,10 +59,10 @@ static std::string GetCommandDef()
 		{
 			"name": "create_room",
 			"name_short": "cr",
-			"datastructure": "rooms",
+			"datastructure": "room",
 			"require_authentication": true,
 			"propagate_to_other_clients": true,
-			"save_operation": true,
+			"save_on_receive": true,
 			"reception": {
 				"server": true,
 				"client": true
