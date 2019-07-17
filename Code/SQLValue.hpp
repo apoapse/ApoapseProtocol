@@ -10,9 +10,11 @@
 class SQLValue
 {
 	std::variant<std::string, int, Int64, std::vector<byte>> m_data;
-	SqlValueType m_type;
+	SqlValueType m_type = SqlValueType::UNSUPPORTED;
 
 public:
+	SQLValue() = default;
+
 	template <typename T>
 	SQLValue(const T& value, SqlValueType type)
 		: m_type(type)

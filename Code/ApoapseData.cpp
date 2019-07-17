@@ -207,31 +207,15 @@ DataStructure ApoapseData::FromJSON(const std::string& relatedDataStructure, con
 	return data;
 }
 
-void ApoapseData::SaveToDatabase(const DataStructure& data) const
-{
-	const int nbFieldToSave = std::count_if(data.fields.begin(), data.fields.end(), [](const DataField& field)
-	{
-		return (field.usedInClientDb == global->isClient || field.usedInServerDb && global->isServer);
-	});
-
-	if (nbFieldToSave == 0)
-	{
-		LOG << LogSeverity::error << "Trying to save data of type " << data.name << " but none of the fields are set to be saved on the database";
-		return;
-	}
-
-	//TOODODODOD
-}
-
-bool ApoapseData::IsStoredOnTheDatabase(const DataStructure& dataStructure)
+bool ApoapseData::AllowDatabaseStorage(const DataStructure& dataStructure)
 {
 	return std::count_if(dataStructure.fields.begin(), dataStructure.fields.end(), [](const DataField& field)
 	{
-		return IsStoredOnTheDatabase(field);
+		return AllowDatabaseStorage(field);
 	});
 }
 
-bool ApoapseData::IsStoredOnTheDatabase(const DataField& field)
+bool ApoapseData::AllowDatabaseStorage(const DataField& field)
 {
 	return (global->isClient && field.usedInClientDb || global->isServer && field.usedInServerDb);
 }
@@ -296,18 +280,18 @@ DataStructure ApoapseData::ReadItemFromDatabaseInternal(const std::string& name,
 	int dbValueId = 1;	// We start at id 1 to skip the id db field which is added by default 
 	for (auto& field : data.fields)
 	{
-		if (IsStoredOnTheDatabase(field))
+		if (AllowDatabaseStorage(field))
 		{
 			if (field.basicType == DataFieldType::boolean)
 				field.value = res[0][dbValueId].GetBoolean();
 
-			if (field.basicType == DataFieldType::byte_blob)
+			else if (field.basicType == DataFieldType::byte_blob)
 				field.value = res[0][dbValueId].GetByteArray();
 
-			if (field.basicType == DataFieldType::integer)
+			else if (field.basicType == DataFieldType::integer)
 				field.value = res[0][dbValueId].GetInt64();
 
-			if (field.basicType == DataFieldType::text)
+			else if (field.basicType == DataFieldType::text)
 				field.value = res[0][dbValueId].GetText();
 
 			dbValueId++;
@@ -329,13 +313,13 @@ MessagePackSerializer DataStructure::GetMessagePackFormat()
 		if (field.basicType == DataFieldType::boolean)
 			ser.UnorderedAppend<bool>(field.name, field.GetValue<bool>());
 
-		if (field.basicType == DataFieldType::byte_blob)
+		else if (field.basicType == DataFieldType::byte_blob)
 			ser.UnorderedAppend<ByteContainer>(field.name, field.GetValue<ByteContainer>());
 
-		if (field.basicType == DataFieldType::integer)
+		else if (field.basicType == DataFieldType::integer)
 			ser.UnorderedAppend<Int64>(field.name, field.GetValue<Int64>());
 
-		if (field.basicType == DataFieldType::text)
+		else if (field.basicType == DataFieldType::text)
 			ser.UnorderedAppend<std::string>(field.name, field.GetValue<std::string>());
 	}
 
@@ -368,6 +352,104 @@ void DataStructure::SendUISignal(const std::string& signalName)
 	global->htmlUI->SendSignal(signalName, json.Generate());
 }
 
+void DataStructure::SaveToDatabase()
+{
+	const int nbFieldToSave = std::count_if(fields.begin(), fields.end(), [](const DataField& field)
+	{
+		return (field.usedInClientDb == global->isClient || field.usedInServerDb && global->isServer);
+	});
+
+	if (nbFieldToSave == 0)
+	{
+		LOG << LogSeverity::error << "Trying to save data of type " << name << " but none of the fields are set to be saved on the database";
+		return;
+	}
+
+	DataField& primaryField = GetPrimaryField();
+
+	std::vector<DataField*> fieldsToSave;
+	for (auto& field : fields)
+	{
+		if (ApoapseData::AllowDatabaseStorage(field) && field.HasValue())
+			fieldsToSave.push_back(&field);
+	}
+
+	SQLQuery query(*global->database);
+
+
+	if (IsAlreadyRegisteredOnDatabase(primaryField))
+	{
+		// Update
+		query << UPDATE << GetDBTableName().c_str() << SET;
+
+		for (size_t i = 0; i < fieldsToSave.size(); i++)
+		{
+			auto& field = fieldsToSave.at(i);
+			query << field->name.c_str() << "=" << field->GetSQLValue();
+
+			if (i != fieldsToSave.size() - 1)
+				query << ",";
+		}
+
+		query << WHERE << primaryField.name.c_str() << EQUALS << primaryField.GetSQLValue();
+		query.Exec();
+
+		LOG << LogSeverity::verbose << "Added new entry on the database with data from the datastructure " << name;
+	}
+	else
+	{
+		// Insert
+		query << INSERT_INTO << GetDBTableName().c_str() << " (";
+
+		for (size_t i = 0; i < fieldsToSave.size(); i++)
+		{
+			query << fieldsToSave.at(i)->name.c_str();
+
+			if (i != fieldsToSave.size() - 1)
+				query << ",";
+		}
+
+		query << ")" << VALUES << "(";
+
+		for (size_t i = 0; i < fieldsToSave.size(); i++)
+		{
+			query << fieldsToSave.at(i)->GetSQLValue();
+
+			if (i != fieldsToSave.size() - 1)
+				query << ",";
+		}
+
+		query << ")";
+		query.Exec();
+
+		LOG << LogSeverity::verbose << "Udpated entry on the database with data from the datastructure " << name;
+	}
+}
+
+bool DataStructure::IsAlreadyRegisteredOnDatabase(DataField& primaryField)
+{
+	SQLQuery query(*global->database);
+	query << SELECT << primaryField.name.c_str() << FROM << GetDBTableName().c_str() << WHERE << primaryField.name.c_str() << EQUALS << primaryField.GetSQLValue();
+	auto res = query.Exec();
+
+	return (res && res.RowCount() == 1);
+}
+
+DataField& DataStructure::GetPrimaryField()
+{
+	const auto findRes = std::find_if(fields.begin(), fields.end(), [](const DataField& field)
+	{
+		return (field.HasValue() && field.isDataUnique);
+	});
+
+	if (findRes == fields.end())
+	{
+		throw std::exception("Unable to find a field suited to check if an element is already registed to the database or not");
+	}
+
+	 return *findRes;
+}
+
 inline bool DataField::Validate() const
 {
 	bool isValid = true;
@@ -394,4 +476,22 @@ inline bool DataField::Validate() const
 	}
 
 	return isValid;
+}
+
+SQLValue DataField::GetSQLValue()
+{
+	if (basicType == DataFieldType::boolean)
+		return SQLValue(GetValue<bool>(), ApoapseData::ConvertFieldTypeToSqlType(*this));
+
+	else if (basicType == DataFieldType::byte_blob)
+		return SQLValue(GetValue<ByteContainer>(), ApoapseData::ConvertFieldTypeToSqlType(*this));
+
+	else if (basicType == DataFieldType::integer)
+		return SQLValue(GetValue<Int64>(), ApoapseData::ConvertFieldTypeToSqlType(*this));
+
+	else if (basicType == DataFieldType::text)
+		return SQLValue(GetValue<std::string>(), ApoapseData::ConvertFieldTypeToSqlType(*this));
+
+	else
+		return SQLValue();
 }

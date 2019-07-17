@@ -96,6 +96,8 @@ struct DataField
 
 	bool Validate() const;
 
+	SQLValue GetSQLValue();
+
 private:
 	size_t GetLength() const
 	{
@@ -136,6 +138,15 @@ struct DataStructure
 	MessagePackSerializer GetMessagePackFormat();
 
 	void SendUISignal(const std::string& signalName);
+	void SaveToDatabase();
+	std::string GetDBTableName() const
+	{
+		return name + "s"; //  // We set the table name as plurial
+	}
+
+private:
+	bool IsAlreadyRegisteredOnDatabase(DataField& primaryField);
+	DataField& GetPrimaryField();
 };
 
 using DataStructureDef = DataStructure;
@@ -143,7 +154,7 @@ using DataStructureDef = DataStructure;
 struct CustomFieldType
 {
 	std::string name;
-	DataFieldType underlyingType;
+	DataFieldType underlyingType = DataFieldType::undefined;
 	int minLength = -1;
 	int maxLength = -1;
 };
@@ -162,9 +173,8 @@ public:
 	DataStructure FromNetwork(const std::string& relatedDataStructure, std::shared_ptr<NetworkPayload> payload);
 	DataStructure FromJSON(const std::string& relatedDataStructure, const JsonHelper& json);
 
-	void SaveToDatabase(const DataStructure& data) const;
-	static bool IsStoredOnTheDatabase(const DataStructure& dataStructure);	// Check if the data structure provided has field stored on the database of the current platform (server or client)
-	static bool IsStoredOnTheDatabase(const DataField& field);
+	static bool AllowDatabaseStorage(const DataStructure& dataStructure);	// Check if the data structure provided has field stored on the database of the current platform (server or client)
+	static bool AllowDatabaseStorage(const DataField& field);
 	static SqlValueType ConvertFieldTypeToSqlType(const DataField& field);
 
 	template <typename T>
@@ -184,5 +194,6 @@ private:
 
 	DataStructureDef& GetStructureDefinition(const std::string& name);
 	DataFieldType GetTypeByTypeName(const std::string& typeStr, bool* isCustomType) const;
+
 	DataStructure ReadItemFromDatabaseInternal(const std::string& name, const std::string& seachFieldName, const SQLValue& searchValue);
 };

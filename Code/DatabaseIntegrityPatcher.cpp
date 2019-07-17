@@ -69,7 +69,7 @@ DatabaseIntegrityPatcher::DatabaseIntegrityPatcher()
 {
 	for (const auto& dataStructure : global->apoapseData->GetRegisteredStructures())
 	{
-		if (!ApoapseData::IsStoredOnTheDatabase(dataStructure))
+		if (!ApoapseData::AllowDatabaseStorage(dataStructure))
 			continue;
 
 		DbTable table;
