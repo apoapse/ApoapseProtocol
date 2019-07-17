@@ -190,6 +190,9 @@
     <ClInclude Include="IHtmlUI.hpp">
       <Filter>ApoapseSystems</Filter>
     </ClInclude>
+    <ClInclude Include="DataStructure.h">
+      <Filter>DataSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -309,6 +312,9 @@
       <Filter>DataSystem</Filter>
     </ClCompile>
     <ClCompile Include="CustomDataType.cpp">
+      <Filter>DataSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="DataStructure.cpp">
       <Filter>DataSystem</Filter>
     </ClCompile>
   </ItemGroup>

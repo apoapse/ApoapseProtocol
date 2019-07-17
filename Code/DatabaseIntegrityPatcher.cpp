@@ -92,7 +92,7 @@ DatabaseIntegrityPatcher::DatabaseIntegrityPatcher()
 			dbField.canBeNull = !field.isRequired;
 			dbField.unique = field.isDataUnique;
 			dbField.primary = false;
-			dbField.type = ApoapseData::ConvertFieldTypeToSqlType(field);
+			dbField.type = field.ConvertFieldTypeToSqlType();
 
 			table.fields.push_back(dbField);
 		}
