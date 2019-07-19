@@ -78,13 +78,18 @@ void CommandsManagerV2::OnReceivedCmdInternal(CommandV2& cmd, GenericConnection&
 	{
 		OnReceivedCommand(cmd, connection);
 
-		if (cmd.saveOnReceive)
-			cmd.GetData().SaveToDatabase();
-
 		if (global->isClient && cmd.clientUIPropagate)
 			PropagateToClientUI(cmd);
 
-		// TODO2: net propagation and operation registration
+		if (cmd.saveOnReceive)
+			cmd.GetData().SaveToDatabase();
+
+		// TODO2: operation registration
+
+		// TODO2: PROPAGATE -> have a system on datastructs where on each field it is defined whatever or not it is propagated and to who (self, usergroup, all) as well as if the command should be propagated or not
+		// See if this should be done the same way than UI propagation (in cmd manager v2) (probably to have full control of the received pipeline)
+		//if (global->isServer && cmd.propagateToOtherClients)
+		//	cmd.Send(*connection.server.usersManager, &netConnection);
 	}
 	else
 	{
