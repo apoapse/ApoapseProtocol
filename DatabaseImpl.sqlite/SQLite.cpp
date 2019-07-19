@@ -88,10 +88,16 @@ SQLPackagedResult SQLite::ExecQuery(const char* preparedQuery, const SQLValue** 
 					break;
 
 				case SQLITE_BLOB:
+				{
 					auto rawdata = (byte*)sqlite3_column_blob(preparedStm, i);
 					int size = sqlite3_column_bytes(preparedStm, i);
 
 					currentRow.AddValue(SQLValue(std::move(std::vector<byte>(rawdata, rawdata + size)), SqlValueType::BYTE_ARRAY));
+				}
+					break;
+
+				case SQLITE_NULL:
+					currentRow.AddValue(SQLValue(std::string(), SqlValueType::UNSUPPORTED));
 					break;
 				}
 			}
