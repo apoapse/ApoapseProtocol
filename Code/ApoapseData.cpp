@@ -249,7 +249,7 @@ DataStructure ApoapseData::ReadItemFromDatabaseInternal(const std::string& name,
 	//auto& fieldInfo = structureDef.GetField(seachFieldName);
 
 	SQLQuery query(*global->database);
-	query << SELECT << ALL << FROM << std::string(name + "s").c_str() << WHERE << searchBy.c_str() << EQUALS << searchValue;
+	query << SELECT << ALL << FROM << structureDef.GetDBTableName().c_str() << WHERE << searchBy.c_str() << EQUALS << searchValue;
 	auto res = query.Exec();
 
 	DataStructure data = structureDef;
@@ -259,7 +259,7 @@ DataStructure ApoapseData::ReadItemFromDatabaseInternal(const std::string& name,
 	int dbValueId = 1;	// We start at id 1 to skip the id db field which is added by default 
 	for (auto& field : data.fields)
 	{
-		if (AllowDatabaseStorage(field))
+		if (AllowDatabaseStorage(field) && res[0][dbValueId].GetType() != SqlValueType::UNSUPPORTED)
 		{
 			if (field.basicType == DataFieldType::boolean)
 				field.value = res[0][dbValueId].GetBoolean();
