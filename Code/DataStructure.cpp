@@ -110,7 +110,7 @@ void DataStructure::SaveToDatabase()
 		query << WHERE << primaryField.name.c_str() << EQUALS << primaryField.GetSQLValue();
 		query.Exec();
 
-		LOG << LogSeverity::verbose << "Added new entry on the database with data from the datastructure " << name;
+		LOG << LogSeverity::verbose << "Udpated entry on the database with data from the datastructure " << name;
 	}
 	else
 	{
@@ -138,7 +138,7 @@ void DataStructure::SaveToDatabase()
 		query << ")";
 		query.Exec();
 
-		LOG << LogSeverity::verbose << "Udpated entry on the database with data from the datastructure " << name;
+		LOG << LogSeverity::verbose << "Added new entry on the database with data from the datastructure " << name;
 	}
 }
 
