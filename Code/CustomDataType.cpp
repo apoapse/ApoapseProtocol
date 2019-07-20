@@ -4,6 +4,7 @@
 #include "DateTimeUtils.h"
 #include "Uuid.h"
 #include "Username.h"
+#include "DataStructure.h"
 
 bool CustomDataType::ValidateCustomType(const CustomFieldType& typeDef, const std::any& value)
 {
@@ -34,4 +35,9 @@ bool CustomDataType::ValidateCustomType(const CustomFieldType& typeDef, const st
 	}
 
 	return true;
+}
+
+void CustomDataType::AutoFill(const CustomFieldType& typeDef, DataField& field)
+{
+	field.SetValue(Uuid::Generate());
 }

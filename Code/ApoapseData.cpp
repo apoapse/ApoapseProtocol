@@ -65,6 +65,7 @@ void ApoapseData::ReadCustomTypes(const JsonHelper& json)
 		customType.underlyingType = GetTypeByTypeName(dser.ReadFieldValue<std::string>("underlying_type").value(), &useCustomType);
 		customType.minLength = dser.ReadFieldValue<int>("min_length").value_or(-1);
 		customType.maxLength = dser.ReadFieldValue<int>("max_length").value_or(-1);
+		customType.autoFill = dser.ReadFieldValue<bool>("auto_fill").value_or(false);
 
 		m_customTypes.push_back(customType);
 	}

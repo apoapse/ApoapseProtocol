@@ -50,6 +50,8 @@ bool CommandV2::IsValid(bool isAuthenticated) const
 
 void CommandV2::Send(INetworkSender& destination, TCPConnection* excludedConnection)
 {
+	m_data.AutoFillFieldsIfRequested();
+
 	if (!static_cast<CommandsManagerV2*>(global->cmdManager.get())->OnSendCommandPre(*this))
 	{
 		LOG << LogSeverity::error << "The command send was stopped by CommandsManagerV2::OnSendCommandPre";

@@ -4,6 +4,7 @@
 struct CustomFieldType;
 class Uuid;
 class Username;
+struct DataField;
 namespace DateTimeUtils
 {
 	class UTCDateTime;
@@ -25,6 +26,7 @@ struct ICustomDataType
 namespace CustomDataType
 {
 	bool ValidateCustomType(const CustomFieldType& typeDef, const std::any& value);
+	void AutoFill(const CustomFieldType& typeDef, DataField& field);
 
 	template <typename T>
 	T ConvertToCustomType(const std::any& value)

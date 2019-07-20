@@ -107,7 +107,7 @@ void GenericConnection::OnReceivedPayload(std::shared_ptr<NetworkPayload> payloa
 	}
 
 	auto cmd = global->cmdManager->CreateCommand(payload);
-	LOG_DEBUG << "Received command " << cmd.name << " from payload total size: " << payload->GetRawData().size();
+	LOG_DEBUG << "Received command " << cmd.name << " from payload. Total size: " << payload->GetRawData().size() << " Valid: " << cmd.IsValid(IsAuthenticated());
 	
 #ifndef DEBUG
 	try

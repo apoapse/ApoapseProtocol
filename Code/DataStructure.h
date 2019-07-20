@@ -23,6 +23,7 @@ struct CustomFieldType
 	DataFieldType underlyingType = DataFieldType::undefined;
 	int minLength = -1;
 	int maxLength = -1;
+	bool autoFill = false;
 };
 
 struct DataField
@@ -124,6 +125,7 @@ public:
 	void SendUISignal(const std::string& signalName);
 	void SaveToDatabase();
 	std::string GetDBTableName() const;
+	void AutoFillFieldsIfRequested();
 
 private:
 	bool IsAlreadyRegisteredOnDatabase(DataField& primaryField);

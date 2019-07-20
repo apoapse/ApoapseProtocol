@@ -147,6 +147,23 @@ inline std::string DataStructure::GetDBTableName() const
 	return name + "s"; //  // We set the table name as plurial
 }
 
+void DataStructure::AutoFillFieldsIfRequested()
+{
+	for (auto& field : fields)
+	{
+		if (field.customType.has_value())
+		{
+			const auto typeDef = global->apoapseData->GetCustomTypeInfo(field.customType.value());
+
+			if (typeDef.autoFill)
+			{
+				CustomDataType::AutoFill(typeDef, field);
+				LOG_DEBUG << "Field " << field.name << " of data structure " << name << " has been auto filled";
+			}
+		}
+	}
+}
+
 bool DataStructure::IsAlreadyRegisteredOnDatabase(DataField& primaryField)
 {
 	SQLQuery query(*global->database);
