@@ -137,7 +137,7 @@ DataStructure ApoapseData::FromNetwork(const std::string& relatedDataStructure, 
 
 	for (auto& field : data.fields)
 	{
-		if (!field.usedInCommand)
+		if (!field.usedInCommand || !data.isValid)
 			continue;
 
 		const bool valueExist = payloadData.Exist(field.name);
