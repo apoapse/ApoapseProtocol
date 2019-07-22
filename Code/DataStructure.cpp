@@ -71,9 +71,9 @@ void DataStructure::SendUISignal(const std::string& signalName)
 void DataStructure::SaveToDatabase()
 {
 	const int nbFieldToSave = std::count_if(fields.begin(), fields.end(), [](const DataField& field)
-		{
-			return (field.usedInClientDb == global->isClient || field.usedInServerDb && global->isServer);
-		});
+	{
+		return (field.usedInClientDb == global->isClient || field.usedInServerDb && global->isServer);
+	});
 
 	if (nbFieldToSave == 0)
 	{
@@ -151,7 +151,7 @@ void DataStructure::AutoFillFieldsIfRequested()
 {
 	for (auto& field : fields)
 	{
-		if (field.customType.has_value())
+		if (field.customType.has_value() && !field.HasValue())
 		{
 			const auto typeDef = global->apoapseData->GetCustomTypeInfo(field.customType.value());
 
