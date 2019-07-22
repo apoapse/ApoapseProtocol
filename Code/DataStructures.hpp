@@ -306,6 +306,7 @@ static std::string GetDataStructures()
 					"type": "uuid",
 					"required": true,
 					"unique": true,
+					"read_permission": "all",
 					"uses":	{
 						"server_storage": true,
 						"client_storage": true,
@@ -317,6 +318,19 @@ static std::string GetDataStructures()
 					"type": "text",
 					"required": true,
 					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "threads_layout",
+					"type": "text",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
 					"uses":	{
 						"server_storage": true,
 						"client_storage": true,

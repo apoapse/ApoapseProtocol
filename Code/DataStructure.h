@@ -8,6 +8,14 @@
 class NetworkPayload;
 class JsonHelper;
 
+enum class ReadPermission
+{
+	none,
+	author,
+	usergroup,
+	all
+};
+
 enum class DataFieldType
 {
 	undefined,
@@ -16,6 +24,7 @@ enum class DataFieldType
 	text,
 	byte_blob
 };
+
 
 struct CustomFieldType
 {
@@ -38,6 +47,8 @@ struct DataField
 	bool usedInClientDb = false;
 	bool usedInCommand = false;
 	bool usedInClientUI = false;
+
+	ReadPermission readPermission = ReadPermission::none;
 
 	std::optional<std::any> value;
 

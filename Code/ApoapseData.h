@@ -42,6 +42,7 @@ private:
 
 	DataStructureDef& GetStructureDefinition(const std::string& name);
 	DataFieldType GetTypeByTypeName(const std::string& typeStr, bool* isCustomType) const;
+	static ReadPermission GetPermissionByName(const std::string& name);
 
 	DataStructure ReadItemFromDatabaseInternal(const std::string& name, const std::string& seachFieldName, const SQLValue& searchValue);
 };

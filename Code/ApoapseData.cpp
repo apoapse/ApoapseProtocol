@@ -32,6 +32,7 @@ void ApoapseData::ReadDataStructures(const JsonHelper& json)
 			field.usedInClientDb = fieldDser.ReadFieldValue<bool>("uses.client_storage").value_or(false);
 			field.usedInCommand = fieldDser.ReadFieldValue<bool>("uses.command").value_or(false);
 			field.usedInClientUI = fieldDser.ReadFieldValue<bool>("uses.client_ui").value_or(false);
+			field.readPermission = GetPermissionByName(fieldDser.ReadFieldValue<std::string>("propagate_to_clients").value_or("none"));
 
 			bool useCustomType = false;
 			field.basicType = GetTypeByTypeName(fieldDser.ReadFieldValue<std::string>("type").value(), &useCustomType);
@@ -242,6 +243,21 @@ DataFieldType ApoapseData::GetTypeByTypeName(const std::string& typeStr, bool* i
 		*isCustomType = true;
 		return GetCustomTypeInfo(typeStr).underlyingType;
 	}
+}
+
+ReadPermission ApoapseData::GetPermissionByName(const std::string& name)
+{
+	if (name == "all")
+		return ReadPermission::all;
+
+	else if (name == "author")
+		return ReadPermission::author;
+
+	else if (name == "usergroup")
+		return ReadPermission::usergroup;
+
+	else
+		return ReadPermission::none;
 }
 
 DataStructure ApoapseData::ReadItemFromDatabaseInternal(const std::string& name, const std::string& searchBy, const SQLValue& searchValue)
