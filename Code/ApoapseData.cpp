@@ -264,7 +264,7 @@ DataStructure ApoapseData::ReadFromDbResult(DataStructureDef& dataStructDef, con
 {
 	DataStructure data = dataStructDef;
 
-	data.dbId = row[0].GetInt64();
+	data.SetDbId(row[0].GetInt64());
 
 	int dbValueId = 1;	// We start at id 1 to skip the id db field which is added by default 
 	for (auto& field : data.fields)

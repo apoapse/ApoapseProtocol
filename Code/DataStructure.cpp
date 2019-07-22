@@ -7,9 +7,9 @@
 DataField& DataStructure::GetField(const std::string& fieldName)
 {
 	auto res = std::find_if(fields.begin(), fields.end(), [&fieldName](DataField& field)
-		{
-			return (field.name == fieldName);
-		});
+	{
+		return (field.name == fieldName);
+	});
 
 	if (res == fields.end())
 		throw std::exception("The requested field do not exist");
@@ -68,6 +68,27 @@ void DataStructure::SendUISignal(const std::string& signalName)
 	global->htmlUI->SendSignal(signalName, json.Generate());
 }
 
+DbId DataStructure::GetDbId()
+{
+	if (!dbId.has_value())
+	{
+		DataField& primaryField = GetPrimaryField();
+
+		SQLQuery query(*global->database);
+		query << SELECT << "id" << FROM << GetDBTableName().c_str() << WHERE << primaryField.name.c_str() << EQUALS << primaryField.GetSQLValue();
+		auto res = query.Exec();
+
+		dbId = res[0][0].GetInt64();
+	}
+
+	return dbId.value();
+}
+
+void DataStructure::SetDbId(DbId id)
+{
+	dbId = id;
+}
+
 void DataStructure::SaveToDatabase()
 {
 	const int nbFieldToSave = std::count_if(fields.begin(), fields.end(), [](const DataField& field)
@@ -90,8 +111,8 @@ void DataStructure::SaveToDatabase()
 			fieldsToSave.push_back(&field);
 	}
 
-	SQLQuery query(*global->database);
 
+	SQLQuery query(*global->database);
 
 	if (IsAlreadyRegisteredOnDatabase(primaryField))
 	{
@@ -175,17 +196,13 @@ bool DataStructure::IsAlreadyRegisteredOnDatabase(DataField& primaryField)
 
 DataField& DataStructure::GetPrimaryField()
 {
-	const auto findRes = std::find_if(fields.begin(), fields.end(), [](const DataField& field)
-		{
-			return (field.HasValue() && field.isDataUnique);
-		});
-
-	if (findRes == fields.end())
+	for (auto& field : fields)
 	{
-		throw std::exception("Unable to find a field suited to check if an element is already registed to the database or not");
+		if (field.HasValue() && field.isDataUnique)
+			return field;
 	}
 
-	return *findRes;
+	throw std::exception("Unable to find a field suited to check if an element is already registed to the database or not");
 }
 
 bool DataField::Validate() const

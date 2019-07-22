@@ -29,7 +29,7 @@ public:
 	template <typename T>
 	DataStructure ReadItemFromDatabase(const std::string& name, const std::string& searchBy, const T& searchValue)
 	{
-		return ReadItemFromDatabaseInternal(name, searchBy, SQLValue(searchValue, SQLValue::GenerateType<T>()));
+		return ReadItemFromDbInternal(name, searchBy, SQLValue(searchValue, SQLValue::GenerateType<T>()));
 	}
 
 	template <typename T>

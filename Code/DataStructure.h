@@ -123,10 +123,11 @@ private:
 
 class DataStructure
 {
+	std::optional<DbId> dbId;
+
 public:
 	std::string name;
 	std::vector<DataField> fields;
-	std::optional<DbId> dbId;
 	bool isValid = true;
 
 	DataField& GetField(const std::string& fieldName);
@@ -137,6 +138,9 @@ public:
 	void SaveToDatabase();
 	std::string GetDBTableName() const;
 	void AutoFillFieldsIfRequested();
+
+	DbId GetDbId();
+	void SetDbId(DbId id);
 
 private:
 	bool IsAlreadyRegisteredOnDatabase(DataField& primaryField);
