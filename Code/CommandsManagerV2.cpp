@@ -77,16 +77,16 @@ void CommandsManagerV2::OnReceivedCmdInternal(CommandV2& cmd, GenericConnection&
 {
 	if (OnReceivedCommandPre(cmd, connection))
 	{
+		// Cmd auto-save
+		if (cmd.saveOnReceive)
+			cmd.GetData().SaveToDatabase();
+
 		// Cmd process
 		OnReceivedCommand(cmd, connection);
 
 		// Cmd receive client notify UI
 		if (global->isClient && cmd.clientUIPropagate)
 			PropagateToClientUI(cmd);
-
-		// Cmd auto-save
-		if (cmd.saveOnReceive)
-			cmd.GetData().SaveToDatabase();
 
 		// Cmd server propagation to requested connected clients
 		if (global->isServer && cmd.propagate)

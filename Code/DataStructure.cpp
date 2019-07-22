@@ -78,7 +78,19 @@ DbId DataStructure::GetDbId()
 		query << SELECT << "id" << FROM << GetDBTableName().c_str() << WHERE << primaryField.name.c_str() << EQUALS << primaryField.GetSQLValue();
 		auto res = query.Exec();
 
-		dbId = res[0][0].GetInt64();
+		if (res && res.RowCount() > 0)
+		{
+			dbId = res[0][0].GetInt64();
+		}
+		else
+		{
+			// If the item is not already registered, we predict the id that will be used once saved
+			SQLQuery query(*global->database);
+			query << SELECT << "COUNT(*)" FROM << GetDBTableName().c_str();
+			auto res = query.Exec();
+
+			dbId = (res[0][0].GetInt64() + 1);
+		}
 	}
 
 	return dbId.value();
