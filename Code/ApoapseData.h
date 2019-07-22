@@ -5,6 +5,7 @@
 #include "DataStructure.h"
 class NetworkPayload;
 class JsonHelper;
+class SQLRow;
 
 using DataStructureDef = DataStructure;
 
@@ -31,9 +32,10 @@ public:
 		return ReadItemFromDatabaseInternal(name, searchBy, SQLValue(searchValue, SQLValue::GenerateType<T>()));
 	}
 
-	std::vector<DataStructure> ReadListFromDatabase(const std::string& name, const std::string& seachFieldName) const
+	template <typename T>
+	std::vector<DataStructure> ReadListFromDatabase(const std::string& name, const std::string& searchBy, const T& searchValue)
 	{
-		return std::vector<DataStructure>();//TODODODODODODDODODOODOD
+		return ReadListFromDbInternal(name, searchBy, SQLValue(searchValue, SQLValue::GenerateType<T>()));
 	}
 
 private:
@@ -44,5 +46,7 @@ private:
 	DataFieldType GetTypeByTypeName(const std::string& typeStr, bool* isCustomType) const;
 	static ReadPermission GetPermissionByName(const std::string& name);
 
-	DataStructure ReadItemFromDatabaseInternal(const std::string& name, const std::string& seachFieldName, const SQLValue& searchValue);
+	DataStructure ReadFromDbResult(DataStructureDef& dataStructDef, const SQLRow& row);
+	DataStructure ReadItemFromDbInternal(const std::string& name, const std::string& seachFieldName, const SQLValue& searchValue);
+	std::vector<DataStructure> ReadListFromDbInternal(const std::string& name, const std::string& seachFieldName, const SQLValue& searchValue);
 };

@@ -260,39 +260,70 @@ ReadPermission ApoapseData::GetPermissionByName(const std::string& name)
 		return ReadPermission::none;
 }
 
-DataStructure ApoapseData::ReadItemFromDatabaseInternal(const std::string& name, const std::string& searchBy, const SQLValue& searchValue)
+DataStructure ApoapseData::ReadFromDbResult(DataStructureDef& dataStructDef, const SQLRow& row)
 {
-	auto& structureDef = GetStructureDefinition(name);
-	//auto& fieldInfo = structureDef.GetField(seachFieldName);
+	DataStructure data = dataStructDef;
 
-	SQLQuery query(*global->database);
-	query << SELECT << ALL << FROM << structureDef.GetDBTableName().c_str() << WHERE << searchBy.c_str() << EQUALS << searchValue;
-	auto res = query.Exec();
-
-	DataStructure data = structureDef;
-
-	data.dbId = res[0][0].GetInt64();
+	data.dbId = row[0].GetInt64();
 
 	int dbValueId = 1;	// We start at id 1 to skip the id db field which is added by default 
 	for (auto& field : data.fields)
 	{
-		if (AllowDatabaseStorage(field) && res[0][dbValueId].GetType() != SqlValueType::UNSUPPORTED)
+		if (AllowDatabaseStorage(field) && row[dbValueId].GetType() != SqlValueType::UNSUPPORTED)
 		{
 			if (field.basicType == DataFieldType::boolean)
-				field.value = res[0][dbValueId].GetBoolean();
+				field.value = row[dbValueId].GetBoolean();
 
 			else if (field.basicType == DataFieldType::byte_blob)
-				field.value = res[0][dbValueId].GetByteArray();
+				field.value = row[dbValueId].GetByteArray();
 
 			else if (field.basicType == DataFieldType::integer)
-				field.value = res[0][dbValueId].GetInt64();
+				field.value = row[dbValueId].GetInt64();
 
 			else if (field.basicType == DataFieldType::text)
-				field.value = res[0][dbValueId].GetText();
+				field.value = row[dbValueId].GetText();
 
 			dbValueId++;
 		}
 	}
 
 	return data;
+}
+
+DataStructure ApoapseData::ReadItemFromDbInternal(const std::string& name, const std::string& searchBy, const SQLValue& searchValue)
+{
+	auto& structureDef = GetStructureDefinition(name);
+	//auto& fieldInfo = structureDef.GetField(seachFieldName);
+
+	SQLQuery query(*global->database);
+	if (searchBy.empty())
+		query << SELECT << ALL << FROM << structureDef.GetDBTableName().c_str();
+	else
+		query << SELECT << ALL << FROM << structureDef.GetDBTableName().c_str() << WHERE << searchBy.c_str() << EQUALS << searchValue;
+
+	auto res = query.Exec();
+
+	return ReadFromDbResult(structureDef, res[0]);
+}
+
+std::vector<DataStructure> ApoapseData::ReadListFromDbInternal(const std::string& name, const std::string& searchBy, const SQLValue& searchValue)
+{
+	std::vector<DataStructure> ouput;
+	auto& structureDef = GetStructureDefinition(name);
+
+	SQLQuery query(*global->database);
+	if (searchBy.empty())
+		query << SELECT << ALL << FROM << structureDef.GetDBTableName().c_str();
+	else
+		query << SELECT << ALL << FROM << structureDef.GetDBTableName().c_str() << WHERE << searchBy.c_str() << EQUALS << searchValue;
+
+	auto res = query.Exec();
+
+	ouput.reserve(res.RowCount());
+	for (const auto& row : res)
+	{
+		ouput.push_back(ReadFromDbResult(structureDef, row));
+	}
+
+	return ouput;
 }
