@@ -8,7 +8,8 @@ static std::string GetDataStructures()
 	"custom_types": [
 		{
 			"name": "uuid",
-			"underlying_type": "blob"
+			"underlying_type": "blob",
+			"auto_fill": true
 		},
 		{
 			"name": "username",
