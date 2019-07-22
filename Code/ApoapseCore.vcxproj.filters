@@ -160,9 +160,6 @@
     <ClInclude Include="FieldValidator.h">
       <Filter>CommandSystem</Filter>
     </ClInclude>
-    <ClInclude Include="TLSCertificate.h">
-      <Filter>Cryptography\TLS</Filter>
-    </ClInclude>
     <ClInclude Include="DataStructures.hpp">
       <Filter>DataSystem</Filter>
     </ClInclude>
@@ -298,9 +295,6 @@
     </ClCompile>
     <ClCompile Include="FieldValidator.cpp">
       <Filter>CommandSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="TLSCertificate.cpp">
-      <Filter>Cryptography\TLS</Filter>
     </ClCompile>
     <ClCompile Include="CommandsManagerV2.cpp">
       <Filter>CommandSystem</Filter>
