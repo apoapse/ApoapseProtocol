@@ -27,6 +27,7 @@ private:
 	virtual bool OnReceivedCommandPre(CommandV2& cmd, GenericConnection& netConnection) = 0;
 	virtual void OnReceivedCommand(CommandV2& cmd, GenericConnection& netConnection) = 0;
 	virtual bool OnSendCommandPre(CommandV2& cmd) { return true; }
+	virtual void Propagate(CommandV2& cmd, GenericConnection& netConnection) {};
 
 	/*bool OnSendCommandPre(CommandV2& cmd);
 	bool OnSendCommandPost(const CommandV2& cmd);*/

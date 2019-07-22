@@ -13,7 +13,6 @@ static std::string GetCommandDef()
 			"datastructure": "install",
 			"require_authentication": false,
 			"only_non_authenticated": true,
-			"propagate_to_other_clients": false,
 			"reception": {
 				"server": true,
 				"client": false
@@ -28,7 +27,6 @@ static std::string GetCommandDef()
 			"datastructure": "client_login",
 			"require_authentication": false,
 			"only_non_authenticated": true,
-			"propagate_to_other_clients": false,
 			"reception": {
 				"server": true,
 				"client": false
@@ -43,13 +41,9 @@ static std::string GetCommandDef()
 			"datastructure": "server_info",
 			"require_authentication": false,
 			"only_non_authenticated": true,
-			"propagate_to_other_clients": false,
 			"reception": {
 				"server": false,
 				"client": true
-			},
-			"operation": {
-				"register": false
 			},
 			"client_ui": {
 				"propagate": true,
@@ -71,9 +65,9 @@ static std::string GetCommandDef()
 				"register": true,
 				"ownership": "all"
 			},
-			"client_ui": {
+			"propagation": {
 				"propagate": true,
-				"signal_name": "OnRoomCreated"
+				"exclude_self": false
 			}
 		}
 	]

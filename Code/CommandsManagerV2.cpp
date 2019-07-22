@@ -18,7 +18,6 @@ CommandsManagerV2::CommandsManagerV2(const std::string& cmdSchemeJson)
 		cmd.relatedDataStructure = dser.ReadFieldValue<std::string>("datastructure").value();
 		cmd.requireAuthentication = dser.ReadFieldValue<bool>("require_authentication").value();
 		cmd.onlyNonAuthenticated = dser.ReadFieldValue<bool>("only_non_authenticated").value_or(false);
-		cmd.propagateToOtherClients = dser.ReadFieldValue<bool>("propagate_to_other_clients").value_or(false);
 		cmd.clientUIPropagate = dser.ReadFieldValue<bool>("client_ui.propagate").value_or(false);
 		cmd.clientUISignalName = dser.ReadFieldValue<std::string>("client_ui.signal_name").value_or(std::string());
 		cmd.operationRegister = dser.ReadFieldValue<bool>("operation.register").value_or(false);
@@ -26,6 +25,8 @@ CommandsManagerV2::CommandsManagerV2(const std::string& cmdSchemeJson)
 		cmd.saveOnReceive = dser.ReadFieldValue<bool>("save_on_receive").value_or(false);
 		cmd.receiveOnClient = dser.ReadFieldValue<bool>("reception.client").value_or(false);
 		cmd.receiveOnServer = dser.ReadFieldValue<bool>("reception.server").value_or(false);
+		cmd.propagate = dser.ReadFieldValue<bool>("propagation.propagate").value_or(false);
+		cmd.excludeSelfPropagation = dser.ReadFieldValue<bool>("propagation.exclude_self").value_or(false);
 
 		if (!GetCmdDef(cmd.nameShort).has_value())
 		{
@@ -76,18 +77,23 @@ void CommandsManagerV2::OnReceivedCmdInternal(CommandV2& cmd, GenericConnection&
 {
 	if (OnReceivedCommandPre(cmd, connection))
 	{
+		// Cmd process
 		OnReceivedCommand(cmd, connection);
 
+		// Cmd receive client notify UI
 		if (global->isClient && cmd.clientUIPropagate)
 			PropagateToClientUI(cmd);
 
+		// Cmd auto-save
 		if (cmd.saveOnReceive)
 			cmd.GetData().SaveToDatabase();
 
+		// Cmd server propagation to requested connected clients
+		if (global->isServer && cmd.propagate)
+			Propagate(cmd, connection);
+
 		// TODO2: operation registration
 
-		// TODO2: PROPAGATE -> have a system on datastructs where on each field it is defined whatever or not it is propagated and to who (self, usergroup, all) as well as if the command should be propagated or not
-		// See if this should be done the same way than UI propagation (in cmd manager v2) (probably to have full control of the received pipeline)
 		//if (global->isServer && cmd.propagateToOtherClients)
 		//	cmd.Send(*connection.server.usersManager, &netConnection);
 	}
