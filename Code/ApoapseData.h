@@ -29,16 +29,31 @@ public:
 	template <typename T>
 	DataStructure ReadItemFromDatabase(const std::string& name, const std::string& searchBy, const T& searchValue)
 	{
-		return ReadItemFromDbInternal(name, searchBy, SQLValue(searchValue, SQLValue::GenerateType<T>()));
+		return ReadItemFromDbInternal(name, searchBy, GenerateSQLValue(searchValue));
 	}
 
 	template <typename T>
 	std::vector<DataStructure> ReadListFromDatabase(const std::string& name, const std::string& searchBy, const T& searchValue)
 	{
-		return ReadListFromDbInternal(name, searchBy, SQLValue(searchValue, SQLValue::GenerateType<T>()));
+		return ReadListFromDbInternal(name, searchBy, GenerateSQLValue(searchValue));
 	}
 
 private:
+	template <typename T>
+	SQLValue GenerateSQLValue(const T& val)
+	{
+		SQLValue sqlVal;
+
+		if constexpr (std::is_base_of<ICustomDataType, T>::value)
+		{
+			sqlVal = SQLValue(val.GetBytes(), SQLValue::GenerateType<ByteContainer>());
+		}
+		else
+			sqlVal = SQLValue(val, SQLValue::GenerateType<T>());
+
+		return sqlVal;
+	}
+
 	void ReadDataStructures(const JsonHelper& json);
 	void ReadCustomTypes(const JsonHelper& json);
 
