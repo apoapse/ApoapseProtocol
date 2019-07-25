@@ -69,6 +69,26 @@ static std::string GetCommandDef()
 				"propagate": true,
 				"exclude_self": false
 			}
+		},
+		{
+			"name": "create_thread",
+			"name_short": "ct",
+			"datastructure": "thread",
+			"require_authentication": true,
+			"propagate_to_other_clients": true,
+			"save_on_receive": true,
+			"reception": {
+				"server": true,
+				"client": true
+			},
+			"operation": {
+				"register": true,
+				"ownership": "all"
+			},
+			"propagation": {
+				"propagate": true,
+				"exclude_self": false
+			}
 		}
 	]
 }

@@ -340,6 +340,47 @@ static std::string GetDataStructures()
 			]
 		},
 		{
+			"name": "thread",
+			"fields": [
+				{
+					"name": "uuid",
+					"type": "uuid",
+					"required": true,
+					"unique": true,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "parent_room",
+					"type": "uuid",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "name",
+					"type": "text",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				}
+			]
+		},
+		{
 			"name": "local_setting",
 			"fields": [
 				{
