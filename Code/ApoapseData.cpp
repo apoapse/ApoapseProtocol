@@ -306,7 +306,7 @@ DataStructure ApoapseData::ReadItemFromDbInternal(const std::string& name, const
 	return ReadFromDbResult(structureDef, res[0]);
 }
 
-std::vector<DataStructure> ApoapseData::ReadListFromDbInternal(const std::string& name, const std::string& searchBy, const SQLValue& searchValue)
+std::vector<DataStructure> ApoapseData::ReadListFromDbInternal(const std::string& name, const std::string& searchBy, const SQLValue& searchValue, const std::string& orderBy, ResultOrder order, Int64 limit)
 {
 	std::vector<DataStructure> ouput;
 	auto& structureDef = GetStructureDefinition(name);
@@ -316,6 +316,21 @@ std::vector<DataStructure> ApoapseData::ReadListFromDbInternal(const std::string
 		query << SELECT << ALL << FROM << structureDef.GetDBTableName().c_str();
 	else
 		query << SELECT << ALL << FROM << structureDef.GetDBTableName().c_str() << WHERE << searchBy.c_str() << EQUALS << searchValue;
+
+	if (!orderBy.empty())
+	{
+		query << ORDER_BY << orderBy.c_str();
+		
+		if (order == ResultOrder::asc)
+			query << ASC;
+		else
+			query << DESC;
+	}
+
+	if (limit != -1)
+	{
+		query << LIMIT << limit;
+	}
 
 	auto res = query.Exec();
 

@@ -9,6 +9,12 @@ class SQLRow;
 
 using DataStructureDef = DataStructure;
 
+enum class ResultOrder
+{
+	desc,
+	asc
+};
+
 class ApoapseData
 {
 	std::vector<CustomFieldType> m_customTypes;
@@ -33,9 +39,9 @@ public:
 	}
 
 	template <typename T>
-	std::vector<DataStructure> ReadListFromDatabase(const std::string& name, const std::string& searchBy, const T& searchValue)
+	std::vector<DataStructure> ReadListFromDatabase(const std::string& name, const std::string& searchBy, const T& searchValue, const std::string& orderBy = "", ResultOrder order = ResultOrder::desc, Int64 limit = -1)
 	{
-		return ReadListFromDbInternal(name, searchBy, GenerateSQLValue(searchValue));
+		return ReadListFromDbInternal(name, searchBy, GenerateSQLValue(searchValue), orderBy, order, limit);
 	}
 
 private:
@@ -63,5 +69,5 @@ private:
 
 	DataStructure ReadFromDbResult(DataStructureDef& dataStructDef, const SQLRow& row);
 	DataStructure ReadItemFromDbInternal(const std::string& name, const std::string& seachFieldName, const SQLValue& searchValue);
-	std::vector<DataStructure> ReadListFromDbInternal(const std::string& name, const std::string& seachFieldName, const SQLValue& searchValue);
+	std::vector<DataStructure> ReadListFromDbInternal(const std::string& name, const std::string& seachFieldName, const SQLValue& searchValue, const std::string& orderBy, ResultOrder order, Int64 limit);
 };
