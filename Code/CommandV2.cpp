@@ -3,6 +3,7 @@
 #include "CommandV2.h"
 #include "NetworkPayload.h"
 #include "CommandsManagerV2.h"
+#include "ApoapseOperation.h"
 
 CommandV2::CommandV2(DataStructure& data) : m_data(data)
 {
@@ -65,6 +66,11 @@ bool CommandV2::IsValid(bool isAuthenticated) const
 
 void CommandV2::Send(INetworkSender& destination, TCPConnection* excludedConnection)
 {
+	if (operationRegister)
+	{
+		ApoapseOperation::PrepareCmdSend(*this);
+	}
+
 	m_data.AutoFillFieldsIfRequested();
 
 	if (!static_cast<CommandsManagerV2*>(global->cmdManager.get())->OnSendCommandPre(*this))

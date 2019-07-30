@@ -5,6 +5,7 @@
 #include "SQLQuery.h"
 #include "NetworkPayload.h"
 #include "CommandsManagerV2.h"
+#include "ApoapseOperation.h"
 
 ApoapseData::ApoapseData(const std::string& dataSchemeJson)
 {
@@ -118,7 +119,7 @@ const CustomFieldType& ApoapseData::GetCustomTypeInfo(const std::string& name) c
 	return *res;
 }
 
-DataStructure ApoapseData::FromNetwork(const std::string& relatedDataStructure, std::shared_ptr<NetworkPayload> payload)
+DataStructure ApoapseData::FromNetwork(const CommandV2& cmd, std::shared_ptr<NetworkPayload> payload)
 {
 	DataStructure data;
 	std::vector<byte> networkPayload;
@@ -133,8 +134,13 @@ DataStructure ApoapseData::FromNetwork(const std::string& relatedDataStructure, 
 	MessagePackDeserializer payloadData(networkPayload);
 
 	{
-		const auto& dataDef = GetStructureDefinition(relatedDataStructure);
+		const auto& dataDef = GetStructureDefinition(cmd.relatedDataStructure);
 		data = dataDef;
+	}
+
+	if (cmd.operationRegister)
+	{
+		ApoapseOperation::AddOperationFields(data);
 	}
 
 	for (auto& field : data.fields)
@@ -282,9 +288,9 @@ DataStructure ApoapseData::ReadFromDbResult(DataStructureDef& dataStructDef, con
 
 			else if (field.basicType == DataFieldType::text)
 				field.value = row[dbValueId].GetText();
-
-			dbValueId++;
 		}
+
+		dbValueId++;
 	}
 
 	return data;

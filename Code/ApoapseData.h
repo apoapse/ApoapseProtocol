@@ -6,6 +6,7 @@
 class NetworkPayload;
 class JsonHelper;
 class SQLRow;
+class CommandV2;
 
 using DataStructureDef = DataStructure;
 
@@ -26,7 +27,7 @@ public:
 	const DataStructureDef& GetStructure(const std::string& name) const;	// Return a data structure object with definitions but no data 
 	const CustomFieldType& GetCustomTypeInfo(const std::string& name) const;
 
-	DataStructure FromNetwork(const std::string& relatedDataStructure, std::shared_ptr<NetworkPayload> payload);
+	DataStructure FromNetwork(const CommandV2& cmd, std::shared_ptr<NetworkPayload> payload);
 	DataStructure FromJSON(const std::string& relatedDataStructure, const JsonHelper& json);
 
 	static bool AllowDatabaseStorage(const DataStructure& dataStructure);	// Check if the data structure provided has field stored on the database of the current platform (server or client)
@@ -43,6 +44,8 @@ public:
 	{
 		return ReadListFromDbInternal(name, searchBy, GenerateSQLValue(searchValue), orderBy, order, limit);
 	}
+
+	DataStructure ReadFromDbResult(DataStructureDef& dataStructDef, const SQLRow& row);
 
 private:
 	template <typename T>
@@ -67,7 +70,6 @@ private:
 	DataFieldType GetTypeByTypeName(const std::string& typeStr, bool* isCustomType) const;
 	static ReadPermission GetPermissionByName(const std::string& name);
 
-	DataStructure ReadFromDbResult(DataStructureDef& dataStructDef, const SQLRow& row);
 	DataStructure ReadItemFromDbInternal(const std::string& name, const std::string& seachFieldName, const SQLValue& searchValue);
 	std::vector<DataStructure> ReadListFromDbInternal(const std::string& name, const std::string& seachFieldName, const SQLValue& searchValue, const std::string& orderBy, ResultOrder order, Int64 limit);
 };

@@ -17,6 +17,14 @@ DataField& DataStructure::GetField(const std::string& fieldName)
 	return *res;
 }
 
+bool DataStructure::FieldExist(const std::string& fieldName)
+{
+	return std::count_if(fields.begin(), fields.end(), [&fieldName](const DataField& field)
+	{
+		return (field.name == fieldName);
+	});
+}
+
 MessagePackSerializer DataStructure::GetMessagePackFormat()
 {
 	MessagePackSerializer ser;

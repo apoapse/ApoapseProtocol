@@ -51,11 +51,25 @@ static std::string GetCommandDef()
 			}
 		},
 		{
+			"name": "request_sync",
+			"name_short": "rs",
+			"datastructure": "sync",
+			"require_authentication": true,
+			"save_on_receive": false,
+			"reception": {
+				"server": true,
+				"client": false
+			},
+			"propagation": {
+				"propagate": false,
+				"exclude_self": false
+			}
+		},
+		{
 			"name": "create_room",
 			"name_short": "cr",
 			"datastructure": "room",
 			"require_authentication": true,
-			"propagate_to_other_clients": true,
 			"save_on_receive": true,
 			"reception": {
 				"server": true,
@@ -75,7 +89,6 @@ static std::string GetCommandDef()
 			"name_short": "ct",
 			"datastructure": "thread",
 			"require_authentication": true,
-			"propagate_to_other_clients": true,
 			"save_on_receive": true,
 			"reception": {
 				"server": true,
@@ -95,7 +108,6 @@ static std::string GetCommandDef()
 			"name_short": "cm",
 			"datastructure": "message",
 			"require_authentication": true,
-			"propagate_to_other_clients": true,
 			"save_on_receive": true,
 			"reception": {
 				"server": true,

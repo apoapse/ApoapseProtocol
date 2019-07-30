@@ -51,7 +51,7 @@ CommandV2 CommandsManagerV2::CreateCommand(std::shared_ptr<NetworkPayload> netPa
 	}
 
 	CommandV2 cmd = cmdDef.value();
-	auto data = global->apoapseData->FromNetwork(cmdDef->relatedDataStructure, netPayload);
+	auto data = global->apoapseData->FromNetwork(cmd, netPayload);
 
 	cmd.SetData(data);
 
@@ -93,9 +93,9 @@ void CommandsManagerV2::OnReceivedCmdInternal(CommandV2& cmd, GenericConnection&
 		if (global->isServer && cmd.propagate)
 			Propagate(cmd, connection);
 
-		// TODO2: operation registration
+		// Operation registration
 		if (cmd.operationRegister)
-			ApoapseOperation::SaveOperation(cmd, connection.GetConnectedUser());
+			ApoapseOperation::RegisterOperation(cmd, connection.GetConnectedUser());
 
 		//if (global->isServer && cmd.propagateToOtherClients)
 		//	cmd.Send(*connection.server.usersManager, &netConnection);

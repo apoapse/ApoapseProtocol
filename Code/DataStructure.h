@@ -131,6 +131,7 @@ public:
 	bool isValid = true;
 
 	DataField& GetField(const std::string& fieldName);
+	bool FieldExist(const std::string& fieldName);
 
 	MessagePackSerializer GetMessagePackFormat();
 

@@ -144,6 +144,22 @@ static std::string GetDataStructures()
 			]
 		},
 		{
+			"name": "sync",
+			"fields": [
+				{
+					"name": "last_op_time",
+					"type": "timestamp",
+					"required": true,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				}
+			]
+		},
+
+		{
 			"name": "install",
 			"fields": [
 				{
@@ -182,6 +198,17 @@ static std::string GetDataStructures()
 			"name": "operation",
 			"fields": [
 				{
+					"name": "uuid",
+					"type": "uuid",
+					"required": true,
+					"unique": true,
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": false
+					}
+				},
+				{
 					"name": "name",
 					"type": "text",
 					"required": true,
@@ -191,7 +218,7 @@ static std::string GetDataStructures()
 						"client_storage": true,
 						"command": false
 					}
-				},				
+				},
 				{
 					"name": "time",
 					"type": "timestamp",
