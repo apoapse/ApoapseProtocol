@@ -59,7 +59,7 @@ void ApoapseOperation::AddOperationFields(DataStructure& dataStruct)
 	dataStruct.fields.push_back(field);
 }
 
-void ApoapseOperation::ExectureSyncRequest(Int64 sinceTimestamp, GenericConnection& destination)
+void ApoapseOperation::ExecuteSyncRequest(Int64 sinceTimestamp, GenericConnection& destination)
 {
 	ASSERT(global->isServer);
 
