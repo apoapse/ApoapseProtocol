@@ -8,6 +8,21 @@ CommandV2::CommandV2(DataStructure& data) : m_data(data)
 {
 }
 
+OperationOwnership CommandV2::ConvertFieldToOwnership(const std::string& value)
+{
+	if (value == "self")
+		return OperationOwnership::self;
+
+	else if (value == "usergroup")
+		return OperationOwnership::usergroup;
+
+	else if (value == "all")
+		return OperationOwnership::all;
+
+	else
+		return OperationOwnership::undefined;
+}
+
 void CommandV2::SetData(const DataStructure& data)
 {
 	m_data = data;

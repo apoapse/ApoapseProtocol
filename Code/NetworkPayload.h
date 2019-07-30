@@ -7,7 +7,6 @@
 
 struct NetworkMessageHeader
 {
-	CommandId command;	//TO REMOVE
 	std::string cmdShortName;
 	UInt32 payloadLength = 0;
 };

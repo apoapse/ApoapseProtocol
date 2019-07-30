@@ -72,7 +72,7 @@ DbId DataStructure::GetDbId()
 {
 	if (!dbId.has_value())
 	{
-		DataField& primaryField = GetPrimaryField();
+		DataField primaryField = GetPrimaryField().value();
 
 		SQLQuery query(*global->database);
 		query << SELECT << "id" << FROM << GetDBTableName().c_str() << WHERE << primaryField.name.c_str() << EQUALS << primaryField.GetSQLValue();
@@ -114,8 +114,6 @@ void DataStructure::SaveToDatabase()
 		return;
 	}
 
-	DataField& primaryField = GetPrimaryField();
-
 	std::vector<DataField*> fieldsToSave;
 	for (auto& field : fields)
 	{
@@ -123,10 +121,11 @@ void DataStructure::SaveToDatabase()
 			fieldsToSave.push_back(&field);
 	}
 
+	auto& primaryField = GetPrimaryField();
 
 	SQLQuery query(*global->database);
 
-	if (IsAlreadyRegisteredOnDatabase(primaryField))
+	if (primaryField && IsAlreadyRegisteredOnDatabase(primaryField.value()))
 	{
 		// Update
 		query << UPDATE << GetDBTableName().c_str() << SET;
@@ -140,7 +139,7 @@ void DataStructure::SaveToDatabase()
 				query << ",";
 		}
 
-		query << WHERE << primaryField.name.c_str() << EQUALS << primaryField.GetSQLValue();
+		query << WHERE << primaryField.value().name.c_str() << EQUALS << primaryField.value().GetSQLValue();
 		query.Exec();
 
 		LOG << LogSeverity::verbose << "Udpated entry on the database with data from the datastructure " << name;
@@ -206,7 +205,7 @@ bool DataStructure::IsAlreadyRegisteredOnDatabase(DataField& primaryField)
 	return (res && res.RowCount() == 1);
 }
 
-DataField& DataStructure::GetPrimaryField()
+std::optional<DataField> DataStructure::GetPrimaryField()
 {
 	for (auto& field : fields)
 	{
@@ -214,7 +213,7 @@ DataField& DataStructure::GetPrimaryField()
 			return field;
 	}
 
-	throw std::exception("Unable to find a field suited to check if an element is already registed to the database or not");
+	return std::optional<DataField>();
 }
 
 bool DataField::Validate() const

@@ -1,6 +1,14 @@
 #pragma once
 #include "ApoapseData.h"
-#include "Operation.h"
+#include "INetworkSender.h"
+
+enum class OperationOwnership
+{
+	undefined,
+	all,
+	self,
+	usergroup,
+};
 
 class CommandV2
 {
@@ -29,6 +37,7 @@ public:
 
 	bool operationRegister = false;
 	OperationOwnership operationOwnership = OperationOwnership::all;
+	static OperationOwnership ConvertFieldToOwnership(const std::string& value);
 
 	void SetData(const DataStructure& data);
 	DataStructure& GetData();

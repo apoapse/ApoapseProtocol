@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClCompile Include="ApoapseData.cpp" />
     <ClCompile Include="ApoapseMetadata.cpp" />
+    <ClCompile Include="ApoapseOperation.cpp" />
     <ClCompile Include="CmdUnitTest.cpp" />
     <ClCompile Include="CommandsManagerV2.cpp" />
     <ClCompile Include="CommandV2.cpp" />
@@ -151,7 +152,6 @@
     <ClCompile Include="DatabaseIntegrityPatcher.cpp" />
     <ClCompile Include="DataStructure.cpp" />
     <ClCompile Include="FieldValidator.cpp" />
-    <ClCompile Include="Operation.cpp" />
     <ClCompile Include="ProtectedByteContainer.cpp" />
     <ClCompile Include="SecurityAlert.cpp" />
     <ClCompile Include="StringExtensions.cpp" />
@@ -168,6 +168,7 @@
     <ClInclude Include="AbstractUser.h" />
     <ClInclude Include="AES.hpp" />
     <ClInclude Include="ApoapseData.h" />
+    <ClInclude Include="ApoapseOperation.h" />
     <ClInclude Include="CommandsDef.hpp" />
     <ClInclude Include="CommandsManagerV2.h" />
     <ClInclude Include="CommandV2.h" />
@@ -183,7 +184,6 @@
     <ClInclude Include="ICommandManager.hpp" />
     <ClInclude Include="IHtmlUI.hpp" />
     <ClInclude Include="Json.hpp" />
-    <ClInclude Include="Operation.h" />
     <ClInclude Include="ProtectedByteContainer.h" />
     <ClInclude Include="GlobalVarDefines.hpp" />
     <ClInclude Include="Random.hpp" />

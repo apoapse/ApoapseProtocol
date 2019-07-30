@@ -202,33 +202,33 @@ static std::string GetDataStructures()
 						"client_storage": true,
 						"command": false
 					}
-				},				
-				{
-					"name": "item",
-					"type": "uuid",
-					"required": true,
-					"unique": false,
-					"uses":	{
-						"server_storage": true,
-						"client_storage": true,
-						"command": false
-					}
-				},				
+				},							
 				{
 					"name": "ownership",
 					"type": "integer",
-					"required": true,
+					"required": false,
 					"unique": false,
 					"uses":	{
 						"server_storage": true,
-						"client_storage": true,
+						"client_storage": false,
 						"command": false
 					}
 				},				
 				{
 					"name": "related_user",
 					"type": "username",
-					"required": true,
+					"required": false,
+					"unique": false,
+					"uses":	{
+						"server_storage": true,
+						"client_storage": false,
+						"command": false
+					}
+				},
+				{
+					"name": "item",
+					"type": "integer",
+					"required": false,
 					"unique": false,
 					"uses":	{
 						"server_storage": true,

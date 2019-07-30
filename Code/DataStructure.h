@@ -144,5 +144,5 @@ public:
 
 private:
 	bool IsAlreadyRegisteredOnDatabase(DataField& primaryField);
-	DataField& GetPrimaryField();
+	std::optional<DataField> GetPrimaryField();
 };

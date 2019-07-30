@@ -15,6 +15,9 @@ class GenericConnection : public TCPConnection
 public:
 	GenericConnection(boost::asio::io_service& ioService, ssl::context& context);
 	virtual ~GenericConnection() override = default;
+
+	virtual bool IsAuthenticated() const = 0;
+	virtual std::optional<Username> GetConnectedUser() const = 0;
 	
 private:
 	bool OnConnectedToServerInternal() override;
@@ -32,6 +35,5 @@ private:
 protected:
 	virtual bool OnConnectedToServer() = 0;
 	virtual void OnReceivedValidCommand(CommandV2& cmd) = 0;
-	virtual bool IsAuthenticated() const = 0;
 	//virtual bool CanProcessCommandFromThisConnection(CommandId command) = 0;
 };

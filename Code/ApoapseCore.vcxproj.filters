@@ -136,9 +136,6 @@
     <ClInclude Include="Random.hpp">
       <Filter>Cryptography\Algorithms</Filter>
     </ClInclude>
-    <ClInclude Include="Operation.h">
-      <Filter>OperationSystem</Filter>
-    </ClInclude>
     <ClInclude Include="AbstractUser.h">
       <Filter>UserSystem</Filter>
     </ClInclude>
@@ -189,6 +186,9 @@
     </ClInclude>
     <ClInclude Include="DataStructure.h">
       <Filter>DataSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ApoapseOperation.h">
+      <Filter>CommandSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -281,9 +281,6 @@
     <ClCompile Include="CmdError.cpp">
       <Filter>CommandSystem\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Operation.cpp">
-      <Filter>OperationSystem</Filter>
-    </ClCompile>
     <ClCompile Include="DatabaseIntegrityPatcher.cpp">
       <Filter>DatabaseAbstractionLayer</Filter>
     </ClCompile>
@@ -310,6 +307,9 @@
     </ClCompile>
     <ClCompile Include="DataStructure.cpp">
       <Filter>DataSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ApoapseOperation.cpp">
+      <Filter>CommandSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -372,9 +372,6 @@
     </Filter>
     <Filter Include="Cryptography\Algorithms">
       <UniqueIdentifier>{8309ae43-42ae-4ebd-9b71-95b460bfe0ea}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="OperationSystem">
-      <UniqueIdentifier>{7c365284-72ae-4b5b-9966-01d1a4efb2e4}</UniqueIdentifier>
     </Filter>
     <Filter Include="UserSystem">
       <UniqueIdentifier>{c14b3976-2e18-4ab4-a312-fc215ab57c61}</UniqueIdentifier>
