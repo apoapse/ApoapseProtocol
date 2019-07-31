@@ -66,6 +66,22 @@ static std::string GetCommandDef()
 			}
 		},
 		{
+			"name": "user",
+			"name_short": "nu",
+			"datastructure": "user",
+			"require_authentication": true,
+			"only_non_authenticated": false,
+			"save_on_receive": true,
+			"reception": {
+				"server": false,
+				"client": true
+			},
+			"operation": {
+				"register": true,
+				"ownership": "all"
+			}
+		},
+		{
 			"name": "create_room",
 			"name_short": "cr",
 			"datastructure": "room",

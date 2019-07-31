@@ -282,7 +282,7 @@ static std::string GetDataStructures()
 				{
 					"name": "password",
 					"type": "blob",
-					"required": true,
+					"required": false,
 					"unique": false,
 					"uses":	{
 						"server_storage": true,
@@ -293,7 +293,7 @@ static std::string GetDataStructures()
 				{
 					"name": "password_salt",
 					"type": "blob",
-					"required": true,
+					"required": false,
 					"unique": false,
 					"uses":	{
 						"server_storage": true,
@@ -315,6 +315,17 @@ static std::string GetDataStructures()
 				{
 					"name": "nickname",
 					"type": "text",
+					"required": false,
+					"unique": false,
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "avatar",
+					"type": "blob",
 					"required": false,
 					"unique": false,
 					"uses":	{
