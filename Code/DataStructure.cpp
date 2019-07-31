@@ -25,7 +25,7 @@ bool DataStructure::FieldExist(const std::string& fieldName)
 	});
 }
 
-MessagePackSerializer DataStructure::GetMessagePackFormat()
+MessagePackSerializer DataStructure::GetMessagePackFormat(bool includeAllFields/* = false*/)
 {
 	MessagePackSerializer ser;
 
@@ -34,6 +34,9 @@ MessagePackSerializer DataStructure::GetMessagePackFormat()
 		if (!field.HasValue())
 			continue;
 
+		if (!includeAllFields && !field.usedInCommand)
+			continue;
+		
 		if (field.basicType == DataFieldType::boolean)
 			ser.UnorderedAppend<bool>(field.name, field.GetValue<bool>());
 

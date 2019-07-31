@@ -133,7 +133,7 @@ public:
 	DataField& GetField(const std::string& fieldName);
 	bool FieldExist(const std::string& fieldName);
 
-	MessagePackSerializer GetMessagePackFormat();
+	MessagePackSerializer GetMessagePackFormat(bool includeAllFields = false);
 
 	void SendUISignal(const std::string& signalName);
 	void SaveToDatabase();

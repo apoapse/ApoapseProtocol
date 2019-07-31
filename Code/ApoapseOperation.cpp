@@ -11,6 +11,12 @@ void ApoapseOperation::RegisterOperation(CommandV2& cmd, const std::optional<Use
 {
 	const std::string opName = cmd.name;
 
+	if (!cmd.GetData().FieldExist("operation_uuid"))
+	{
+		PrepareCmdSend(cmd);
+		LOG_DEBUG << "The command " << cmd.name << " do not have an operation uuid. It has been added. Make sure RegisterOperation is called before sending.";
+	}
+
 	auto opData = global->apoapseData->GetStructure("operation");
 	opData.GetField("uuid").SetValue(cmd.GetData().GetField("operation_uuid").GetValue<Uuid>());
 	opData.GetField("name").SetValue(opName);
