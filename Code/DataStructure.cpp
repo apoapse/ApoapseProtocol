@@ -220,7 +220,7 @@ std::optional<DataField> DataStructure::GetPrimaryField()
 {
 	for (auto& field : fields)
 	{
-		if (field.HasValue() && field.isDataUnique)
+		if (field.HasValue() && field.isDataUnique && field.name != "operation_uuid")
 			return field;
 	}
 
