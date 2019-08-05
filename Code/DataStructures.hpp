@@ -484,6 +484,59 @@ static std::string GetDataStructures()
 			]
 		},
 		{
+			"name": "tag",
+			"fields": [
+				{
+					"name": "uuid",
+					"type": "uuid",
+					"required": true,
+					"unique": true,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "name",
+					"type": "text",
+					"required": true,
+					"unique": false,
+					"read_permission": "self",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "item_type",
+					"type": "text",
+					"required": true,
+					"unique": false,
+					"read_permission": "self",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "item_uuid",
+					"type": "uuid",
+					"required": true,
+					"unique": false,
+					"read_permission": "self",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				}
+			]
+		},
+		{
 			"name": "local_setting",
 			"fields": [
 				{

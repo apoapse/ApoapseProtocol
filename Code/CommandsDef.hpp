@@ -137,6 +137,25 @@ static std::string GetCommandDef()
 				"propagate": true,
 				"exclude_self": false
 			}
+		},
+		{
+			"name": "add_tag",
+			"name_short": "at",
+			"datastructure": "tag",
+			"require_authentication": true,
+			"save_on_receive": true,
+			"reception": {
+				"server": true,
+				"client": true
+			},
+			"operation": {
+				"register": true,
+				"ownership": "self"
+			},
+			"propagation": {
+				"propagate": true,
+				"exclude_self": false
+			}
 		}
 	]
 }
