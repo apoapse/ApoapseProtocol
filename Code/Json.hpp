@@ -76,33 +76,47 @@ public:
 	template <typename T>
 	void InsertArray(const std::string& path, const std::vector<T>& values)
 	{
-		boost::property_tree::ptree childTree;
-
-		for (auto& value : values)
+		if (values.empty())
 		{
-			boost::property_tree::ptree arrayItem;
-
-			arrayItem.put("", value);
-			childTree.push_back(std::make_pair("", arrayItem));
+			m_properties.add(path, "[]");
 		}
+		else
+		{
+			boost::property_tree::ptree childTree;
 
-		m_properties.add_child(path, childTree);
+			for (auto& value : values)
+			{
+				boost::property_tree::ptree arrayItem;
+
+				arrayItem.put("", value);
+				childTree.push_back(std::make_pair("", arrayItem));
+			}
+
+			m_properties.add_child(path, childTree);
+		}
 	}
 
 	template <>
 	void InsertArray(const std::string& path, const std::vector<std::string>& values)
 	{
-		boost::property_tree::ptree childTree;
-
-		for (auto& value : values)
+		if (values.empty())
 		{
-			boost::property_tree::ptree arrayItem;
-
-			arrayItem.put("", value, StringTranslator());
-			childTree.push_back(std::make_pair("", arrayItem));
+			m_properties.add(path, "[]");
 		}
+		else
+		{
+			boost::property_tree::ptree childTree;
 
-		m_properties.add_child(path, childTree);
+			for (auto& value : values)
+			{
+				boost::property_tree::ptree arrayItem;
+
+				arrayItem.put("", value, StringTranslator());
+				childTree.push_back(std::make_pair("", arrayItem));
+			}
+
+			m_properties.add_child(path, childTree);
+		}
 	}
 
 	template <typename T>
