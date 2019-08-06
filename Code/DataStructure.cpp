@@ -48,6 +48,21 @@ MessagePackSerializer DataStructure::GetMessagePackFormat(bool includeAllFields/
 
 		else if (field.basicType == DataFieldType::text)
 			ser.UnorderedAppend<std::string>(field.name, field.GetValue<std::string>());
+
+		else if (field.basicType == DataFieldType::data_array)
+		{
+			std::vector<MessagePackSerializer> serArray;
+
+			auto dataArray = field.GetValue<std::vector<DataStructure>>();
+			serArray.reserve(dataArray.size());
+
+			for (auto& dat : dataArray)
+			{
+				serArray.push_back(dat.GetMessagePackFormat(includeAllFields));
+			}
+			
+			ser.UnorderedAppendArray(field.name, serArray);
+		}
 	}
 
 	return ser;
@@ -231,7 +246,7 @@ bool DataField::Validate() const
 {
 	bool isValid = true;
 
-	if (customType.has_value())
+	if (customType.has_value() && basicType != DataFieldType::data_array)
 	{
 		const auto typeDef = global->apoapseData->GetCustomTypeInfo(customType.value());
 

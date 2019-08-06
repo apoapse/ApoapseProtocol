@@ -35,12 +35,14 @@ void ApoapseData::ReadDataStructures(const JsonHelper& json)
 			field.usedInClientUI = fieldDser.ReadFieldValue<bool>("uses.client_ui").value_or(false);
 			field.readPermission = GetPermissionByName(fieldDser.ReadFieldValue<std::string>("propagate_to_clients").value_or("none"));
 
-			bool useCustomType = false;
-			field.basicType = GetTypeByTypeName(fieldDser.ReadFieldValue<std::string>("type").value(), &useCustomType);
-			
-			if (useCustomType)
 			{
-				field.customType = fieldDser.ReadFieldValue<std::string>("type").value();
+				bool useCustomType = false;
+				field.basicType = GetTypeByTypeName(fieldDser.ReadFieldValue<std::string>("type").value(), &useCustomType);
+
+				if (useCustomType)
+				{
+					field.customType = fieldDser.ReadFieldValue<std::string>("type").value();
+				}
 			}
 
 			if (field.basicType != DataFieldType::undefined)
@@ -73,6 +75,64 @@ void ApoapseData::ReadCustomTypes(const JsonHelper& json)
 	}
 
 	LOG << "Registered " << m_customTypes.size() << " custom data structure types";
+}
+
+void ApoapseData::FillAndValidate(MessagePackDeserializer& payloadData, DataStructure& data)
+{
+	for (auto& field : data.fields)
+	{
+		if (!field.usedInCommand || !data.isValid)
+			continue;
+
+		const bool valueExist = payloadData.Exist(field.name);
+
+		if (field.isRequired && !valueExist)
+		{
+			LOG << "The field " << field.name << " is required but is not present in the net payload" << LogSeverity::error;
+			data.isValid = false;
+		}
+
+		if (valueExist)
+		{
+			if (field.basicType == DataFieldType::boolean)
+			{
+				field.value = payloadData.GetValue<bool>(field.name);
+			}
+			else if (field.basicType == DataFieldType::byte_blob)
+			{
+				field.value = payloadData.GetValue<ByteContainer>(field.name);
+			}
+			else if (field.basicType == DataFieldType::integer)
+			{
+				field.value = payloadData.GetValue<Int64>(field.name);
+			}
+			else if (field.basicType == DataFieldType::text)
+			{
+				field.value = payloadData.GetValue<std::string>(field.name);
+			}
+			else if (field.basicType == DataFieldType::data_array)
+			{
+				std::vector<DataStructure> datArray;
+
+				for (auto& dser : payloadData.GetArray<MessagePackDeserializer>(field.name))
+				{
+					DataStructure dat;
+
+					{
+						const auto& dataDef = GetStructureDefinition(field.customType.value());
+						dat = dataDef;
+					}
+
+					FillAndValidate(dser, dat);
+					datArray.push_back(dat);
+				}
+
+				field.value = datArray;
+			}
+
+			data.isValid = field.Validate();
+		}
+	}
 }
 
 DataStructureDef& ApoapseData::GetStructureDefinition(const std::string& name)
@@ -119,6 +179,16 @@ const CustomFieldType& ApoapseData::GetCustomTypeInfo(const std::string& name) c
 	return *res;
 }
 
+bool ApoapseData::DataStructureExist(const std::string& name) const
+{
+	auto& res = std::find_if(m_registeredDataStructures.begin(), m_registeredDataStructures.end(), [&name](const DataStructureDef& dataStruct)
+	{
+		return (dataStruct.name == name);
+	});
+
+	return (res != m_registeredDataStructures.end());
+}
+
 DataStructure ApoapseData::FromNetwork(const CommandV2& cmd, std::shared_ptr<NetworkPayload> payload)
 {
 	DataStructure data;
@@ -143,41 +213,7 @@ DataStructure ApoapseData::FromNetwork(const CommandV2& cmd, std::shared_ptr<Net
 		ApoapseOperation::AddOperationFields(data);
 	}
 
-	for (auto& field : data.fields)
-	{
-		if (!field.usedInCommand || !data.isValid)
-			continue;
-
-		const bool valueExist = payloadData.Exist(field.name);
-
-		if (field.isRequired && !valueExist)
-		{
-			LOG << "The field " << field.name << " is required but is not present in the net payload" << LogSeverity::error;
-			data.isValid = false;
-		}
-
-		if (valueExist)
-		{
-			if (field.basicType == DataFieldType::boolean)
-			{
-				field.value = payloadData.GetValue<bool>(field.name);
-			}
-			else if (field.basicType == DataFieldType::byte_blob)
-			{
-				field.value = payloadData.GetValue<ByteContainer>(field.name);
-			}
-			else if (field.basicType == DataFieldType::integer)
-			{
-				field.value = payloadData.GetValue<Int64>(field.name);
-			}
-			else if (field.basicType == DataFieldType::text)
-			{
-				field.value = payloadData.GetValue<std::string>(field.name);
-			}
-
-			data.isValid = field.Validate();
-		}
-	}
+	FillAndValidate(payloadData, data);
 
 	return data;
 }
@@ -247,7 +283,11 @@ DataFieldType ApoapseData::GetTypeByTypeName(const std::string& typeStr, bool* i
 	else
 	{
 		*isCustomType = true;
-		return GetCustomTypeInfo(typeStr).underlyingType;
+
+		if (DataStructureExist(typeStr))
+			return DataFieldType::data_array;
+		else
+			return GetCustomTypeInfo(typeStr).underlyingType;
 	}
 }
 

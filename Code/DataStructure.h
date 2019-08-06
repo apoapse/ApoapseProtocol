@@ -22,7 +22,8 @@ enum class DataFieldType
 	integer,
 	boolean,
 	text,
-	byte_blob
+	byte_blob,
+	data_array
 };
 
 
@@ -70,6 +71,11 @@ struct DataField
 			return optional;
 	}
 
+	std::vector<class DataStructure> GetDataArray()
+	{
+		return std::any_cast<std::vector<class DataStructure>>(value.value());
+	}
+
 	void SetValue(Int64 val)
 	{
 		value = val;
@@ -105,6 +111,11 @@ struct DataField
 
 		else
 			throw std::exception("DataField:SetValue no ICustomDataType converter defined for this base type");
+	}
+
+	void SetValue(std::vector<class DataStructure>& dataArray)
+	{
+		value = dataArray;
 	}
 
 	bool HasValue() const

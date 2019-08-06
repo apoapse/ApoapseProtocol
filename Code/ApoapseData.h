@@ -26,6 +26,7 @@ public:
 	const std::vector<DataStructureDef>& GetRegisteredStructures() const;
 	const DataStructureDef& GetStructure(const std::string& name) const;	// Return a data structure object with definitions but no data 
 	const CustomFieldType& GetCustomTypeInfo(const std::string& name) const;
+	bool DataStructureExist(const std::string& name) const;
 
 	DataStructure FromNetwork(const CommandV2& cmd, std::shared_ptr<NetworkPayload> payload);
 	DataStructure FromJSON(const std::string& relatedDataStructure, const JsonHelper& json);
@@ -65,6 +66,8 @@ private:
 
 	void ReadDataStructures(const JsonHelper& json);
 	void ReadCustomTypes(const JsonHelper& json);
+
+	void FillAndValidate(MessagePackDeserializer& payloadData, DataStructure& data);
 
 	DataStructureDef& GetStructureDefinition(const std::string& name);
 	DataFieldType GetTypeByTypeName(const std::string& typeStr, bool* isCustomType) const;
