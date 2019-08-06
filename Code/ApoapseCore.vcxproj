@@ -155,6 +155,7 @@
     <ClCompile Include="ProtectedByteContainer.cpp" />
     <ClCompile Include="SecurityAlert.cpp" />
     <ClCompile Include="StringExtensions.cpp" />
+    <ClCompile Include="UsergroupManager.cpp" />
     <ClCompile Include="Username.cpp" />
     <ClCompile Include="UT_CommandSystem.cpp" />
     <ClCompile Include="UT_Cryptography.cpp" />
@@ -246,6 +247,7 @@
     <ClCompile Include="UT_StringExtensions.cpp">
       <FileType>CppHeader</FileType>
     </ClCompile>
+    <ClInclude Include="UsergroupManager.h" />
     <ClInclude Include="Username.h" />
     <ClInclude Include="Uuid.h" />
   </ItemGroup>

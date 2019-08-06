@@ -96,54 +96,6 @@ static std::string GetDataStructures()
 			]
 		},
 		{
-			"name": "server_info",
-			"fields": [
-				{
-					"name": "status",
-					"type": "text",
-					"required": true,
-					"uses":	{
-						"server_storage": false,
-						"client_storage": false,
-						"command": true,
-						"client_ui": true
-					}
-				},
-				{
-					"name": "username",
-					"type": "username",
-					"required": true,
-					"uses":	{
-						"server_storage": false,
-						"client_storage": false,
-						"command": true,
-						"client_ui": true
-					}
-				},
-				{
-					"name": "requirePasswordChange",
-					"type": "bool",
-					"required": false,
-					"uses":	{
-						"server_storage": false,
-						"client_storage": false,
-						"command": true
-					}
-				},
-				{
-					"name": "nickname",
-					"type": "text",
-					"required": false,
-					"uses":	{
-						"server_storage": false,
-						"client_storage": false,
-						"command": true,
-						"client_ui": true
-					}
-				}
-			]
-		},
-		{
 			"name": "sync",
 			"fields": [
 				{
@@ -315,6 +267,17 @@ static std::string GetDataStructures()
 				{
 					"name": "nickname",
 					"type": "text",
+					"required": false,
+					"unique": false,
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "usergroup",
+					"type": "uuid",
 					"required": false,
 					"unique": false,
 					"uses":	{
@@ -532,6 +495,106 @@ static std::string GetDataStructures()
 						"server_storage": true,
 						"client_storage": true,
 						"command": true
+					}
+				}
+			]
+		},
+		{
+			"name": "usergroup",
+			"fields": [
+				{
+					"name": "uuid",
+					"type": "uuid",
+					"required": true,
+					"unique": true,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": false,
+						"command": true
+					}
+				},
+				{
+					"name": "name",
+					"type": "text",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": false,
+						"command": true
+					}
+				},
+				{
+					"name": "permissions",
+					"type": "text",
+					"required": false,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": false,
+						"command": true
+					}
+				}
+			]
+		},
+		{
+			"name": "server_info",
+			"fields": [
+				{
+					"name": "status",
+					"type": "text",
+					"required": true,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true,
+						"client_ui": true
+					}
+				},
+				{
+					"name": "username",
+					"type": "username",
+					"required": true,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true,
+						"client_ui": true
+					}
+				},
+				{
+					"name": "requirePasswordChange",
+					"type": "bool",
+					"required": false,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				},
+				{
+					"name": "nickname",
+					"type": "text",
+					"required": false,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true,
+						"client_ui": true
+					}
+				},
+				{
+					"name": "usergroups",
+					"type": "usergroup",
+					"required": false,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true,
+						"client_ui": true
 					}
 				}
 			]
