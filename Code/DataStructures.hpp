@@ -576,6 +576,17 @@ static std::string GetDataStructures()
 					}
 				},
 				{
+					"name": "usergroups",
+					"type": "usergroup",
+					"required": false,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true,
+						"client_ui": true
+					}
+				},
+				{
 					"name": "nickname",
 					"type": "text",
 					"required": false,
@@ -587,14 +598,14 @@ static std::string GetDataStructures()
 					}
 				},
 				{
-					"name": "usergroups",
-					"type": "usergroup",
+					"name": "usergroup",
+					"type": "uuid",
 					"required": false,
 					"uses":	{
 						"server_storage": false,
 						"client_storage": false,
 						"command": true,
-						"client_ui": true
+						"client_ui": false
 					}
 				}
 			]
