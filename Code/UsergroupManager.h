@@ -7,7 +7,7 @@ class Usergroup
 {
 	Uuid m_uuid;
 	std::string m_name;
-	std::vector<std::string> m_permissions;
+	std::vector<std::string> m_permissions = {};
 
 public:
 	Usergroup(DataStructure& data);
@@ -23,7 +23,7 @@ public:
 
 class UsergroupManager
 {
-	std::vector<Usergroup> m_registeredUsergroups;
+	std::vector<Usergroup> m_registeredUsergroups = {};
 
 public:
 	UsergroupManager();

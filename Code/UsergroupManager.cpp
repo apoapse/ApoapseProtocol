@@ -8,7 +8,10 @@ Usergroup::Usergroup(DataStructure& data)
 	m_uuid = data.GetField("uuid").GetValue<Uuid>();
 	m_name = data.GetField("name").GetValue<std::string>();
 
-	StringExtensions::split(data.GetField("permissions").GetValue<std::string>(), m_permissions, " ");
+	if (data.GetField("permissions").HasValue())
+	{
+		StringExtensions::split(data.GetField("permissions").GetValue<std::string>(), m_permissions, " ");
+	}
 }
 
 bool Usergroup::operator==(const Uuid& uuid) const
@@ -33,7 +36,7 @@ std::string Usergroup::GetName() const
 
 bool Usergroup::HasPermission(const std::string& permName) const
 {
-	auto res = std::find(m_permissions.begin(), m_permissions.end(), permName);
+	const auto res = std::find(m_permissions.begin(), m_permissions.end(), permName);
 
 	return (res != m_permissions.end());
 }
@@ -75,7 +78,7 @@ void UsergroupManager::RegisterUsergroup(Usergroup& usergroup)
 
 const Usergroup& UsergroupManager::GetUsergroup(const Uuid& uuid) const
 {
-	auto res = std::find(m_registeredUsergroups.begin(), m_registeredUsergroups.end(), uuid);
+	const auto res = std::find(m_registeredUsergroups.begin(), m_registeredUsergroups.end(), uuid);
 
 	if (res == m_registeredUsergroups.end())
 		throw std::exception("No usergroup with the provided uuid");
@@ -85,7 +88,7 @@ const Usergroup& UsergroupManager::GetUsergroup(const Uuid& uuid) const
 
 const Usergroup& UsergroupManager::GetUsergroup(const std::string& name) const
 {
-	auto res = std::find(m_registeredUsergroups.begin(), m_registeredUsergroups.end(), name);
+	const auto res = std::find(m_registeredUsergroups.begin(), m_registeredUsergroups.end(), name);
 
 	if (res == m_registeredUsergroups.end())
 		throw std::exception("No usergroup with the provided name");
@@ -102,6 +105,6 @@ void UsergroupManager::CreateUsergroup(const Uuid& uuid, const std::string& name
 
 	dat.SaveToDatabase();
 
-	RegisterUsergroup(Usergroup(dat));
+	auto usergroup = Usergroup(dat);
+	RegisterUsergroup(usergroup);
 }
-
