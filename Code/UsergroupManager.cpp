@@ -38,6 +38,11 @@ bool Usergroup::HasPermission(const std::string& permName) const
 	return (res != m_permissions.end());
 }
 
+const std::vector<std::string>& Usergroup::GetPermissions() const
+{
+	return m_permissions;
+}
+
 UsergroupManager::UsergroupManager()
 {
 	ASSERT(global->isServer);

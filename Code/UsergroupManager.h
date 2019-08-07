@@ -18,6 +18,7 @@ public:
 	std::string GetName() const;
 
 	bool HasPermission(const std::string& permName) const;
+	const std::vector<std::string>& GetPermissions() const;
 };
 
 class UsergroupManager
