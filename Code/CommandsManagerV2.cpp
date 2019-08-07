@@ -6,6 +6,7 @@
 #include "SecurityAlert.h"
 #include "GenericConnection.h"
 #include "ApoapseOperation.h"
+#include "StringExtensions.h"
 
 CommandsManagerV2::CommandsManagerV2(const std::string& cmdSchemeJson)
 {
@@ -28,6 +29,15 @@ CommandsManagerV2::CommandsManagerV2(const std::string& cmdSchemeJson)
 		cmd.receiveOnServer = dser.ReadFieldValue<bool>("reception.server").value_or(false);
 		cmd.propagate = dser.ReadFieldValue<bool>("propagation.propagate").value_or(false);
 		cmd.excludeSelfPropagation = dser.ReadFieldValue<bool>("propagation.exclude_self").value_or(false);
+
+		if (dser.ReadFieldValue<std::string>("required_permissions").is_initialized())
+		{
+			const std::string permStr = dser.ReadFieldValue<std::string>("required_permissions").value();
+			if (!permStr.empty())
+			{
+				StringExtensions::split(permStr, cmd.requiredPermissions, " ");
+			}
+		}
 
 		if (!GetCmdDef(cmd.nameShort).has_value())
 		{

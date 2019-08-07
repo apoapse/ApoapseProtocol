@@ -4,6 +4,7 @@
 #include "NetworkPayload.h"
 #include "CommandsManagerV2.h"
 #include "ApoapseOperation.h"
+#include "UsergroupManager.h"
 
 CommandV2::CommandV2(DataStructure& data) : m_data(data)
 {
@@ -29,7 +30,7 @@ void CommandV2::SetData(const DataStructure& data)
 	m_data = data;
 }
 
-bool CommandV2::IsValid(bool isAuthenticated) const
+bool CommandV2::IsValid(const IUser* user) const
 {
 	if (!m_data.isValid)
 	{
@@ -49,16 +50,28 @@ bool CommandV2::IsValid(bool isAuthenticated) const
 		return false;
 	}
 
-	if (onlyNonAuthenticated && isAuthenticated)
+	if (onlyNonAuthenticated && user)
 	{
 		LOG << LogSeverity::warning << "Command " << name << ": this command is only when the user is not authenticated";
 		return false;
 	}
 
-	if (requireAuthentication && !isAuthenticated)
+	if (requireAuthentication && !user)
 	{
 		LOG << LogSeverity::warning << "Command " << name << ": this command require the user to be authenticated";
 		return false;
+	}
+
+	if (global->isServer && !requiredPermissions.empty())
+	{
+		for (const auto& permission : requiredPermissions)
+		{
+			if (!user->GetUsergroup().HasPermission(permission))
+			{
+				LOG << LogSeverity::warning << "The user sent the command " << name << " but he does not have the required permission " << permission;
+				return false;
+			}
+		}
 	}
 
 	return true;

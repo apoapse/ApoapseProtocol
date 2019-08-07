@@ -166,7 +166,7 @@
       <FileType>CppHeader</FileType>
     </ClCompile>
     <ClCompile Include="Uuid.cpp" />
-    <ClInclude Include="AbstractUser.h" />
+    <ClInclude Include="IUser.h" />
     <ClInclude Include="AES.hpp" />
     <ClInclude Include="ApoapseData.h" />
     <ClInclude Include="ApoapseOperation.h" />

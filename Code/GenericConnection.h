@@ -34,6 +34,6 @@ private:
 
 protected:
 	virtual bool OnConnectedToServer() = 0;
-	virtual void OnReceivedValidCommand(CommandV2& cmd) = 0;
+	virtual void OnReceivedCommand(CommandV2& cmd) = 0;
 	//virtual bool CanProcessCommandFromThisConnection(CommandId command) = 0;
 };

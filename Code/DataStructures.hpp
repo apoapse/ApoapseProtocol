@@ -110,7 +110,6 @@ static std::string GetDataStructures()
 				}
 			]
 		},
-
 		{
 			"name": "install",
 			"fields": [

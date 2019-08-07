@@ -136,9 +136,6 @@
     <ClInclude Include="Random.hpp">
       <Filter>Cryptography\Algorithms</Filter>
     </ClInclude>
-    <ClInclude Include="AbstractUser.h">
-      <Filter>UserSystem</Filter>
-    </ClInclude>
     <ClInclude Include="GlobalVarDefines.hpp">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
@@ -191,6 +188,9 @@
       <Filter>CommandSystem</Filter>
     </ClInclude>
     <ClInclude Include="UsergroupManager.h">
+      <Filter>UserSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="IUser.h">
       <Filter>UserSystem</Filter>
     </ClInclude>
   </ItemGroup>

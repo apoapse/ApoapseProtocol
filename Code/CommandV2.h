@@ -1,6 +1,7 @@
 #pragma once
 #include "ApoapseData.h"
 #include "INetworkSender.h"
+#include "IUser.h"
 
 enum class OperationOwnership
 {
@@ -24,6 +25,7 @@ public:
 
 	bool requireAuthentication = true;
 	bool onlyNonAuthenticated = false;
+	std::vector<std::string> requiredPermissions = {};
 
 	bool clientUIPropagate = false;
 	std::string clientUISignalName;
@@ -41,7 +43,7 @@ public:
 
 	void SetData(const DataStructure& data);
 	DataStructure& GetData();
-	bool IsValid(bool isAuthenticated) const;
+	bool IsValid(const IUser* user) const;
 
 	void Send(INetworkSender& destination, TCPConnection* excludedConnection = nullptr);
 
