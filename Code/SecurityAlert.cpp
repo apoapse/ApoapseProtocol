@@ -2,8 +2,6 @@
 #include "SecurityAlert.h"
 #include "Common.h"
 #include "Uuid.h"
-#include "CmdError.h"
-#include "CommandsManager.h"
 
 SecurityLog::SecurityAlert SecurityLog::GetAlertFromErrorCode(ApoapseErrorCode errorCode)
 {
@@ -59,8 +57,7 @@ void SecurityLog::LogAlert(ApoapseErrorCode errorCode, INetworkSender& destinati
 
 void SecurityLog::NotifySender(ApoapseErrorCode errorCode, INetworkSender& destination, const Uuid* relatedItem /*= nullptr*/)
 {
-	CmdError cmd;
-	cmd.SendError(errorCode, destination, relatedItem);
+	//global->cmdManager->CreateCommand("error", )
 }
 
 std::string SecurityLog::SeverityToStr(SecurityAlert::Severity severity)

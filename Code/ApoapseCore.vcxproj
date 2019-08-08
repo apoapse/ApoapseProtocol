@@ -143,21 +143,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ApoapseData.cpp" />
-    <ClCompile Include="ApoapseMetadata.cpp" />
     <ClCompile Include="ApoapseOperation.cpp" />
-    <ClCompile Include="CmdUnitTest.cpp" />
     <ClCompile Include="CommandsManagerV2.cpp" />
     <ClCompile Include="CommandV2.cpp" />
     <ClCompile Include="CustomDataType.cpp" />
     <ClCompile Include="DatabaseIntegrityPatcher.cpp" />
     <ClCompile Include="DataStructure.cpp" />
-    <ClCompile Include="FieldValidator.cpp" />
     <ClCompile Include="ProtectedByteContainer.cpp" />
     <ClCompile Include="SecurityAlert.cpp" />
     <ClCompile Include="StringExtensions.cpp" />
     <ClCompile Include="UsergroupManager.cpp" />
     <ClCompile Include="Username.cpp" />
-    <ClCompile Include="UT_CommandSystem.cpp" />
     <ClCompile Include="UT_Cryptography.cpp" />
     <ClCompile Include="UT_MessagePack.cpp" />
     <ClCompile Include="UT_ProtectedByteContainer.cpp" />
@@ -175,10 +171,8 @@
     <ClInclude Include="CommandV2.h" />
     <ClInclude Include="CustomDataType.h" />
     <ClInclude Include="DatabaseIntegrityPatcher.h" />
-    <ClInclude Include="ApoapseMetadata.h" />
     <ClInclude Include="DataStructure.h" />
     <ClInclude Include="DataStructures.hpp" />
-    <ClInclude Include="FieldValidator.h" />
     <ClInclude Include="Hash.hpp" />
     <ClInclude Include="CryptographyTypes.hpp" />
     <ClInclude Include="HMAC.hpp" />
@@ -192,16 +186,12 @@
     <ClInclude Include="SecurityAlert.h" />
     <ClInclude Include="ApoapseErrorCodes.hpp" />
     <ClInclude Include="ByteUtils.hpp" />
-    <ClInclude Include="Command.h" />
-    <ClInclude Include="CommandsManager.h" />
-    <ClInclude Include="Commands.hpp" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Database.hpp" />
     <ClInclude Include="DateTimeUtils.h" />
     <ClInclude Include="Diagnostic.hpp" />
     <ClInclude Include="eLogSeverity.hpp" />
     <ClInclude Include="DllExportSymbolApi.hpp" />
-    <ClInclude Include="CmdError.h" />
     <ClInclude Include="GenericConnection.h" />
     <ClInclude Include="ILogger.hpp" />
     <ClInclude Include="INetworkSender.h" />
@@ -229,7 +219,6 @@
     <ClInclude Include="MessagePack.hpp" />
     <ClInclude Include="UnitTest.hpp" />
     <ClInclude Include="UnitTestsManager.h" />
-    <ClCompile Include="CmdError.cpp" />
     <ClCompile Include="SQLQuery.cpp" />
     <ClCompile Include="TCPServer.cpp" />
     <ClCompile Include="UT_ByteUtils.cpp">
@@ -252,8 +241,6 @@
     <ClInclude Include="Uuid.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Command.cpp" />
-    <ClCompile Include="CommandsManager.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="DateTimeUtils.cpp" />
     <ClCompile Include="GenericConnection.cpp" />

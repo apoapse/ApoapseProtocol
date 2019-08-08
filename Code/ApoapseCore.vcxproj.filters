@@ -61,15 +61,6 @@
     <ClInclude Include="ReadBufferSize.hpp">
       <Filter>Network\Sockets</Filter>
     </ClInclude>
-    <ClInclude Include="Commands.hpp">
-      <Filter>CommandSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="Command.h">
-      <Filter>CommandSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="CommandsManager.h">
-      <Filter>CommandSystem</Filter>
-    </ClInclude>
     <ClInclude Include="ObjectsFactory.hpp">
       <Filter>StructureUtils</Filter>
     </ClInclude>
@@ -127,9 +118,6 @@
     <ClInclude Include="Username.h">
       <Filter>UserSystem</Filter>
     </ClInclude>
-    <ClInclude Include="CmdError.h">
-      <Filter>CommandSystem\Commands</Filter>
-    </ClInclude>
     <ClInclude Include="AES.hpp">
       <Filter>Cryptography\Algorithms</Filter>
     </ClInclude>
@@ -147,12 +135,6 @@
     </ClInclude>
     <ClInclude Include="SQLUtils.hpp">
       <Filter>DatabaseAbstractionLayer</Filter>
-    </ClInclude>
-    <ClInclude Include="ApoapseMetadata.h">
-      <Filter>ApoapseSystems</Filter>
-    </ClInclude>
-    <ClInclude Include="FieldValidator.h">
-      <Filter>CommandSystem</Filter>
     </ClInclude>
     <ClInclude Include="DataStructures.hpp">
       <Filter>DataSystem</Filter>
@@ -221,12 +203,6 @@
       <Filter>Network\Protocol</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="Command.cpp">
-      <Filter>CommandSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="CommandsManager.cpp">
-      <Filter>CommandSystem</Filter>
-    </ClCompile>
     <ClCompile Include="UT_ByteUtils.cpp">
       <Filter>UnitTests\Tests</Filter>
     </ClCompile>
@@ -263,12 +239,6 @@
     <ClCompile Include="UT_Range.cpp">
       <Filter>UnitTests\Tests</Filter>
     </ClCompile>
-    <ClCompile Include="UT_CommandSystem.cpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="CmdUnitTest.cpp">
-      <Filter>CommandSystem\Commands</Filter>
-    </ClCompile>
     <ClCompile Include="ProtectedByteContainer.cpp">
       <Filter>Cryptography</Filter>
     </ClCompile>
@@ -281,20 +251,11 @@
     <ClCompile Include="Username.cpp">
       <Filter>UserSystem</Filter>
     </ClCompile>
-    <ClCompile Include="CmdError.cpp">
-      <Filter>CommandSystem\Commands</Filter>
-    </ClCompile>
     <ClCompile Include="DatabaseIntegrityPatcher.cpp">
       <Filter>DatabaseAbstractionLayer</Filter>
     </ClCompile>
     <ClCompile Include="StringExtensions.cpp">
       <Filter>TypeUtils</Filter>
-    </ClCompile>
-    <ClCompile Include="ApoapseMetadata.cpp">
-      <Filter>ApoapseSystems</Filter>
-    </ClCompile>
-    <ClCompile Include="FieldValidator.cpp">
-      <Filter>CommandSystem</Filter>
     </ClCompile>
     <ClCompile Include="CommandsManagerV2.cpp">
       <Filter>CommandSystem</Filter>
@@ -369,9 +330,6 @@
     </Filter>
     <Filter Include="DatabaseAbstractionLayer">
       <UniqueIdentifier>{c218d407-5201-4351-8c72-7a03c70be57b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommandSystem\Commands">
-      <UniqueIdentifier>{c5a3f0d5-3d91-4e71-854f-1c35fdadac45}</UniqueIdentifier>
     </Filter>
     <Filter Include="Cryptography">
       <UniqueIdentifier>{a6b3fcec-a6d1-482f-82f6-149aad456fd0}</UniqueIdentifier>
