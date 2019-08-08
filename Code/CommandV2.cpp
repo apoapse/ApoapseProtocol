@@ -62,6 +62,27 @@ bool CommandV2::IsValid(const IUser* user) const
 		return false;
 	}
 
+	if (requireAuthentication && !user)
+	{
+		LOG << LogSeverity::warning << "Command " << name << ": this command require the user to be authenticated";
+		return false;
+	}
+
+	if (global->isServer)
+	{
+		if (onlyTemporaryAuth && user && !user->IsUsingTemporaryPassword())
+		{
+			LOG << LogSeverity::warning << "Command " << name << ": this command require the user to be authenticated but with a temporary password";
+			return false;
+		}
+
+		if (requireAuthentication && !onlyTemporaryAuth && user->IsUsingTemporaryPassword())
+		{
+			LOG << LogSeverity::warning << "Command " << name << ": this command require the user to be authenticated without a temporary password";
+			return false;
+		}
+	}
+
 	if (global->isServer && !requiredPermissions.empty())
 	{
 		for (const auto& permission : requiredPermissions)

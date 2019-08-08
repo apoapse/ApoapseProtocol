@@ -32,6 +32,7 @@ public:
 	void RegisterUsergroup(Usergroup& usergroup);
 	const Usergroup& GetUsergroup(const Uuid& uuid) const;
 	const Usergroup& GetUsergroup(const std::string& name) const;
+	const std::vector<Usergroup>& GetUsergroups() const;
 
 	void CreateUsergroup(const Uuid& uuid, const std::string& name, const std::string& permissions);
 };

@@ -20,6 +20,7 @@ CommandsManagerV2::CommandsManagerV2(const std::string& cmdSchemeJson)
 		cmd.relatedDataStructure = dser.ReadFieldValue<std::string>("datastructure").value();
 		cmd.requireAuthentication = dser.ReadFieldValue<bool>("require_authentication").value();
 		cmd.onlyNonAuthenticated = dser.ReadFieldValue<bool>("only_non_authenticated").value_or(false);
+		cmd.onlyTemporaryAuth = dser.ReadFieldValue<bool>("only_temporary_auth").value_or(false);
 		cmd.clientUIPropagate = dser.ReadFieldValue<bool>("client_ui.propagate").value_or(false);
 		cmd.clientUISignalName = dser.ReadFieldValue<std::string>("client_ui.signal_name").value_or(std::string());
 		cmd.operationRegister = dser.ReadFieldValue<bool>("operation.register").value_or(false);

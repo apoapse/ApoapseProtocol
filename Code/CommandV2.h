@@ -25,6 +25,7 @@ public:
 
 	bool requireAuthentication = true;
 	bool onlyNonAuthenticated = false;
+	bool onlyTemporaryAuth = false;
 	std::vector<std::string> requiredPermissions = {};
 
 	bool clientUIPropagate = false;

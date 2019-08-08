@@ -498,6 +498,43 @@ static std::string GetDataStructures()
 				}
 			]
 		},
+			{
+			"name": "add_user",
+			"fields": [
+				{
+					"name": "username",
+					"type": "username",
+					"required": true,
+					"unique": true,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				},
+				{
+					"name": "temp_password",
+					"type": "sha256",
+					"required": true,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				},
+				{
+					"name": "usergroup",
+					"type": "uuid",
+					"required": true,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true,
+						"client_ui": false
+					}
+				}				
+			]
+		},
 		{
 			"name": "usergroup",
 			"fields": [
@@ -565,16 +602,6 @@ static std::string GetDataStructures()
 					}
 				},
 				{
-					"name": "requirePasswordChange",
-					"type": "bool",
-					"required": false,
-					"uses":	{
-						"server_storage": false,
-						"client_storage": false,
-						"command": true
-					}
-				},
-				{
 					"name": "usergroups",
 					"type": "usergroup",
 					"required": false,
@@ -605,6 +632,31 @@ static std::string GetDataStructures()
 						"client_storage": false,
 						"command": true,
 						"client_ui": false
+					}
+				}
+			]
+		},
+		{
+			"name": "set_identity",
+			"fields": [
+				{
+					"name": "password",
+					"type": "sha256",
+					"required": true,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				},
+				{
+					"name": "nickname",
+					"type": "text",
+					"required": true,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
 					}
 				}
 			]

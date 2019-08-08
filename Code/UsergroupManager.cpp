@@ -96,6 +96,11 @@ const Usergroup& UsergroupManager::GetUsergroup(const std::string& name) const
 	return *res;
 }
 
+const std::vector<Usergroup>& UsergroupManager::GetUsergroups() const
+{
+	return m_registeredUsergroups;
+}
+
 void UsergroupManager::CreateUsergroup(const Uuid& uuid, const std::string& name, const std::string& permissions)
 {
 	auto dat = global->apoapseData->GetStructure("usergroup");

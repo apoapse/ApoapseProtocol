@@ -160,7 +160,7 @@ static std::string GetCommandDef()
 		{
 			"name": "add_user",
 			"name_short": "au",
-			"datastructure": "tag",
+			"datastructure": "add_user",
 			"require_authentication": true,
 			"required_permissions": "CREATE_USER",
 			"save_on_receive": false,
@@ -175,6 +175,18 @@ static std::string GetCommandDef()
 			"propagation": {
 				"propagate": false,
 				"exclude_self": false
+			}
+		},
+		{
+			"name": "set_identity",
+			"name_short": "fp",
+			"datastructure": "set_identity",
+			"require_authentication": true,
+			"only_temporary_auth": true,
+			"save_on_receive": false,
+			"reception": {
+				"server": true,
+				"client": false
 			}
 		}
 	]
