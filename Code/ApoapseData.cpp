@@ -166,17 +166,17 @@ const DataStructureDef& ApoapseData::GetStructure(const std::string& name) const
 	return *res;
 }
 
-const CustomFieldType& ApoapseData::GetCustomTypeInfo(const std::string& name) const
+const CustomFieldType* ApoapseData::GetCustomTypeInfo(const std::string& name) const
 {
 	auto& res = std::find_if(m_customTypes.begin(), m_customTypes.end(), [&name](const CustomFieldType& fieldType)
-		{
-			return (fieldType.name == name);
-		});
+	{
+		return (fieldType.name == name);
+	});
 
 	if (res == m_customTypes.end())
-		throw std::exception("The requested custom filed type do not exist");
+		return nullptr;
 
-	return *res;
+	return &*res;
 }
 
 bool ApoapseData::DataStructureExist(const std::string& name) const
@@ -287,7 +287,7 @@ DataFieldType ApoapseData::GetTypeByTypeName(const std::string& typeStr, bool* i
 		if (DataStructureExist(typeStr))
 			return DataFieldType::data_array;
 		else
-			return GetCustomTypeInfo(typeStr).underlyingType;
+			return GetCustomTypeInfo(typeStr)->underlyingType;
 	}
 }
 

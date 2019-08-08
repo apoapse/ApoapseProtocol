@@ -25,7 +25,7 @@ public:
 	ApoapseData(const std::string& dataSchemeJson);
 	const std::vector<DataStructureDef>& GetRegisteredStructures() const;
 	const DataStructureDef& GetStructure(const std::string& name) const;	// Return a data structure object with definitions but no data 
-	const CustomFieldType& GetCustomTypeInfo(const std::string& name) const;
+	const CustomFieldType* GetCustomTypeInfo(const std::string& name) const;
 	bool DataStructureExist(const std::string& name) const;
 
 	DataStructure FromNetwork(const CommandV2& cmd, std::shared_ptr<NetworkPayload> payload);

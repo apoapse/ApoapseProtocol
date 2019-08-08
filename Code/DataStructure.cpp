@@ -211,11 +211,11 @@ void DataStructure::AutoFillFieldsIfRequested()
 	{
 		if (field.customType.has_value() && !field.HasValue())
 		{
-			const auto typeDef = global->apoapseData->GetCustomTypeInfo(field.customType.value());
+			const auto* typeDef = global->apoapseData->GetCustomTypeInfo(field.customType.value());
 
-			if (typeDef.autoFill)
+			if (typeDef && typeDef->autoFill)
 			{
-				CustomDataType::AutoFill(typeDef, field);
+				CustomDataType::AutoFill(*typeDef, field);
 				LOG_DEBUG << "Field " << field.name << " of data structure " << name << " has been auto filled";
 			}
 		}
@@ -248,7 +248,7 @@ bool DataField::Validate() const
 
 	if (customType.has_value() && basicType != DataFieldType::data_array)
 	{
-		const auto typeDef = global->apoapseData->GetCustomTypeInfo(customType.value());
+		const auto typeDef = *global->apoapseData->GetCustomTypeInfo(customType.value());
 
 		// Validate ranges
 		if (typeDef.minLength != -1 || typeDef.maxLength != -1)

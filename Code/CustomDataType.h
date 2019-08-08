@@ -12,6 +12,8 @@ namespace DateTimeUtils
 
 struct ICustomDataType
 {
+	virtual ~ICustomDataType() = default;
+
 	virtual std::vector<byte> GetBytes() const
 	{
 		throw std::exception("ICustomDataType members should not be called directly");
