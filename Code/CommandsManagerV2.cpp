@@ -108,6 +108,9 @@ void CommandsManagerV2::OnReceivedCmdInternal(CommandV2& cmd, GenericConnection&
 		if (cmd.operationRegister)
 			ApoapseOperation::RegisterOperation(cmd, connection.GetConnectedUser());
 
+		// Cmd post process
+		OnReceivedCommandPost(cmd, connection);
+
 		//if (global->isServer && cmd.propagateToOtherClients)
 		//	cmd.Send(*connection.server.usersManager, &netConnection);
 	}
