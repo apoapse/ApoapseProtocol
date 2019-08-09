@@ -510,7 +510,48 @@ static std::string GetDataStructures()
 				}
 			]
 		},
-			{
+		{
+			"name": "mark_as_read",
+			"fields": [
+				{
+					"name": "uuid",
+					"type": "uuid",
+					"required": true,
+					"unique": true,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": false,
+						"command": true
+					}
+				},
+				{
+					"name": "item_type",
+					"type": "text",
+					"required": true,
+					"unique": false,
+					"read_permission": "self",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": false,
+						"command": true
+					}
+				},
+				{
+					"name": "item_uuid",
+					"type": "uuid",
+					"required": true,
+					"unique": false,
+					"read_permission": "self",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": false,
+						"command": true
+					}
+				}
+			]
+		},
+		{
 			"name": "add_user",
 			"fields": [
 				{
