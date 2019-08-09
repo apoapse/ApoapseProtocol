@@ -33,7 +33,9 @@ public:
 
 	bool receiveOnClient = false;
 	bool receiveOnServer = false;
-	bool saveOnReceive = false;
+
+	bool saveOnReceiveServer = false;
+	bool saveOnReceiveClient = false;
 
 	bool propagate = false;
 	bool excludeSelfPropagation = false;

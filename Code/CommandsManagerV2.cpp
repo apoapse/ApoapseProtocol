@@ -25,7 +25,8 @@ CommandsManagerV2::CommandsManagerV2(const std::string& cmdSchemeJson)
 		cmd.clientUISignalName = dser.ReadFieldValue<std::string>("client_ui.signal_name").value_or(std::string());
 		cmd.operationRegister = dser.ReadFieldValue<bool>("operation.register").value_or(false);
 		cmd.operationOwnership = CommandV2::ConvertFieldToOwnership(dser.ReadFieldValue<std::string>("operation.ownership").value_or(""));
-		cmd.saveOnReceive = dser.ReadFieldValue<bool>("save_on_receive").value_or(false);
+		cmd.saveOnReceiveServer = dser.ReadFieldValue<bool>("save_on_receive.server").value_or(false);
+		cmd.saveOnReceiveClient = dser.ReadFieldValue<bool>("save_on_receive.client").value_or(false);
 		cmd.receiveOnClient = dser.ReadFieldValue<bool>("reception.client").value_or(false);
 		cmd.receiveOnServer = dser.ReadFieldValue<bool>("reception.server").value_or(false);
 		cmd.propagate = dser.ReadFieldValue<bool>("propagation.propagate").value_or(false);
@@ -90,7 +91,7 @@ void CommandsManagerV2::OnReceivedCmdInternal(CommandV2& cmd, GenericConnection&
 	if (OnReceivedCommandPre(cmd, connection))
 	{
 		// Cmd auto-save
-		if (cmd.saveOnReceive)
+		if ((global->isServer && cmd.saveOnReceiveServer) || (global->isClient && cmd.saveOnReceiveClient))
 			cmd.GetData().SaveToDatabase();
 
 		// Cmd process

@@ -55,7 +55,6 @@ static std::string GetCommandDef()
 			"name_short": "rs",
 			"datastructure": "sync",
 			"require_authentication": true,
-			"save_on_receive": false,
 			"reception": {
 				"server": true,
 				"client": false
@@ -71,7 +70,10 @@ static std::string GetCommandDef()
 			"datastructure": "user",
 			"require_authentication": true,
 			"only_non_authenticated": false,
-			"save_on_receive": true,
+			"save_on_receive": {
+				"server": true,
+				"client": true
+			},
 			"reception": {
 				"server": false,
 				"client": true
@@ -86,7 +88,10 @@ static std::string GetCommandDef()
 			"name_short": "cr",
 			"datastructure": "room",
 			"require_authentication": true,
-			"save_on_receive": true,
+			"save_on_receive": {
+				"server": true,
+				"client": true
+			},
 			"reception": {
 				"server": true,
 				"client": true
@@ -105,7 +110,10 @@ static std::string GetCommandDef()
 			"name_short": "ct",
 			"datastructure": "thread",
 			"require_authentication": true,
-			"save_on_receive": true,
+			"save_on_receive": {
+				"server": true,
+				"client": true
+			},
 			"reception": {
 				"server": true,
 				"client": true
@@ -124,7 +132,10 @@ static std::string GetCommandDef()
 			"name_short": "cm",
 			"datastructure": "message",
 			"require_authentication": true,
-			"save_on_receive": true,
+			"save_on_receive": {
+				"server": true,
+				"client": true
+			},
 			"reception": {
 				"server": true,
 				"client": true
@@ -143,7 +154,10 @@ static std::string GetCommandDef()
 			"name_short": "at",
 			"datastructure": "tag",
 			"require_authentication": true,
-			"save_on_receive": true,
+			"save_on_receive": {
+				"server": true,
+				"client": true
+			},
 			"reception": {
 				"server": true,
 				"client": true
@@ -163,7 +177,6 @@ static std::string GetCommandDef()
 			"datastructure": "add_user",
 			"require_authentication": true,
 			"required_permissions": "CREATE_USER",
-			"save_on_receive": false,
 			"reception": {
 				"server": true,
 				"client": false
@@ -183,10 +196,31 @@ static std::string GetCommandDef()
 			"datastructure": "set_identity",
 			"require_authentication": true,
 			"only_temporary_auth": true,
-			"save_on_receive": false,
 			"reception": {
 				"server": true,
 				"client": false
+			}
+		},
+		{
+			"name": "mark_as_read",
+			"name_short": "mr",
+			"datastructure": "mark_as_read",
+			"require_authentication": true,
+			"save_on_receive": {
+				"server": true,
+				"client": false
+			},
+			"reception": {
+				"server": true,
+				"client": true
+			},
+			"operation": {
+				"register": true,
+				"ownership": "self"
+			},
+			"propagation": {
+				"propagate": true,
+				"exclude_self": false
 			}
 		}
 	]
