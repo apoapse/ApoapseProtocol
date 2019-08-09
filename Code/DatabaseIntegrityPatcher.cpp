@@ -87,14 +87,17 @@ DatabaseIntegrityPatcher::DatabaseIntegrityPatcher()
 
 		for (const auto& field : dataStructure.fields)
 		{
-			DbField dbField;
-			dbField.name = field.name;
-			dbField.canBeNull = !field.isRequired;
-			dbField.unique = field.isDataUnique;
-			dbField.primary = false;
-			dbField.type = field.ConvertFieldTypeToSqlType();
+			if (ApoapseData::AllowDatabaseStorage(field))
+			{
+				DbField dbField;
+				dbField.name = field.name;
+				dbField.canBeNull = !field.isRequired;
+				dbField.unique = field.isDataUnique;
+				dbField.primary = false;
+				dbField.type = field.ConvertFieldTypeToSqlType();
 
-			table.fields.push_back(dbField);
+				table.fields.push_back(dbField);
+			}
 		}
 
 		m_SqlTables.push_back(table);

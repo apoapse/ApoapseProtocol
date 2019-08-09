@@ -328,9 +328,9 @@ DataStructure ApoapseData::ReadFromDbResult(DataStructureDef& dataStructDef, con
 
 			else if (field.basicType == DataFieldType::text)
 				field.value = row[dbValueId].GetText();
-		}
 
-		dbValueId++;
+			dbValueId++;
+		}
 	}
 
 	return data;

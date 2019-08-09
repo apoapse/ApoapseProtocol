@@ -442,6 +442,18 @@ static std::string GetDataStructures()
 						"client_storage": true,
 						"command": true
 					}
+				},
+				{
+					"name": "is_read",
+					"type": "bool",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": false,
+						"client_storage": true,
+						"command": false
+					}
 				}
 			]
 		},
