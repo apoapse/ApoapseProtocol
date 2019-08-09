@@ -309,25 +309,29 @@ ReadPermission ApoapseData::GetPermissionByName(const std::string& name)
 DataStructure ApoapseData::ReadFromDbResult(DataStructureDef& dataStructDef, const SQLRow& row)
 {
 	DataStructure data = dataStructDef;
+	int dbValueId = 0;
 
 	data.SetDbId(row[0].GetInt64());
+	dbValueId++;	// We set it to 1 to skip the id db field which is added by default
 
-	int dbValueId = 1;	// We start at id 1 to skip the id db field which is added by default 
 	for (auto& field : data.fields)
 	{
-		if (AllowDatabaseStorage(field) && row[dbValueId].GetType() != SqlValueType::UNSUPPORTED)
+		if (AllowDatabaseStorage(field))
 		{
-			if (field.basicType == DataFieldType::boolean)
-				field.value = row[dbValueId].GetBoolean();
+			if (row[dbValueId].GetType() != SqlValueType::UNSUPPORTED)
+			{
+				if (field.basicType == DataFieldType::boolean)
+					field.value = row[dbValueId].GetBoolean();
 
-			else if (field.basicType == DataFieldType::byte_blob)
-				field.value = row[dbValueId].GetByteArray();
+				else if (field.basicType == DataFieldType::byte_blob)
+					field.value = row[dbValueId].GetByteArray();
 
-			else if (field.basicType == DataFieldType::integer)
-				field.value = row[dbValueId].GetInt64();
+				else if (field.basicType == DataFieldType::integer)
+					field.value = row[dbValueId].GetInt64();
 
-			else if (field.basicType == DataFieldType::text)
-				field.value = row[dbValueId].GetText();
+				else if (field.basicType == DataFieldType::text)
+					field.value = row[dbValueId].GetText();
+			}
 
 			dbValueId++;
 		}
