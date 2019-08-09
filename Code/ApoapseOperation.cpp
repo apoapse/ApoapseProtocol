@@ -26,7 +26,7 @@ void ApoapseOperation::RegisterOperation(CommandV2& cmd, const std::optional<Use
 	{
 		opData.GetField("ownership").SetValue((Int64)cmd.operationOwnership);
 
-		if (sender.has_value() && cmd.operationOwnership == OperationOwnership::self || cmd.operationOwnership == OperationOwnership::usergroup)
+		if (sender.has_value() && (cmd.operationOwnership == OperationOwnership::self || cmd.operationOwnership == OperationOwnership::usergroup))
 		{
 			opData.GetField("related_user").SetValue(sender.value());
 		}
@@ -72,7 +72,7 @@ void ApoapseOperation::ExecuteSyncRequest(Int64 sinceTimestamp, GenericConnectio
 	SQLQuery query(*global->database);
 	query << SELECT << ALL << FROM << "operations" << WHERE << "time" << GREATER_THAN << sinceTimestamp << AND << "(" << "ownership" << EQUALS << (Int64)OperationOwnership::all << OR << "related_user" << EQUALS << destination.GetConnectedUser().value().GetBytes() << ")";
 	auto res = query.Exec();
-	auto operationStruct = global->apoapseData->GetStructure("operation");
+	DataStructureDef operationStruct = global->apoapseData->GetStructure("operation");
 
 	UInt64 syncedItems = 0;
 	for (const auto& sqlRow : res)
@@ -81,7 +81,7 @@ void ApoapseOperation::ExecuteSyncRequest(Int64 sinceTimestamp, GenericConnectio
 		const std::string cmdName = opData.GetField("name").GetValue<std::string>();
 		const std::string dataStructName = global->cmdManager->GetCmdDefByFullName(cmdName).relatedDataStructure;
 
-		auto itemData = global->apoapseData->ReadItemFromDatabase(dataStructName, "id", opData.GetField("item").GetValue<Int64>());
+		DataStructure itemData = global->apoapseData->ReadItemFromDatabase(dataStructName, "id", opData.GetField("item").GetValue<Int64>());
 
 		AddOperationFields(itemData);
 		itemData.GetField("operation_uuid").SetValue(opData.GetField("uuid").GetValue<Uuid>());
