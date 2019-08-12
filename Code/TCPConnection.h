@@ -23,8 +23,10 @@ class TCPConnection : public std::enable_shared_from_this<TCPConnection>, public
 		client,
 	};
 
-private:
+protected:
 	std::unique_ptr<SSLSocket> m_socket;
+
+private:
 	std::atomic<bool> m_isConnected = { false };
 	//boost::asio::io_service::strand m_writeStrand;
 

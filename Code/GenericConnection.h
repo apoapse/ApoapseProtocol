@@ -4,7 +4,8 @@
 #include "Range.hpp"
 #include <memory>
 #include <chrono>
-#include "CommandV2.h"
+#include "Username.h"
+class CommandV2;
 class NetworkPayload;
 
 class GenericConnection : public TCPConnection
