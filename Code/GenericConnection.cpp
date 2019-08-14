@@ -38,8 +38,10 @@ void GenericConnection::ProcessHeader(Range<std::array<byte, READ_BUFFER_SIZE>>&
 
 void GenericConnection::ProcessDataGeneric(Range<std::array<byte, READ_BUFFER_SIZE>>& range, std::shared_ptr<NetworkPayload> payload, size_t bytesTransferred)
 {
+#ifndef DEBUG
 	try
 	{
+#endif // !DEBUG
 		if (range.size() > 0)
 			payload->Insert(range, bytesTransferred);
 
@@ -63,12 +65,12 @@ void GenericConnection::ProcessDataGeneric(Range<std::array<byte, READ_BUFFER_SI
 		}
 		else
 			ReadPayloadData(std::move(payload));
-	}
+
+#ifndef DEBUG
 	catch (const std::length_error&)
 	{
 		SecurityLog::LogAlert(ApoapseErrorCode::network_message_too_long, *this);
 	}
-#ifndef DEBUG
 	catch (const std::exception& e)
 	{
 		LOG << e << LogSeverity::error;
