@@ -7,18 +7,24 @@
 #include "Uuid.h"
 #include "GenericConnection.h"
 
-void ApoapseOperation::RegisterOperation(CommandV2& cmd, const std::optional<Username>& sender)
+void ApoapseOperation::RegisterOperation(CommandV2& cmd, const std::optional<Username>& sender, bool generateUuid /*= false*/)
 {
 	const std::string opName = cmd.name;
+	std::optional<Uuid> operationUuid = (cmd.GetData().FieldExist("operation_uuid") ? cmd.GetData().GetField("operation_uuid").GetValue<Uuid>() : std::optional<Uuid>());
 
-	if (!cmd.GetData().FieldExist("operation_uuid"))
+	if (generateUuid)
+	{
+		operationUuid = Uuid::Generate();
+	}
+	
+	if (!operationUuid.has_value())
 	{
 		PrepareCmdSend(cmd);
 		LOG_DEBUG << "The command " << cmd.name << " do not have an operation uuid. It has been added. Make sure RegisterOperation is called before sending.";
 	}
 
 	auto opData = global->apoapseData->GetStructure("operation");
-	opData.GetField("uuid").SetValue(cmd.GetData().GetField("operation_uuid").GetValue<Uuid>());
+	opData.GetField("uuid").SetValue(operationUuid.value());
 	opData.GetField("name").SetValue(opName);
 	opData.GetField("time").SetValue(DateTimeUtils::UnixTimestampNow());
 

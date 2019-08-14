@@ -398,7 +398,19 @@ static std::string GetDataStructures()
 				{
 					"name": "parent_thread",
 					"type": "uuid",
-					"required": true,
+					"required": false,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "direct_recipient",
+					"type": "username",
+					"required": false,
 					"unique": false,
 					"read_permission": "all",
 					"uses":	{

@@ -150,6 +150,28 @@ static std::string GetCommandDef()
 			}
 		},
 		{
+			"name": "direct_message",
+			"name_short": "dm",
+			"datastructure": "message",
+			"require_authentication": true,
+			"save_on_receive": {
+				"server": true,
+				"client": true
+			},
+			"reception": {
+				"server": true,
+				"client": true
+			},
+			"operation": {
+				"register": true,
+				"ownership": "self"
+			},
+			"propagation": {
+				"propagate": true,
+				"exclude_self": false
+			}
+		},
+		{
 			"name": "add_tag",
 			"name_short": "at",
 			"datastructure": "tag",

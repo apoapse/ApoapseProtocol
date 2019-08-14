@@ -118,7 +118,9 @@ void CommandV2::Send(INetworkSender& destination, TCPConnection* excludedConnect
 	auto bytes = std::vector<byte>(NetworkPayload::headerLength + msgPackBytes.size());
 
 	std::copy(msgPackBytes.begin(), msgPackBytes.end(), bytes.begin() + NetworkPayload::headerLength);
-
+	
+	LOG_DEBUG << "Sending command " << name;
+	
 	auto payload = std::make_shared<NetworkPayload>(nameShort, std::move(bytes));
 	destination.Send(payload, excludedConnection);
 }
