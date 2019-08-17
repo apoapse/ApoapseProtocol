@@ -642,6 +642,52 @@ static std::string GetDataStructures()
 			]
 		},
 		{
+			"name": "connected_user",
+			"fields": [
+				{
+					"name": "user",
+					"type": "username",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				}
+			]
+		},
+		{
+			"name": "user_status",
+			"fields": [
+				{
+					"name": "user",
+					"type": "username",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				},
+				{
+					"name": "status",
+					"type": "integer",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				}
+			]
+		},
+		{
 			"name": "server_info",
 			"fields": [
 				{
@@ -674,7 +720,18 @@ static std::string GetDataStructures()
 						"server_storage": false,
 						"client_storage": false,
 						"command": true,
-						"client_ui": true
+						"client_ui": false
+					}
+				},
+				{
+					"name": "connected_users",
+					"type": "connected_user",
+					"required": false,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true,
+						"client_ui": false
 					}
 				},
 				{

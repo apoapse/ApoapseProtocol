@@ -244,6 +244,28 @@ static std::string GetCommandDef()
 				"propagate": true,
 				"exclude_self": false
 			}
+		},
+		{
+			"name": "change_user_status",
+			"name_short": "us",
+			"datastructure": "user_status",
+			"require_authentication": true,
+			"save_on_receive": {
+				"server": false,
+				"client": false
+			},
+			"reception": {
+				"server": false,
+				"client": true
+			},
+			"operation": {
+				"register": false,
+				"ownership": "self"
+			},
+			"propagation": {
+				"propagate": false,
+				"exclude_self": false
+			}
 		}
 	]
 }
