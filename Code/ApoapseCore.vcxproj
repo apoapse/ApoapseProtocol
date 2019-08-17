@@ -153,6 +153,7 @@
     <ClCompile Include="ProtectedByteContainer.cpp" />
     <ClCompile Include="SecurityAlert.cpp" />
     <ClCompile Include="StringExtensions.cpp" />
+    <ClCompile Include="ThreadUtils.cpp" />
     <ClCompile Include="UsergroupManager.cpp" />
     <ClCompile Include="Username.cpp" />
     <ClCompile Include="UT_Cryptography.cpp" />
@@ -217,6 +218,7 @@
     <ClInclude Include="TCPConnection.h" />
     <ClInclude Include="TCPServer.h" />
     <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="ThreadUtils.h" />
     <ClInclude Include="TypeDefs.hpp" />
     <ClInclude Include="MessagePack.hpp" />
     <ClInclude Include="UnitTest.hpp" />

@@ -178,6 +178,9 @@
     <ClInclude Include="FileStreamConnection.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
+    <ClInclude Include="ThreadUtils.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -283,6 +286,9 @@
     </ClCompile>
     <ClCompile Include="FileStreamConnection.cpp">
       <Filter>Network\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadUtils.cpp">
+      <Filter>Threading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

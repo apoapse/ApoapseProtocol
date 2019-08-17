@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ThreadPool.h"
 #include "Common.h"
+#include "ThreadUtils.h"
 
 ThreadPool::ThreadPool(const std::string& threadPoolName, UInt32 nbThreads)
 	: m_threadPoolName(threadPoolName)
@@ -9,7 +10,11 @@ ThreadPool::ThreadPool(const std::string& threadPoolName, UInt32 nbThreads)
 {
 	for (UInt32 i = 0; i < nbThreads; i++)
 	{
-		std::thread thread([this] { this->Consume(); });
+		std::thread thread([this, &threadPoolName]
+		{
+			ThreadUtils::NameThread(threadPoolName);
+			this->Consume();
+		});
 		thread.detach();
 
 		m_workerThreads.push_back(std::move(thread));
