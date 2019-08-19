@@ -6,6 +6,11 @@
 #include "ApoapseOperation.h"
 #include "UsergroupManager.h"
 
+CommandV2::~CommandV2()
+{
+	//LOG_DEBUG << "~CommandV2";
+}
+
 CommandV2::CommandV2(DataStructure& data) : m_data(data)
 {
 }

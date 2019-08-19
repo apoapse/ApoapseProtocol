@@ -29,7 +29,7 @@ const SQLPackagedResult SQLQuery::Exec()
 
 std::future<SQLPackagedResult> SQLQuery::ExecAsync()
 {
-	return global->threadPool->PushTask([this]
+	return global->threadPool->PushTaskFuture([this]
 	{
 		return Exec();
 	});

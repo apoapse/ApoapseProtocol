@@ -17,6 +17,7 @@ struct Global
 	bool isClient = false;
 
 	std::unique_ptr<ThreadPool> threadPool;
+	std::unique_ptr<ThreadPool> mainThread;
 	std::unique_ptr<Logger> logger;
 	IDatabase* database = nullptr;
 	std::unique_ptr<ApoapseData> apoapseData;

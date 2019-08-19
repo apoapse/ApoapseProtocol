@@ -137,6 +137,8 @@ class DataStructure
 	std::optional<DbId> dbId;
 
 public:
+	DataStructure() = default;
+	
 	std::string name;
 	std::vector<DataField> fields;
 	bool isValid = true;

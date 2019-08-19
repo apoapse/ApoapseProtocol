@@ -31,7 +31,7 @@ void WINSetThreadName(DWORD dwThreadID, const char* threadName) {
 }
 #endif
 
-void ThreadUtils::NameThread(const std::string& name)
+void ThreadUtils::NameThread(std::string name)
 {
 	#ifdef _WIN32
 	WINSetThreadName(GetCurrentThreadId(), name.c_str());

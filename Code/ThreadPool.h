@@ -12,6 +12,7 @@ class ThreadPool
 {
 	struct ITask
 	{
+		virtual ~ITask() = default;
 		virtual void Execute() = 0;
 	};
 
@@ -24,6 +25,19 @@ class ThreadPool
 		{
 		}
 
+		void Execute() override
+		{
+			task();
+		}
+	};
+
+	struct SimpleTask : public ITask
+	{
+		const std::function<void()> task;
+
+		SimpleTask(const std::function<void()>& func) : task(func)
+		{}
+		
 		void Execute() override
 		{
 			task();
@@ -44,7 +58,7 @@ public:
 	// Parameter: const string & threadPoolName - Name of the object, useful for debugging
 	// Parameter: UInt32 nbThreads - Number of worker threads
 	//************************************
-	ThreadPool(const std::string& threadPoolName, UInt32 nbThreads);
+	ThreadPool(const std::string& threadPoolName, UInt32 nbThreads, bool autoRun);
 	virtual ~ThreadPool();
 
 	//************************************
@@ -53,9 +67,9 @@ public:
 	// WARNING:   For the return class, std::promise need a default constructor and an copy assignement operator
 	//************************************
 	template<typename T>
-	std::future<typename std::result_of<T()>::type> PushTask(T func)
+	std::future<typename std::result_of<T()>::type> PushTaskFuture(T func)
 	{
-		using TypeResult = std::result_of<T()>::type;
+		using TypeResult = typename std::result_of<T()>::type;
 		static_assert((!std::is_object<TypeResult>::value || std::is_default_constructible<TypeResult>::value/* && std::is_trivially_assignable<TypeResult, TypeResult>::value*/), "The type provided need to have a default constructor and trivial assignment operator");
 
 		auto* task = new Task<TypeResult>(std::move(func));
@@ -67,11 +81,17 @@ public:
 		return response;
 	}
 
+	void PushTask(const std::function<void()>& func)
+	{
+		auto* task = new SimpleTask(func);
+		while (!m_workQueue.push(std::move(task)));
+		OnAddedTask();
+	}
+	
 	Int64 GetTasksInQueueCount() const;
 	std::string GetThreadPoolName() const;
 
-protected:
-	void Consume();
+	void Run();
 
 private:
 	void OnAddedTask();

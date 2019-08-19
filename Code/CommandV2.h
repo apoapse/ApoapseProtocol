@@ -17,8 +17,9 @@ class CommandV2
 
 public:
 	CommandV2() = default;
+	~CommandV2();
 	CommandV2(DataStructure& data);
-
+	
 	std::string name;
 	std::string nameShort;
 	std::string relatedDataStructure;

@@ -3,24 +3,36 @@
 #include "Common.h"
 #include "ThreadUtils.h"
 
-ThreadPool::ThreadPool(const std::string& threadPoolName, UInt32 nbThreads)
+ThreadPool::ThreadPool(const std::string& threadPoolName, UInt32 nbThreads, bool autoRun)
 	: m_threadPoolName(threadPoolName)
 	, m_queueCapacity(INITIAL_QUEUE_CAPACITY)
 	, m_tasksInQueueCounter(0)
 {
-	for (UInt32 i = 0; i < nbThreads; i++)
+	if (autoRun)
 	{
-		std::thread thread([this, &threadPoolName]
+		for (UInt32 i = 0; i < nbThreads; i++)
 		{
-			ThreadUtils::NameThread(threadPoolName);
-			this->Consume();
-		});
-		thread.detach();
+			std::thread thread([this, &threadPoolName, i]
+			{
+				{
+					std::stringstream threadName;
+					threadName << threadPoolName << " #" << i + 1;
+					ThreadUtils::NameThread(threadName.str());
+				}
+				
+				this->Run();
+			});
+			thread.detach();
 
-		m_workerThreads.push_back(std::move(thread));
+			m_workerThreads.push_back(std::move(thread));
+		}
+
+		LOG << "Created the thread pool " << threadPoolName << " with " << nbThreads << " worker threads";
 	}
-
-	LOG << "Created the thread pool " << threadPoolName << " with " << nbThreads << " worker threads";
+	else
+	{
+		LOG << "Created the thread pool " << threadPoolName ;
+	}
 }
 
 ThreadPool::~ThreadPool()
@@ -41,14 +53,14 @@ void ThreadPool::OnAddedTask()
 
 	if (m_tasksInQueueCounter >= (Int64)(m_queueCapacity - 2))	// Margin of 2 items
 	{
-		Int64 newSize = m_queueCapacity * 2;
+		const Int64 newSize = m_queueCapacity * 2;
 
-		LOG << "Thread pool " << m_threadPoolName << ": queue close to be full, preventively resizing to " << newSize;
+		LOG << "Thread pool " << m_threadPoolName << ": queue close to be full, retentively resizing to " << newSize;
 		ResizeQueue(newSize);
 	}
 }
 
-void ThreadPool::Consume()
+void ThreadPool::Run()
 {
 	while (true)
 	{
@@ -74,7 +86,7 @@ void ThreadPool::Consume()
 
 void ThreadPool::ResizeQueue(size_t requestedQueueCapacity)
 {
-	ASSERT_MSG(requestedQueueCapacity >= INITIAL_QUEUE_CAPACITY, "JobManager: Requested queue capacity should not be lower than the default value of DEFAULT_QUEUE_CAPACITY");
+	ASSERT_MSG(requestedQueueCapacity >= INITIAL_QUEUE_CAPACITY, "Thread pool: Requested queue capacity should not be lower than the default value of DEFAULT_QUEUE_CAPACITY");
 
 	m_workQueue.reserve(requestedQueueCapacity);
 

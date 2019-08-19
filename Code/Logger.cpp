@@ -14,7 +14,7 @@ Logger::Logger(const std::string& logFile, bool asyncLogToFile /*= true*/)
 	m_asyncLogToFile(asyncLogToFile)
 {
 	if (m_asyncLogToFile)
-		m_localThreadPool = std::make_unique<ThreadPool>("Logger (" + m_logFile + ")", 1);
+		m_localThreadPool = std::make_unique<ThreadPool>("Logger (" + m_logFile + ")", 1, true);
 }
 
 void Logger::Log(const LogMessage& logMessage)
