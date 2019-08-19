@@ -18,10 +18,14 @@ struct Global
 
 	std::unique_ptr<ThreadPool> threadPool;
 	std::unique_ptr<ThreadPool> mainThread;
+	
 	std::unique_ptr<Logger> logger;
 	IDatabase* database = nullptr;
+	
 	std::unique_ptr<ApoapseData> apoapseData;
 	std::unique_ptr<ICommandManager> cmdManager;
+
+	std::unique_ptr<boost::asio::io_service> mainConnectionIOService;
 
 #ifdef APOAPSE_SERVER
 	class ServerSettings* settings = nullptr;

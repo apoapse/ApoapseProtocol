@@ -33,7 +33,28 @@ void WINSetThreadName(DWORD dwThreadID, const char* threadName) {
 
 void ThreadUtils::NameThread(std::string name)
 {
+	threadNames[std::this_thread::get_id()] = name;
+		
 	#ifdef _WIN32
 	WINSetThreadName(GetCurrentThreadId(), name.c_str());
 	#endif
+}
+
+std::string ThreadUtils::GetThreadName()
+{
+	auto currentThreadId = std::this_thread::get_id();
+
+	return GetThreadName(currentThreadId);
+}
+
+std::string ThreadUtils::GetThreadName(std::thread::id& threadId)
+{
+	std::stringstream ss;
+
+	if (threadNames.count(threadId))
+		ss << threadNames.at(threadId);
+	else
+		ss << threadId;
+	
+	return ss.str();
 }

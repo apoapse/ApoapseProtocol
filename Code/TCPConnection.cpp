@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Common.h"
 #include "TCPConnection.h"
+#include "ThreadUtils.h"
 
 TCPConnection::TCPConnection(boost::asio::io_service& io_service, ssl::context& context)
 	//, m_writeStrand(io_service)
@@ -172,12 +173,10 @@ std::string TCPConnection::GetEndpointStr() const
 void TCPConnection::InternalSend()
 {
 	const auto& item = m_sendQueue.front();
-
 	auto handler = boost::bind(&TCPConnection::HandleWriteAsync, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
 
 	if (std::holds_alternative<std::shared_ptr<NetworkPayload>>(item))
 	{	
-		//auto data = ;//TEMP ???
 		m_socket->async_write_some(boost::asio::buffer(std::get<std::shared_ptr<NetworkPayload>>(item)->GetRawData()), handler);
 		//boost::asio::async_write(GetSocket(), boost::asio::buffer(std::get<std::shared_ptr<NetworkPayload>>(item)->GetRawData()), handler);
 	}
@@ -222,7 +221,7 @@ void TCPConnection::HandleWriteAsync(const boost::system::error_code& error, siz
 
 		if (itemRealSize == bytesTransferred)
 		{
-			LOG << bytesTransferred << " bytes has been sent successfully to " << GetEndpoint() << LogSeverity::debug;
+			LOG_DEBUG << bytesTransferred << " bytes has been sent successfully to " << GetEndpoint() << " from thread " << ThreadUtils::GetThreadName();
 			OnSendingSuccessful(bytesTransferred);
 		}
 		else
@@ -233,7 +232,6 @@ void TCPConnection::HandleWriteAsync(const boost::system::error_code& error, siz
 	}
 	else
 		OnReceivedErrorInternal(error);
-
 
 	//if (!m_sendQueue.empty())
 		m_sendQueue.pop_front();
