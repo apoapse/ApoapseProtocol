@@ -48,7 +48,7 @@ public:
 protected:
 	virtual void OnFileDownloadCompleted() = 0;
 	virtual void ErrorDisconnectAll() = 0;
-	virtual void Authenticate(const Username& username, const hash_SHA256& authCode) = 0;
+	virtual void Authenticate(const Username&/* username*/, const hash_SHA256&/* authCode*/) { ASSERT(false); }
 	virtual std::string GetDownloadFilePath(UInt64 fileSize) = 0;
 	virtual void OnFileSentSuccessfully() = 0;
 	virtual void OnConnectedToServer() = 0;

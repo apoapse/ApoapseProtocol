@@ -702,6 +702,17 @@ static std::string GetDataStructures()
 					}
 				},
 				{
+					"name": "file_stream_auth_code",
+					"type": "blob",
+					"required": false,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true,
+						"client_ui": false
+					}
+				},
+				{
 					"name": "username",
 					"type": "username",
 					"required": true,

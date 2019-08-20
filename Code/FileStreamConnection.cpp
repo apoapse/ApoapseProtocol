@@ -10,7 +10,7 @@ FileStreamConnection::FileStreamConnection(io_context& ioService, ssl::context& 
 
 FileStreamConnection::~FileStreamConnection()
 {
-	LOG << "~FileStreamConnection";
+	LOG_DEBUG << "~FileStreamConnection";
 }
 
 bool FileStreamConnection::IsDownloadingFile() const
@@ -106,10 +106,10 @@ void FileStreamConnection::OnReceiveData(size_t bytesTransferred)
 {
 	if (global->isServer && !m_socketAuthenticated)
 	{
-		if (bytesTransferred == (FileReceive::headerLength + sha256Length + sha256Length))	// header + Username + auth code
+		if (bytesTransferred == (/*FileReceive::headerLength + */sha256Length + sha256Length))	// header + Username + auth code
 		{
 			Range range(m_readBuffer, bytesTransferred);
-			range.Consume(FileReceive::headerLength);
+			//range.Consume(FileReceive::headerLength);
 			
 			const Username username = Username(ByteContainer(range.begin(), range.begin() + sha256Length));
 			range.Consume(sha256Length);
@@ -125,6 +125,7 @@ void FileStreamConnection::OnReceiveData(size_t bytesTransferred)
 			ErrorDisconnectAll();
 		}
 
+		StartReading();
 		return;
 	}
 

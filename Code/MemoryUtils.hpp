@@ -20,6 +20,16 @@ inline std::array<T, SIZE> VectorToArray(const std::vector<T>& vector)
 	return output;
 }
 
+template <typename T, size_t SIZE>
+inline std::vector<T> ArrayToVector(const std::array<T, SIZE>& arr)
+{
+	std::vector<T> output;
+	output.reserve(SIZE);
+
+	std::copy(arr.begin(), arr.end(), std::back_inserter(output));
+	return output;
+}
+
 template <typename CLASS>
 class RawPtrOwner final
 {
