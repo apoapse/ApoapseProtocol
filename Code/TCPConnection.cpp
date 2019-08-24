@@ -93,7 +93,7 @@ void TCPConnection::HandleHandshake(const boost::system::error_code& error)
 		Close();
 	}
 
-	this->OnConnectedToServerInternal();
+	this->OnSocketConnectedInternal();
 	m_isConnected = true;
 }
 

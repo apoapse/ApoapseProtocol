@@ -192,6 +192,10 @@ bool ApoapseData::DataStructureExist(const std::string& name) const
 DataStructure ApoapseData::FromNetwork(const CommandV2& cmd, std::shared_ptr<NetworkPayload> payload)
 {
 	DataStructure data;
+
+	if (payload->headerInfo->payloadLength == 0)	// In case this is an empty command
+		return data;
+	
 	std::vector<byte> networkPayload;
 
 	{

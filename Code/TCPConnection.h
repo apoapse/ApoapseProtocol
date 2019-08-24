@@ -86,7 +86,7 @@ protected:
 		m_socket->async_read_some(boost::asio::buffer(buffer), handler);
 	}
 
-	virtual bool OnConnectedToServerInternal() = 0;
+	virtual bool OnSocketConnectedInternal() = 0;
 	virtual bool OnReceivedError(const boost::system::error_code& error) = 0;
 	virtual void OnSendingSuccessful(size_t bytesTransferred) = 0;
 };

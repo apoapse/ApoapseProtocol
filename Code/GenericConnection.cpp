@@ -11,7 +11,7 @@ GenericConnection::GenericConnection(boost::asio::io_service& ioService, ssl::co
 
 }
 
-bool GenericConnection::OnConnectedToServerInternal()
+bool GenericConnection::OnSocketConnectedInternal()
 {
 	StartReading();
 

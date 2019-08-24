@@ -34,31 +34,8 @@ static std::string GetDataStructures()
 
 	"data_structures": [
 		{
-			"name": "error",
-			"fields": [
-				{
-					"name": "error_code",
-					"type": "integer",
-					"required": true,
-					"unique": false,
-					"uses":	{
-						"server_storage": false,
-						"client_storage": false,
-						"command": true
-					}
-				},
-				{
-					"name": "related_item",
-					"type": "uuid",
-					"required": false,
-					"unique": false,
-					"uses":	{
-						"server_storage": false,
-						"client_storage": false,
-						"command": true
-					}
-				}
-			]
+			"name": "empty",
+			"fields": [	]
 		},
 		{
 			"name": "client_login",
@@ -523,6 +500,95 @@ static std::string GetDataStructures()
 			]
 		},
 		{
+			"name": "attachment",
+			"fields": [
+				{
+					"name": "uuid",
+					"type": "uuid",
+					"required": true,
+					"unique": true,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "name",
+					"type": "text",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "parent_thread",
+					"type": "uuid",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "file_size",
+					"type": "integer",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "sent_time",
+					"type": "datetime",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "sender",
+					"type": "username",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "is_read",
+					"type": "bool",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": false,
+						"client_storage": true,
+						"command": false
+					}
+				}
+			]
+		},
+		{
 			"name": "mark_as_read",
 			"fields": [
 				{
@@ -790,33 +856,6 @@ static std::string GetDataStructures()
 						"server_storage": false,
 						"client_storage": false,
 						"command": true
-					}
-				}
-			]
-		},
-		{
-			"name": "local_setting",
-			"fields": [
-				{
-					"name": "name",
-					"type": "text",
-					"required": true,
-					"unique": true,
-					"uses":	{
-						"server_storage": false,
-						"client_storage": true,
-						"command": false
-					}
-				},
-				{
-					"name": "value",
-					"type": "text",
-					"required": true,
-					"unique": false,
-					"uses":	{
-						"server_storage": false,
-						"client_storage": true,
-						"command": false
 					}
 				}
 			]

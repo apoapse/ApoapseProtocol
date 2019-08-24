@@ -1,7 +1,15 @@
 #pragma once
 #include "TCPConnection.h"
 #include <fstream>
+#include <deque>
 constexpr auto FILE_STREAM_READ_BUFFER_SIZE = 4096;
+
+struct AttachmentFile
+{
+	std::string filePath;
+	std::string fileName;
+	size_t fileSize = 0;
+};
 
 class FileStreamConnection : public TCPConnection
 {
@@ -33,35 +41,44 @@ class FileStreamConnection : public TCPConnection
 	std::optional<FileSend> m_currentFileSend;
 	bool m_socketAuthenticated = false;
 
+	std::deque<AttachmentFile> m_filesToSendQueue;
+	std::deque<AttachmentFile> m_filesToReceiveQueue;
+
 public:
 	FileStreamConnection(io_context& ioService, ssl::context& context);
 	virtual ~FileStreamConnection();
 
 	bool IsDownloadingFile() const;
 	bool IsSendingFile() const;
-	void SendFile(const std::string& filePath, UInt64 size);
 
 	// TCPConnection
-	bool OnConnectedToServerInternal() override;
+	bool OnSocketConnectedInternal() override;
 	bool OnReceivedError(const boost::system::error_code& error) override;
 
+	void PushFileToReceive(const AttachmentFile& file);
+	void PushFileToSend(const AttachmentFile& file);
+
+	void SetAuthenticated();
+
 protected:
-	virtual void OnFileDownloadCompleted() = 0;
+	virtual void OnFileDownloadCompleted(const AttachmentFile& file) = 0;
 	virtual void ErrorDisconnectAll() = 0;
 	virtual void Authenticate(const Username&/* username*/, const hash_SHA256&/* authCode*/) { ASSERT(false); }
-	virtual std::string GetDownloadFilePath(UInt64 fileSize) = 0;
-	virtual void OnFileSentSuccessfully() = 0;
-	virtual void OnConnectedToServer() = 0;
+	virtual void OnFileSentSuccessfully(const AttachmentFile& file) = 0;
+	virtual void OnSocketConnected() = 0;
 	
 private:
+	void SendFileFromQueue();
+	void SendFileInternal(const std::string& filePath, UInt64 size);
+	void OnFileSentInternal();
+	
 	void StartReading();
 	void OnReceiveData(size_t bytesTransferred);
 
 	void OnFullHeaderReceived();
 	void OnFilePartReceived(Range<std::array<byte, FILE_STREAM_READ_BUFFER_SIZE>> data);
 
-	void SendFileChunk();
 	void HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnection> tcpConnection);
 
-	void OnSendingSuccessful(size_t bytesTransferred) override;
+	void OnSendingSuccessful(size_t bytesTransferred) override;	// Used with generic ByteContainer, strings sends not for files
 };

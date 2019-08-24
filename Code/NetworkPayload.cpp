@@ -78,7 +78,7 @@ void NetworkPayload::ReadHeader()
 
 void NetworkPayload::WriteHeader(const std::string& cmdShortName, std::vector<byte>& data)
 {
-	ASSERT(data.size() > headerLength);
+	ASSERT(data.size() >= headerLength);
 	ASSERT_MSG(CanFit<UInt32>(data.size()) , "The vector provided is to big for its size to fit into a UInt32");
 
 	std::copy(cmdShortName.begin(), cmdShortName.end(), data.begin());

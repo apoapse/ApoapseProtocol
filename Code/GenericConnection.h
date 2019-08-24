@@ -20,7 +20,7 @@ public:
 	virtual std::optional<Username> GetConnectedUser() const = 0;
 	
 private:
-	bool OnConnectedToServerInternal() override;
+	bool OnSocketConnectedInternal() override;
 	virtual bool OnReceivedError(const boost::system::error_code& error) override;
 	void StartReading();
 	void ProcessHeader(Range<std::array<byte, READ_BUFFER_SIZE>>& range, size_t bytesTransferred);
