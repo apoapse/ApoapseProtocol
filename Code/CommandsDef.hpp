@@ -268,27 +268,6 @@ static std::string GetCommandDef()
 			}
 		},
 		{
-			"name": "upload_attachment",
-			"name_short": "ua",
-			"datastructure": "attachment",
-			"require_authentication": true,
-			"save_on_receive": {
-				"server": false,
-				"client": false
-			},
-			"reception": {
-				"server": true,
-				"client": true
-			},
-			"operation": {
-				"register": false
-			},
-			"propagation": {
-				"propagate": false,
-				"exclude_self": false
-			}
-		},
-		{
 			"name": "ready_to_receive_file",
 			"name_short": "rr",
 			"datastructure": "empty",

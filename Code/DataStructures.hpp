@@ -358,6 +358,71 @@ static std::string GetDataStructures()
 			]
 		},
 		{
+			"name": "attachment",
+			"fields": [
+				{
+					"name": "uuid",
+					"type": "uuid",
+					"required": true,
+					"unique": true,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "name",
+					"type": "text",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "file_size",
+					"type": "integer",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": true
+					}
+				},
+				{
+					"name": "parent_message",
+					"type": "uuid",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": false
+					}
+				},
+				{
+					"name": "is_downloaded",
+					"type": "bool",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": true,
+						"client_storage": true,
+						"command": false
+					}
+				}
+			]
+		},
+		{
 			"name": "message",
 			"fields": [
 				{
@@ -443,6 +508,18 @@ static std::string GetDataStructures()
 						"client_storage": true,
 						"command": false
 					}
+				},
+				{
+					"name": "attachments",
+					"type": "attachment",
+					"required": false,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
 				}
 			]
 		},
@@ -495,95 +572,6 @@ static std::string GetDataStructures()
 						"server_storage": true,
 						"client_storage": true,
 						"command": true
-					}
-				}
-			]
-		},
-		{
-			"name": "attachment",
-			"fields": [
-				{
-					"name": "uuid",
-					"type": "uuid",
-					"required": true,
-					"unique": true,
-					"read_permission": "all",
-					"uses":	{
-						"server_storage": true,
-						"client_storage": true,
-						"command": true
-					}
-				},
-				{
-					"name": "name",
-					"type": "text",
-					"required": true,
-					"unique": false,
-					"read_permission": "all",
-					"uses":	{
-						"server_storage": true,
-						"client_storage": true,
-						"command": true
-					}
-				},
-				{
-					"name": "parent_thread",
-					"type": "uuid",
-					"required": true,
-					"unique": false,
-					"read_permission": "all",
-					"uses":	{
-						"server_storage": true,
-						"client_storage": true,
-						"command": true
-					}
-				},
-				{
-					"name": "file_size",
-					"type": "integer",
-					"required": true,
-					"unique": false,
-					"read_permission": "all",
-					"uses":	{
-						"server_storage": true,
-						"client_storage": true,
-						"command": true
-					}
-				},
-				{
-					"name": "sent_time",
-					"type": "datetime",
-					"required": true,
-					"unique": false,
-					"read_permission": "all",
-					"uses":	{
-						"server_storage": true,
-						"client_storage": true,
-						"command": true
-					}
-				},
-				{
-					"name": "sender",
-					"type": "username",
-					"required": true,
-					"unique": false,
-					"read_permission": "all",
-					"uses":	{
-						"server_storage": true,
-						"client_storage": true,
-						"command": true
-					}
-				},
-				{
-					"name": "is_read",
-					"type": "bool",
-					"required": true,
-					"unique": false,
-					"read_permission": "all",
-					"uses":	{
-						"server_storage": false,
-						"client_storage": true,
-						"command": false
 					}
 				}
 			]

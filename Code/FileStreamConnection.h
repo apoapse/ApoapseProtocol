@@ -2,10 +2,13 @@
 #include "TCPConnection.h"
 #include <fstream>
 #include <deque>
+#include "Uuid.h"
 constexpr auto FILE_STREAM_READ_BUFFER_SIZE = 4096;
 
 struct AttachmentFile
 {
+	Uuid uuid;
+	Uuid relatedMessage;
 	std::string filePath;
 	std::string fileName;
 	size_t fileSize = 0;
