@@ -122,7 +122,7 @@ bool DatabaseIntegrityPatcher::CheckAndResolve()
 
  			try
  			{
-				if (tableOnDb != table)
+				if (!tableOnDb.fields.empty() && tableOnDb != table)
 				{
 					// The table need to be updated
 					const std::string tempTableName = "temp_" + tableOnDb.name;
