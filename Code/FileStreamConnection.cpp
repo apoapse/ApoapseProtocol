@@ -167,7 +167,7 @@ void FileStreamConnection::OnReceiveData(size_t bytesTransferred, std::shared_pt
 
 	m_currentFileDownload->receivedSize += static_cast<UInt32>(data.size());
 
-	if (data.size() > 0)
+	if (IsDownloadingFile() && data.size() > 0)
 	{
 		OnFilePartReceived(data);
 	}
