@@ -287,6 +287,27 @@ static std::string GetCommandDef()
 				"propagate": false,
 				"exclude_self": false
 			}
+		},
+		{
+			"name": "attachment_download",
+			"name_short": "ad",
+			"datastructure": "attachment_download",
+			"require_authentication": true,
+			"save_on_receive": {
+				"server": false,
+				"client": false
+			},
+			"reception": {
+				"server": true,
+				"client": false
+			},
+			"operation": {
+				"register": false
+			},
+			"propagation": {
+				"propagate": false,
+				"exclude_self": false
+			}
 		}
 	]
 }

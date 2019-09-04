@@ -1,8 +1,10 @@
 #pragma once
-#include "TCPConnection.h"
+//#include "TCPConnection.h"
 #include <fstream>
 #include <deque>
 #include "Uuid.h"
+#include <mutex>
+#include "TCPConnectionNoTLS.h"
 constexpr auto FILE_STREAM_READ_BUFFER_SIZE = 4096;
 
 struct AttachmentFile
@@ -12,9 +14,12 @@ struct AttachmentFile
 	std::string filePath;
 	std::string fileName;
 	size_t fileSize = 0;
+
+	AttachmentFile() = default;
+	AttachmentFile(DataStructure& data, const std::string& filePath);
 };
 
-class FileStreamConnection : public TCPConnection
+class FileStreamConnection : public TCPConnectionNoTLS
 {
 	struct FileReceive
 	{
@@ -47,8 +52,10 @@ class FileStreamConnection : public TCPConnection
 	std::deque<AttachmentFile> m_filesToSendQueue;
 	std::deque<AttachmentFile> m_filesToReceiveQueue;
 
+	std::vector<byte> m_fullFile;
+	
 public:
-	FileStreamConnection(io_context& ioService, ssl::context& context);
+	FileStreamConnection(io_context& ioService/*, ssl::context& context*/);
 	virtual ~FileStreamConnection();
 
 	bool IsDownloadingFile() const;
@@ -81,7 +88,7 @@ private:
 	void OnFullHeaderReceived();
 	void OnFilePartReceived(Range<std::array<byte, FILE_STREAM_READ_BUFFER_SIZE>> data);
 
-	void HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnection> tcpConnection);
+	void HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection);
 
 	void OnSendingSuccessful(size_t bytesTransferred) override;	// Used with generic ByteContainer, strings sends not for files
 };

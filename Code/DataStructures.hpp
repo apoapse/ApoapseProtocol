@@ -847,6 +847,23 @@ static std::string GetDataStructures()
 					}
 				}
 			]
+		},
+		{
+			"name": "attachment_download",
+			"fields": [
+				{
+					"name": "uuid",
+					"type": "uuid",
+					"required": true,
+					"unique": true,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				}
+			]
 		}
 	]
 }

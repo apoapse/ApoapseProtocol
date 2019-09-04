@@ -4,8 +4,18 @@
 #include "CryptographyTypes.hpp"
 #include "Username.h"
 #include <filesystem>
+#include "ThreadUtils.h"
 
-FileStreamConnection::FileStreamConnection(io_context& ioService, ssl::context& context) : TCPConnection(ioService, context)
+AttachmentFile::AttachmentFile(DataStructure& data, const std::string& filePath)
+{
+	uuid = data.GetField("uuid").GetValue<Uuid>();
+	relatedMessage = data.GetField("parent_message").GetValue<Uuid>();
+	fileName = data.GetField("name").GetValue<std::string>();
+	fileSize = data.GetField("file_size").GetValue<Int64>();
+	this->filePath = filePath;
+}
+
+FileStreamConnection::FileStreamConnection(io_context& ioService/*, ssl::context& context*/) : TCPConnectionNoTLS(ioService/*, context*/)
 {
 }
 
@@ -24,25 +34,67 @@ bool FileStreamConnection::IsSendingFile() const
 	return m_currentFileSend.has_value();
 }
 
-void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnection> tcpConnection)
+void FileStreamConnection::SendFileFromQueue()
+{
+	ASSERT(!m_filesToSendQueue.empty());
+
+	auto& file = m_filesToSendQueue.front();
+	SendFileInternal(file.filePath, file.fileSize);
+}
+
+void FileStreamConnection::SendFileInternal(const std::string& filePath, UInt64 size)
+{
+	LOG << "Sending file " << filePath << " size: " << size;
+	
+	m_currentFileSend = FileSend();
+	m_currentFileSend->fileSize = static_cast<UInt32>(size + (UInt64)FileReceive::headerLength);
+	
+	m_currentFileSend->readStream = std::ifstream(filePath, std::ifstream::binary);
+
+	auto headerData = ToBytes<UInt32>((UInt32)size, Endianness::BIG_ENDIAN);
+	ASSERT(headerData.size() == FileReceive::headerLength);
+
+	std::copy(headerData.begin(), headerData.end(), m_writeBuffer.begin());
+
+	auto self(shared_from_this());
+	m_socket->async_write_some(boost::asio::buffer(m_writeBuffer, headerData.size()), [this, self](boost::system::error_code er, size_t bytesTransferred)
+	{
+		HandleFileWriteAsync(er, bytesTransferred, self);
+	});
+}
+
+void FileStreamConnection::OnFileSentInternal()
+{
+	const AttachmentFile fileSent = m_filesToSendQueue.front();
+	m_filesToSendQueue.pop_front();
+	
+	OnFileSentSuccessfully(fileSent);
+
+	if (!m_filesToSendQueue.empty())
+		SendFileFromQueue();
+}
+
+void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
 {
 	ASSERT(IsSendingFile());
-	//LOG_DEBUG << "HandleFileWriteAsync" << bytesTransferred;
-
 	m_currentFileSend->sentSize += (UInt32)bytesTransferred;
 
-	if (m_currentFileSend->sentSize == m_currentFileSend->fileSize)
+	//LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " thread: " << ThreadUtils::GetThreadName();
+	
+	if (m_currentFileSend->sentSize == m_currentFileSend->fileSize || bytesTransferred == 0)
 	{
 		m_currentFileSend->readStream.close();
-		m_currentFileSend.reset();
-
 		OnFileSentInternal();
+
+		m_currentFileSend.reset();
 		StartReading();
 	}
 	else
 	{
 		m_currentFileSend->readStream.read((char*)m_writeBuffer.data(), m_writeBuffer.size());
-		std::streamsize dataSize = m_currentFileSend->readStream.gcount();
+		const std::streamsize dataSize = m_currentFileSend->readStream.gcount();
+
+		LOG_DEBUG << "Read " << dataSize << " bytes from file";
 
 		auto self(shared_from_this());
 		m_socket->async_write_some(boost::asio::buffer(m_writeBuffer, dataSize), [this, self](boost::system::error_code er, size_t bytesTransferred)
@@ -59,7 +111,10 @@ void FileStreamConnection::OnSendingSuccessful(size_t bytesTransferred)
 
 void FileStreamConnection::StartReading()
 {
-	ReadSome(m_readBuffer, [this](size_t bytesTransferred) { OnReceiveData(bytesTransferred); });
+	ReadSome(m_readBuffer, [this](size_t bytesTransferred)
+	{
+		OnReceiveData(bytesTransferred);
+	});
 }
 
 void FileStreamConnection::OnReceiveData(size_t bytesTransferred)
@@ -106,7 +161,8 @@ void FileStreamConnection::OnReceiveData(size_t bytesTransferred)
 			std::copy(data.begin(), data.begin() + receivedHeaderLength, m_currentFileDownload->headerData.begin());
 			data.Consume(receivedHeaderLength);
 		}
-		else if (m_currentFileDownload->receivedSize >= FileReceive::headerLength)
+		
+		if (m_currentFileDownload->receivedSize >= FileReceive::headerLength)
 		{
 			OnFullHeaderReceived();
 		}
@@ -148,12 +204,12 @@ void FileStreamConnection::OnFullHeaderReceived()
 void FileStreamConnection::OnFilePartReceived(Range<std::array<byte, FILE_STREAM_READ_BUFFER_SIZE>> data)
 {
 	const UInt32 bytesToWrite = std::min((UInt32)data.size(), (m_currentFileDownload->fileSize - m_currentFileDownload->writtenSize));
-
+	//LOG_DEBUG << std::string(data.begin(), data.begin() + bytesToWrite);
 	m_currentFileDownload->writeStream.write((const char*)data.data(), bytesToWrite);
 	
 	m_currentFileDownload->writtenSize += bytesToWrite;
-	//LOG_DEBUG << "OnFilePartReceived. Size written" << m_currentFileDownload->writtenSize << " of " << m_currentFileDownload->fileSize;
-
+	//LOG_DEBUG << "OnFilePartReceived. Size written " << m_currentFileDownload->writtenSize << " of " << m_currentFileDownload->fileSize << " thread: " << ThreadUtils::GetThreadName();
+	
 	if (m_currentFileDownload->writtenSize == m_currentFileDownload->fileSize)
 	{
 		m_currentFileDownload->writeStream.close();
@@ -175,7 +231,7 @@ bool FileStreamConnection::OnSocketConnectedInternal()
 
 bool FileStreamConnection::OnReceivedError(const boost::system::error_code& error)
 {
-	LOG << error.message() << LogSeverity::warning;
+	LOG << "OnReceivedError " << error.message() << LogSeverity::warning;
 
 	return true;
 }
@@ -195,43 +251,4 @@ void FileStreamConnection::PushFileToSend(const AttachmentFile& file)
 void FileStreamConnection::SetAuthenticated()
 {
 	m_socketAuthenticated = true;
-}
-
-void FileStreamConnection::SendFileFromQueue()
-{
-	ASSERT(!m_filesToSendQueue.empty());
-
-	auto& file = m_filesToSendQueue.front();
-	SendFileInternal(file.filePath, file.fileSize);
-}
-
-void FileStreamConnection::SendFileInternal(const std::string& filePath, UInt64 size)
-{
-	LOG << "Sending file " << filePath << " size: " << size;
-	
-	m_currentFileSend = FileSend();
-	m_currentFileSend->fileSize = static_cast<UInt32>(size + (UInt64)FileReceive::headerLength);
-	
-	m_currentFileSend->readStream = std::ifstream(filePath, std::ifstream::binary);
-
-	auto headerData = ToBytes<UInt32>((UInt32)size, Endianness::BIG_ENDIAN);
-	ASSERT(headerData.size() == FileReceive::headerLength);
-	std::copy(headerData.begin(), headerData.end(), m_writeBuffer.begin());
-
-	auto self(shared_from_this());
-	m_socket->async_write_some(boost::asio::buffer(m_writeBuffer, headerData.size()), [this, self](boost::system::error_code er, size_t bytesTransferred)
-	{
-		HandleFileWriteAsync(er, bytesTransferred, self);
-	});
-}
-
-void FileStreamConnection::OnFileSentInternal()
-{
-	const AttachmentFile fileSent = m_filesToSendQueue.front();
-	m_filesToSendQueue.pop_front();
-	
-	OnFileSentSuccessfully(fileSent);
-
-	if (!m_filesToSendQueue.empty())
-		SendFileFromQueue();
 }

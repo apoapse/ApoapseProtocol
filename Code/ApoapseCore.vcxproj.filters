@@ -181,6 +181,12 @@
     <ClInclude Include="ThreadUtils.h">
       <Filter>Threading</Filter>
     </ClInclude>
+    <ClInclude Include="TCPConnectionNoTLS.h">
+      <Filter>Network\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="TCPServerNoTLS.h">
+      <Filter>Network\Sockets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -289,6 +295,12 @@
     </ClCompile>
     <ClCompile Include="ThreadUtils.cpp">
       <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="TCPConnectionNoTLS.cpp">
+      <Filter>Network\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="TCPServerNoTLS.cpp">
+      <Filter>Network\Sockets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
