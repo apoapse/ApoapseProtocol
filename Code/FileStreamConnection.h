@@ -23,14 +23,9 @@ class FileStreamConnection : public TCPConnectionNoTLS
 {
 	struct FileReceive
 	{
-		static const UInt8 headerLength = 4;
-		
-		UInt32 fileSize = headerLength;
+		UInt32 fileSize = 0;
 		UInt32 receivedSize = 0;
 		UInt32 writtenSize = 0;
-
-		bool headerReceived = false;
-		std::array<byte, headerLength> headerData;
 		
 		std::ofstream writeStream;
 	};
@@ -85,7 +80,6 @@ private:
 	void StartReading();
 	void OnReceiveData(size_t bytesTransferred);
 
-	void OnFullHeaderReceived();
 	void OnFilePartReceived(Range<std::array<byte, FILE_STREAM_READ_BUFFER_SIZE>> data);
 
 	void HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection);

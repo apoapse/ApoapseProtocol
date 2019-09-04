@@ -47,17 +47,17 @@ void FileStreamConnection::SendFileInternal(const std::string& filePath, UInt64 
 	LOG << "Sending file " << filePath << " size: " << size;
 	
 	m_currentFileSend = FileSend();
-	m_currentFileSend->fileSize = static_cast<UInt32>(size + (UInt64)FileReceive::headerLength);
-	
+	m_currentFileSend->fileSize = static_cast<UInt32>(size);
 	m_currentFileSend->readStream = std::ifstream(filePath, std::ifstream::binary);
 
-	auto headerData = ToBytes<UInt32>((UInt32)size, Endianness::BIG_ENDIAN);
-	ASSERT(headerData.size() == FileReceive::headerLength);
+	// Read file
+	m_currentFileSend->readStream.read((char*)m_writeBuffer.data(), m_writeBuffer.size());
+	const std::streamsize dataSize = m_currentFileSend->readStream.gcount();
 
-	std::copy(headerData.begin(), headerData.end(), m_writeBuffer.begin());
+	LOG_DEBUG << "Read " << dataSize << " bytes from file";
 
 	auto self(shared_from_this());
-	m_socket->async_write_some(boost::asio::buffer(m_writeBuffer, headerData.size()), [this, self](boost::system::error_code er, size_t bytesTransferred)
+	m_socket->async_write_some(boost::asio::buffer(m_writeBuffer, dataSize), [this, self](boost::system::error_code er, size_t bytesTransferred)
 	{
 		HandleFileWriteAsync(er, bytesTransferred, self);
 	});
@@ -79,7 +79,7 @@ void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code&
 	ASSERT(IsSendingFile());
 	m_currentFileSend->sentSize += (UInt32)bytesTransferred;
 
-	//LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " thread: " << ThreadUtils::GetThreadName();
+	LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " thread: " << ThreadUtils::GetThreadName();
 	
 	if (m_currentFileSend->sentSize == m_currentFileSend->fileSize || bytesTransferred == 0)
 	{
@@ -94,7 +94,7 @@ void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code&
 		m_currentFileSend->readStream.read((char*)m_writeBuffer.data(), m_writeBuffer.size());
 		const std::streamsize dataSize = m_currentFileSend->readStream.gcount();
 
-		LOG_DEBUG << "Read " << dataSize << " bytes from file";
+		//LOG_DEBUG << "Read " << dataSize << " bytes from file";
 
 		auto self(shared_from_this());
 		m_socket->async_write_some(boost::asio::buffer(m_writeBuffer, dataSize), [this, self](boost::system::error_code er, size_t bytesTransferred)
@@ -121,7 +121,7 @@ void FileStreamConnection::OnReceiveData(size_t bytesTransferred)
 {
 	if (global->isServer && !m_socketAuthenticated)
 	{
-		if (bytesTransferred == (sha256Length + sha256Length))	// header + Username + auth code
+		if (bytesTransferred == (sha256Length + sha256Length))	// Username + auth code
 		{
 			Range range(m_readBuffer, bytesTransferred);
 			
@@ -145,28 +145,25 @@ void FileStreamConnection::OnReceiveData(size_t bytesTransferred)
 
 	if (!IsDownloadingFile())
 	{
-		LOG << "Start file download";
+		auto& file = m_filesToReceiveQueue.front();
 		m_currentFileDownload = FileReceive();
+		m_currentFileDownload->fileSize = (UInt32)file.fileSize;
+
+		// We create the parent directory if it does not exist
+		const std::string filePathFolder = std::filesystem::path(file.filePath).parent_path().string();
+		if (!filePathFolder.empty() && !std::filesystem::exists(filePathFolder))
+		{
+			std::filesystem::create_directory(filePathFolder);
+		}
+
+		m_currentFileDownload->writeStream = std::ofstream(file.filePath, std::ofstream::binary);
+
+		LOG << "Start file download (size: " << m_currentFileDownload->fileSize << ")";
 	}
 
 	Range data(m_readBuffer, bytesTransferred);
 
 	m_currentFileDownload->receivedSize += static_cast<UInt32>(data.size());
-
-	if (!m_currentFileDownload->headerReceived)
-	{
-		if (m_currentFileDownload->receivedSize <= FileReceive::headerLength)
-		{
-			const UInt64 receivedHeaderLength = std::min(data.size(), (size_t)FileReceive::headerLength);
-			std::copy(data.begin(), data.begin() + receivedHeaderLength, m_currentFileDownload->headerData.begin());
-			data.Consume(receivedHeaderLength);
-		}
-		
-		if (m_currentFileDownload->receivedSize >= FileReceive::headerLength)
-		{
-			OnFullHeaderReceived();
-		}
-	}
 
 	if (data.size() > 0)
 	{
@@ -176,39 +173,16 @@ void FileStreamConnection::OnReceiveData(size_t bytesTransferred)
 	StartReading();
 }
 
-void FileStreamConnection::OnFullHeaderReceived()
-{
-	ASSERT(IsDownloadingFile());
-	ASSERT(m_currentFileDownload->receivedSize >= FileReceive::headerLength);
-
-	const auto& currentFile = m_filesToReceiveQueue.front();
-	m_currentFileDownload->fileSize = FromBytes<UInt32>(m_currentFileDownload->headerData, Endianness::BIG_ENDIAN);
-	m_currentFileDownload->receivedSize = m_currentFileDownload->receivedSize - FileReceive::headerLength;
-
-	if (m_currentFileDownload->fileSize != currentFile.fileSize)
-		throw std::exception("The file size do not match");
-
-	// We create the parent directory if it does not exist
-	const std::string filePathFolder = std::filesystem::path(currentFile.filePath).parent_path().string();
-	if (!filePathFolder.empty() && !std::filesystem::exists(filePathFolder))
-	{
-		std::filesystem::create_directory(filePathFolder);
-	}
-
-	m_currentFileDownload->writeStream = std::ofstream(currentFile.filePath, std::ofstream::binary);
-
-	m_currentFileDownload->headerReceived = true;
-	LOG << "Start downloading file of size " << m_currentFileDownload->fileSize << " to " << currentFile.filePath;
-}
-
 void FileStreamConnection::OnFilePartReceived(Range<std::array<byte, FILE_STREAM_READ_BUFFER_SIZE>> data)
 {
 	const UInt32 bytesToWrite = std::min((UInt32)data.size(), (m_currentFileDownload->fileSize - m_currentFileDownload->writtenSize));
 	//LOG_DEBUG << std::string(data.begin(), data.begin() + bytesToWrite);
-	m_currentFileDownload->writeStream.write((const char*)data.data(), bytesToWrite);
+
+	std::array<byte, FILE_STREAM_READ_BUFFER_SIZE> localBuffer;
+	std::copy(m_readBuffer.begin(), m_readBuffer.begin() + bytesToWrite, localBuffer.begin());
 	
+	m_currentFileDownload->writeStream.write((const char*)localBuffer.data(), bytesToWrite);
 	m_currentFileDownload->writtenSize += bytesToWrite;
-	//LOG_DEBUG << "OnFilePartReceived. Size written " << m_currentFileDownload->writtenSize << " of " << m_currentFileDownload->fileSize << " thread: " << ThreadUtils::GetThreadName();
 	
 	if (m_currentFileDownload->writtenSize == m_currentFileDownload->fileSize)
 	{
