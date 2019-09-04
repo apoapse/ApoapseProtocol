@@ -78,7 +78,7 @@ private:
 	void OnFileSentInternal();
 	
 	void StartReading();
-	void OnReceiveData(size_t bytesTransferred);
+	void OnReceiveData(size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection);
 
 	void OnFilePartReceived(Range<std::array<byte, FILE_STREAM_READ_BUFFER_SIZE>> data);
 

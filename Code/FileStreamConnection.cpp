@@ -91,7 +91,8 @@ void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code&
 	}
 	else
 	{
-		std::this_thread::sleep_for(2ms);
+		std::this_thread::sleep_for(2ms);	// TODO IMPORTANT THIS THING IS NECESSARY FOR NOW TO HAVE DATA RECEIVED IN THE RIGHT ORDER
+		
 		m_currentFileSend->readStream.read((char*)m_writeBuffer.data(), m_writeBuffer.size());
 		const std::streamsize dataSize = m_currentFileSend->readStream.gcount();
 
@@ -111,13 +112,14 @@ void FileStreamConnection::OnSendingSuccessful(size_t bytesTransferred)
 
 void FileStreamConnection::StartReading()
 {
-	ReadSome(m_readBuffer, [this](size_t bytesTransferred)
+	auto self(shared_from_this());
+	m_socket->async_read_some(boost::asio::buffer(m_readBuffer), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
 	{
-		OnReceiveData(bytesTransferred);
-	});
+		OnReceiveData(bytesTransferred, self);
+	}));
 }
 
-void FileStreamConnection::OnReceiveData(size_t bytesTransferred)
+void FileStreamConnection::OnReceiveData(size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
 {
 	if (global->isServer && !m_socketAuthenticated)
 	{
@@ -143,7 +145,7 @@ void FileStreamConnection::OnReceiveData(size_t bytesTransferred)
 		return;
 	}
 
-	if (!IsDownloadingFile())
+	if (!IsDownloadingFile() && !m_filesToReceiveQueue.empty())
 	{
 		auto& file = m_filesToReceiveQueue.front();
 		m_currentFileDownload = FileReceive();
@@ -178,10 +180,7 @@ void FileStreamConnection::OnFilePartReceived(Range<std::array<byte, FILE_STREAM
 	const UInt32 bytesToWrite = std::min((UInt32)data.size(), (m_currentFileDownload->fileSize - m_currentFileDownload->writtenSize));
 	//LOG_DEBUG << std::string(data.begin(), data.begin() + bytesToWrite);
 
-	std::array<byte, FILE_STREAM_READ_BUFFER_SIZE> localBuffer;
-	std::copy(m_readBuffer.begin(), m_readBuffer.begin() + bytesToWrite, localBuffer.begin());
-	
-	m_currentFileDownload->writeStream.write((const char*)localBuffer.data(), bytesToWrite);
+	m_currentFileDownload->writeStream.write((const char*)m_readBuffer.data(), bytesToWrite);
 	m_currentFileDownload->writtenSize += bytesToWrite;
 	
 	if (m_currentFileDownload->writtenSize == m_currentFileDownload->fileSize)
