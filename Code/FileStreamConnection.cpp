@@ -15,7 +15,7 @@ AttachmentFile::AttachmentFile(DataStructure& data, const std::string& filePath)
 	this->filePath = filePath;
 }
 
-FileStreamConnection::FileStreamConnection(io_context& ioService/*, ssl::context& context*/) : TCPConnectionNoTLS(ioService/*, context*/)
+FileStreamConnection::FileStreamConnection(io_context& ioService/*, ssl::context& context*/) : TCPConnectionNoTLS(ioService/*, context*/), m_strand(ioService)
 {
 }
 
@@ -57,10 +57,10 @@ void FileStreamConnection::SendFileInternal(const std::string& filePath, UInt64 
 	LOG_DEBUG << "Read " << dataSize << " bytes from file";
 
 	auto self(shared_from_this());
-	m_socket->async_write_some(boost::asio::buffer(m_writeBuffer, dataSize), [this, self](boost::system::error_code er, size_t bytesTransferred)
+	m_socket->async_write_some(boost::asio::buffer(m_writeBuffer, dataSize), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
 	{
 		HandleFileWriteAsync(er, bytesTransferred, self);
-	});
+	}));
 }
 
 void FileStreamConnection::OnFileSentInternal()
@@ -79,7 +79,7 @@ void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code&
 	ASSERT(IsSendingFile());
 	m_currentFileSend->sentSize += (UInt32)bytesTransferred;
 
-	LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " thread: " << ThreadUtils::GetThreadName();
+	//LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " thread: " << ThreadUtils::GetThreadName();
 	
 	if (m_currentFileSend->sentSize == m_currentFileSend->fileSize || bytesTransferred == 0)
 	{
@@ -91,16 +91,16 @@ void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code&
 	}
 	else
 	{
+		std::this_thread::sleep_for(2ms);
 		m_currentFileSend->readStream.read((char*)m_writeBuffer.data(), m_writeBuffer.size());
 		const std::streamsize dataSize = m_currentFileSend->readStream.gcount();
 
 		//LOG_DEBUG << "Read " << dataSize << " bytes from file";
-
 		auto self(shared_from_this());
-		m_socket->async_write_some(boost::asio::buffer(m_writeBuffer, dataSize), [this, self](boost::system::error_code er, size_t bytesTransferred)
+		m_socket->async_write_some(boost::asio::buffer(m_writeBuffer, dataSize), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
 		{
 			HandleFileWriteAsync(er, bytesTransferred, self);
-		});
+		}));
 	}
 }
 

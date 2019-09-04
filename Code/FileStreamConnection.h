@@ -3,9 +3,10 @@
 #include <fstream>
 #include <deque>
 #include "Uuid.h"
+#include <boost/asio/strand.hpp>
 #include <mutex>
 #include "TCPConnectionNoTLS.h"
-constexpr auto FILE_STREAM_READ_BUFFER_SIZE = 4096;
+constexpr auto FILE_STREAM_READ_BUFFER_SIZE = 1024 * 500;
 
 struct AttachmentFile
 {
@@ -46,8 +47,7 @@ class FileStreamConnection : public TCPConnectionNoTLS
 
 	std::deque<AttachmentFile> m_filesToSendQueue;
 	std::deque<AttachmentFile> m_filesToReceiveQueue;
-
-	std::vector<byte> m_fullFile;
+	boost::asio::io_context::strand m_strand;
 	
 public:
 	FileStreamConnection(io_context& ioService/*, ssl::context& context*/);
