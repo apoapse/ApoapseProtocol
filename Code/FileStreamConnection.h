@@ -35,6 +35,7 @@ class FileStreamConnection : public TCPConnectionNoTLS
 	{
 		UInt32 fileSize = 0;
 		UInt32 sentSize = 0;
+		UInt16 packetIndex = 0;
 
 		std::ifstream readStream;
 	};
@@ -48,7 +49,8 @@ class FileStreamConnection : public TCPConnectionNoTLS
 	std::deque<AttachmentFile> m_filesToSendQueue;
 	std::deque<AttachmentFile> m_filesToReceiveQueue;
 	boost::asio::io_context::strand m_strand;
-	
+	std::vector<UInt32> m_bytesWriten;
+
 public:
 	FileStreamConnection(io_context& ioService/*, ssl::context& context*/);
 	virtual ~FileStreamConnection();
