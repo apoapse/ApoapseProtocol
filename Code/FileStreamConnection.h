@@ -81,11 +81,11 @@ private:
 	
 	void StartReading();
 	void OnReceiveData(size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection);
-	void ReadFromFile();
+	UInt16 ReadFromFile();
 
 	void OnFilePartReceived(Range<std::array<byte, FILE_STREAM_READ_BUFFER_SIZE>> data);
 
-	void HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection);
+	void HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, UInt16 packetIndex, std::shared_ptr<TCPConnectionNoTLS> tcpConnection);
 
 	void OnSendingSuccessful(size_t bytesTransferred) override;	// Used with generic ByteContainer, strings sends not for files
 };

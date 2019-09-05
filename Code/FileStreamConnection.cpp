@@ -50,12 +50,12 @@ void FileStreamConnection::SendFileInternal(const std::string& filePath, UInt64 
 
 	LOG << "Sending file " << filePath << " size: " << m_currentFileSend->fileSize;
 
-	ReadFromFile();
+	const UInt16 packetIndex = ReadFromFile();
 	
 	auto self(shared_from_this());
-	m_socket->async_write_some(boost::asio::buffer(m_writeBuffer), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
+	m_socket->async_write_some(boost::asio::buffer(m_writeBuffer), boost::asio::bind_executor(m_strand, [this, self, packetIndex](boost::system::error_code er, size_t bytesTransferred)
 	{
-		HandleFileWriteAsync(er, bytesTransferred, self);
+		HandleFileWriteAsync(er, bytesTransferred, packetIndex, self);
 	}));
 }
 
@@ -70,12 +70,14 @@ void FileStreamConnection::OnFileSentInternal()
 		SendFileFromQueue();
 }
 
-void FileStreamConnection::ReadFromFile()
+UInt16 FileStreamConnection::ReadFromFile()
 {
+	const UInt16 currentPacketIndex = m_currentFileSend->packetIndex;
+	
 	{
-		const auto byteArray = ToBytes<UInt16>(static_cast<UInt16>(m_currentFileSend->packetIndex), Endianness::BIG_ENDIAN);
+		const auto byteArray = ToBytes<UInt16>(static_cast<UInt16>(currentPacketIndex), Endianness::BIG_ENDIAN);
 		std::copy(byteArray.begin(), byteArray.end(), m_writeBuffer.begin());
-		LOG_DEBUG << "packetIndex " << m_currentFileSend->packetIndex;
+
 		m_currentFileSend->packetIndex++;
 	}
 	
@@ -86,11 +88,13 @@ void FileStreamConnection::ReadFromFile()
 	m_currentFileSend->sentSize += (UInt32)dataSize;
 
 	//LOG_DEBUG << "Read " << dataSize << " bytes from file";
+	return currentPacketIndex;
 }
 
-void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
+void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, UInt16 packetIndex, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
 {
 	ASSERT(IsSendingFile());
+	m_bytesWriten.push_back(packetIndex);
 	//LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " thread: " << ThreadUtils::GetThreadName();
 	
 	if (m_currentFileSend->sentSize == m_currentFileSend->fileSize || bytesTransferred == 0)
@@ -100,7 +104,7 @@ void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code&
 
 		for (auto bytesWriten : m_bytesWriten)
 		{
-			LOG_DEBUG << "bytesWriten " << bytesWriten << " next index: " << m_currentFileSend->packetIndex;
+			LOG_DEBUG << "index " << bytesWriten << " next index: " << m_currentFileSend->packetIndex;
 		}
 		m_bytesWriten.clear();
 		
@@ -110,13 +114,13 @@ void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code&
 	}
 	else
 	{
-		//std::this_thread::sleep_for(2ms);	// TODO IMPORTANT THIS THING IS NECESSARY FOR NOW TO HAVE DATA RECEIVED IN THE RIGHT ORDER
-		ReadFromFile();
+		std::this_thread::sleep_for(4ms);	// TODO IMPORTANT THIS THING IS NECESSARY FOR NOW TO HAVE DATA RECEIVED IN THE RIGHT ORDER
+		const UInt16 newPacketIndex = ReadFromFile();
 
 		auto self(shared_from_this());
-		m_socket->async_write_some(boost::asio::buffer(m_writeBuffer), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
+		m_socket->async_write_some(boost::asio::buffer(m_writeBuffer), boost::asio::bind_executor(m_strand, [this, self, newPacketIndex](boost::system::error_code er, size_t bytesTransferred)
 		{
-			HandleFileWriteAsync(er, bytesTransferred, self);
+			HandleFileWriteAsync(er, bytesTransferred, newPacketIndex, self);
 		}));
 	}
 
@@ -210,14 +214,15 @@ void FileStreamConnection::OnFilePartReceived(Range<std::array<byte, FILE_STREAM
 	//LOG_DEBUG << std::string(data.begin(), data.begin() + bytesToWrite);
 
 	m_currentFileDownload->writeStream.write((const char*)&m_readBuffer[2], bytesToWrite);
+	m_currentFileDownload->writeStream.flush();
 	m_currentFileDownload->writtenSize += bytesToWrite;
 	LOG_DEBUG << "bytesToWrite " << bytesToWrite;
 	
 	if (m_currentFileDownload->writtenSize == m_currentFileDownload->fileSize)
 	{
 		m_currentFileDownload->writeStream.close();
-
 		const AttachmentFile file = m_filesToReceiveQueue.front();
+
 		OnFileDownloadCompleted(file);
 
 		m_filesToReceiveQueue.pop_front();
