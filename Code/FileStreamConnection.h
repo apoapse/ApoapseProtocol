@@ -79,6 +79,7 @@ private:
 	
 	void StartReading();
 	void OnReceiveData(size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection);
+	void ReadFromFile();
 
 	void OnFilePartReceived(Range<std::array<byte, FILE_STREAM_READ_BUFFER_SIZE>> data);
 

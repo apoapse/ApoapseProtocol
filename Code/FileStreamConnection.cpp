@@ -44,20 +44,16 @@ void FileStreamConnection::SendFileFromQueue()
 
 void FileStreamConnection::SendFileInternal(const std::string& filePath, UInt64 size)
 {
-	LOG << "Sending file " << filePath << " size: " << size;
-	
 	m_currentFileSend = FileSend();
 	m_currentFileSend->fileSize = static_cast<UInt32>(size);
 	m_currentFileSend->readStream = std::ifstream(filePath, std::ifstream::binary);
 
-	// Read file
-	m_currentFileSend->readStream.read((char*)m_writeBuffer.data(), m_writeBuffer.size());
-	const std::streamsize dataSize = m_currentFileSend->readStream.gcount();
+	LOG << "Sending file " << filePath << " size: " << m_currentFileSend->fileSize;
 
-	LOG_DEBUG << "Read " << dataSize << " bytes from file";
-
+	ReadFromFile();
+	
 	auto self(shared_from_this());
-	m_socket->async_write_some(boost::asio::buffer(m_writeBuffer, dataSize), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
+	m_socket->async_write_some(boost::asio::buffer(m_writeBuffer), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
 	{
 		HandleFileWriteAsync(er, bytesTransferred, self);
 	}));
@@ -74,31 +70,36 @@ void FileStreamConnection::OnFileSentInternal()
 		SendFileFromQueue();
 }
 
+void FileStreamConnection::ReadFromFile()
+{
+	m_currentFileSend->readStream.read((char*)m_writeBuffer.data(), m_writeBuffer.size());
+	const std::streamsize dataSize = m_currentFileSend->readStream.gcount();
+	m_currentFileSend->sentSize += (UInt32)dataSize;
+
+	//LOG_DEBUG << "Read " << dataSize << " bytes from file";
+}
+
 void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
 {
 	ASSERT(IsSendingFile());
-	m_currentFileSend->sentSize += (UInt32)bytesTransferred;
-
 	//LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " thread: " << ThreadUtils::GetThreadName();
 	
 	if (m_currentFileSend->sentSize == m_currentFileSend->fileSize || bytesTransferred == 0)
 	{
 		m_currentFileSend->readStream.close();
 		OnFileSentInternal();
-
 		m_currentFileSend.reset();
 		StartReading();
 	}
 	else
 	{
 		std::this_thread::sleep_for(2ms);	// TODO IMPORTANT THIS THING IS NECESSARY FOR NOW TO HAVE DATA RECEIVED IN THE RIGHT ORDER
-		
-		m_currentFileSend->readStream.read((char*)m_writeBuffer.data(), m_writeBuffer.size());
-		const std::streamsize dataSize = m_currentFileSend->readStream.gcount();
+		ReadFromFile();
 
 		//LOG_DEBUG << "Read " << dataSize << " bytes from file";
+		
 		auto self(shared_from_this());
-		m_socket->async_write_some(boost::asio::buffer(m_writeBuffer, dataSize), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
+		m_socket->async_write_some(boost::asio::buffer(m_writeBuffer), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
 		{
 			HandleFileWriteAsync(er, bytesTransferred, self);
 		}));
