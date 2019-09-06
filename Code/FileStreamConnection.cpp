@@ -94,27 +94,19 @@ UInt16 FileStreamConnection::ReadFromFile()
 void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, UInt16 packetIndex, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
 {
 	ASSERT(IsSendingFile());
-	m_bytesWriten.push_back(packetIndex);
-	//LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " thread: " << ThreadUtils::GetThreadName();
+	//LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " index: " << packetIndex;
 	
 	if (m_currentFileSend->sentSize == m_currentFileSend->fileSize || bytesTransferred == 0)
 	{
 		m_currentFileSend->readStream.close();
 		OnFileSentInternal();
-
-		for (auto bytesWriten : m_bytesWriten)
-		{
-			LOG_DEBUG << "index " << bytesWriten << " next index: " << m_currentFileSend->packetIndex;
-		}
-		m_bytesWriten.clear();
-		
 		m_currentFileSend.reset();
 
 		StartReading();
 	}
 	else
 	{
-		std::this_thread::sleep_for(4ms);	// TODO IMPORTANT THIS THING IS NECESSARY FOR NOW TO HAVE DATA RECEIVED IN THE RIGHT ORDER
+		//std::this_thread::sleep_for(4ms);	// TODO IMPORTANT THIS THING IS NECESSARY FOR NOW TO HAVE DATA RECEIVED IN THE RIGHT ORDER
 		const UInt16 newPacketIndex = ReadFromFile();
 
 		auto self(shared_from_this());
@@ -211,11 +203,9 @@ void FileStreamConnection::OnFilePartReceived(Range<std::array<byte, FILE_STREAM
 	std::shared_ptr<NetBuffer> dataBuffer = std::make_shared<NetBuffer>();
 	std::copy(m_readBuffer.begin(), m_readBuffer.end(), dataBuffer->begin());
 	m_currentFileDownload->writtenSize += bytesToWrite;
-	//LOG_DEBUG << std::string(data.begin(), data.begin() + bytesToWrite);
 
 	auto& bufferRef = *dataBuffer;
-	m_currentFileDownload->writeStream.write((const char*)&bufferRef[2], bytesToWrite);
-	//LOG_DEBUG << "bytesToWrite " << bytesToWrite;
+	m_currentFileDownload->writeStream.write((const char*)data.data(), bytesToWrite);
 
 	LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileDownload->writtenSize << " of " << m_currentFileDownload->fileSize << " index: " << packetIndex;
 	
