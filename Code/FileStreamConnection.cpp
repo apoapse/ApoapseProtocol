@@ -203,20 +203,21 @@ void FileStreamConnection::OnReceiveData(size_t bytesTransferred, std::shared_pt
 
 void FileStreamConnection::OnFilePartReceived(Range<std::array<byte, FILE_STREAM_READ_BUFFER_SIZE>> data)
 {
-	{
-		const UInt16 packetIndex = FromBytes<UInt16>(data, Endianness::BIG_ENDIAN);
-		data.Consume(2);
+	const UInt16 packetIndex = FromBytes<UInt16>(data, Endianness::BIG_ENDIAN);
+	data.Consume(2);
 
-		LOG_DEBUG << "packetIndex " << packetIndex;
-	}
-	
 	const UInt32 bytesToWrite = std::min((UInt32)data.size(), (m_currentFileDownload->fileSize - m_currentFileDownload->writtenSize));
+
+	std::shared_ptr<NetBuffer> dataBuffer = std::make_shared<NetBuffer>();
+	std::copy(m_readBuffer.begin(), m_readBuffer.end(), dataBuffer->begin());
+	m_currentFileDownload->writtenSize += bytesToWrite;
 	//LOG_DEBUG << std::string(data.begin(), data.begin() + bytesToWrite);
 
-	m_currentFileDownload->writeStream.write((const char*)&m_readBuffer[2], bytesToWrite);
-	m_currentFileDownload->writeStream.flush();
-	m_currentFileDownload->writtenSize += bytesToWrite;
-	LOG_DEBUG << "bytesToWrite " << bytesToWrite;
+	auto& bufferRef = *dataBuffer;
+	m_currentFileDownload->writeStream.write((const char*)&bufferRef[2], bytesToWrite);
+	//LOG_DEBUG << "bytesToWrite " << bytesToWrite;
+
+	LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileDownload->writtenSize << " of " << m_currentFileDownload->fileSize << " index: " << packetIndex;
 	
 	if (m_currentFileDownload->writtenSize == m_currentFileDownload->fileSize)
 	{
