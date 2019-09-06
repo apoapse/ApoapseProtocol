@@ -87,7 +87,7 @@ std::shared_ptr<FileStreamConnection::WriteBuffer> FileStreamConnection::ReadFro
 void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<WriteBuffer> buffer, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
 {
 	ASSERT(IsSendingFile());
-	LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " index: " << buffer->index;
+	//LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " index: " << buffer->index;
 
 	m_currentFileSend->sentSize += bytesTransferred;
 	
