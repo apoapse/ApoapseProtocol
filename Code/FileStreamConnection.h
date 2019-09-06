@@ -6,6 +6,7 @@
 #include <boost/asio/strand.hpp>
 #include <mutex>
 #include "TCPConnectionNoTLS.h"
+#include <boost/multi_index/detail/adl_swap.hpp>
 constexpr auto FILE_STREAM_READ_BUFFER_SIZE = 1024 * 500;
 
 using NetBuffer = std::array<byte, FILE_STREAM_READ_BUFFER_SIZE>;
@@ -41,9 +42,15 @@ class FileStreamConnection : public TCPConnectionNoTLS
 
 		std::ifstream readStream;
 	};
+
+	struct WriteBuffer
+	{
+		NetBuffer data;
+		UInt16 index;
+	};
 	
-	NetBuffer m_readBuffer;
-	NetBuffer m_writeBuffer;
+	std::array<byte, FILE_STREAM_READ_BUFFER_SIZE> m_readBuffer;
+	std::array<byte, FILE_STREAM_READ_BUFFER_SIZE> m_writeBuffer;
 	std::optional<FileReceive> m_currentFileDownload;
 	std::optional<FileSend> m_currentFileSend;
 	bool m_socketAuthenticated = false;
@@ -82,11 +89,11 @@ private:
 	
 	void StartReading();
 	void OnReceiveData(size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection);
-	UInt16 ReadFromFile();
+	std::shared_ptr<WriteBuffer> ReadFromFile();
 
-	void OnFilePartReceived(Range<std::array<byte, FILE_STREAM_READ_BUFFER_SIZE>> data);
+	void OnFilePartReceived(size_t bytesTransferred, std::shared_ptr<NetBuffer> dataBuffer);
 
-	void HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, UInt16 packetIndex, std::shared_ptr<TCPConnectionNoTLS> tcpConnection);
+	void HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<WriteBuffer> buffer, std::shared_ptr<TCPConnectionNoTLS> tcpConnection);
 
 	void OnSendingSuccessful(size_t bytesTransferred) override;	// Used with generic ByteContainer, strings sends not for files
 };

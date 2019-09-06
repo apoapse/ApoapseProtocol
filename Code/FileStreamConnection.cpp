@@ -38,8 +38,11 @@ void FileStreamConnection::SendFileFromQueue()
 {
 	ASSERT(!m_filesToSendQueue.empty());
 
-	auto& file = m_filesToSendQueue.front();
-	SendFileInternal(file.filePath, file.fileSize);
+	m_socket->get_io_service().post([this]()
+	{
+		auto& file = m_filesToSendQueue.front();
+		SendFileInternal(file.filePath, file.fileSize);
+	});
 }
 
 void FileStreamConnection::SendFileInternal(const std::string& filePath, UInt64 size)
@@ -50,13 +53,47 @@ void FileStreamConnection::SendFileInternal(const std::string& filePath, UInt64 
 
 	LOG << "Sending file " << filePath << " size: " << m_currentFileSend->fileSize;
 
-	const UInt16 packetIndex = ReadFromFile();
-	
-	auto self(shared_from_this());
-	m_socket->async_write_some(boost::asio::buffer(m_writeBuffer), boost::asio::bind_executor(m_strand, [this, self, packetIndex](boost::system::error_code er, size_t bytesTransferred)
+			std::shared_ptr<WriteBuffer> newBuffer = ReadFromFile();
+
+		auto self(shared_from_this());
+		m_socket->async_write_some(boost::asio::buffer(newBuffer->data), boost::asio::bind_executor(m_strand, [this, self, newBuffer](boost::system::error_code er, size_t bytesTransferred)
+		{
+			HandleFileWriteAsync(er, bytesTransferred, newBuffer, self);
+		}));
+
+	/*size_t fileRead = 0;
 	{
-		HandleFileWriteAsync(er, bytesTransferred, packetIndex, self);
-	}));
+		std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
+		UInt16 index = 0;
+		while(!file.eof())
+		{
+			auto buffer = std::make_shared<WriteBuffer>();
+			buffer->index = index;
+
+			{
+				const auto byteArray = ToBytes<UInt16>(static_cast<UInt16>(buffer->index), Endianness::BIG_ENDIAN);
+				std::copy(byteArray.begin(), byteArray.end(), buffer->data.begin());
+			}
+			
+			file.read((char*)&buffer->data, buffer->data.size());
+			const std::streamsize dataSize = file.gcount();
+			fileRead += dataSize;
+
+			auto self(shared_from_this());
+			m_socket->async_write_some(boost::asio::buffer(buffer->data), boost::asio::bind_executor(m_strand, [this, self, buffer](boost::system::error_code er, size_t bytesTransferred)
+			{
+				HandleFileWriteAsync(er, bytesTransferred, buffer, self);
+			}));
+
+			index++;
+		}
+		file.close();
+	
+
+		ASSERT(fileRead == m_currentFileSend->fileSize);
+	
+	}*/
+	
 }
 
 void FileStreamConnection::OnFileSentInternal()
@@ -70,33 +107,36 @@ void FileStreamConnection::OnFileSentInternal()
 		SendFileFromQueue();
 }
 
-UInt16 FileStreamConnection::ReadFromFile()
+std::shared_ptr<FileStreamConnection::WriteBuffer> FileStreamConnection::ReadFromFile()
 {
-	const UInt16 currentPacketIndex = m_currentFileSend->packetIndex;
+	auto buffer = std::make_shared<WriteBuffer>();
+	buffer->index = m_currentFileSend->packetIndex;
+	m_currentFileSend->packetIndex++;
 	
-	{
-		const auto byteArray = ToBytes<UInt16>(static_cast<UInt16>(currentPacketIndex), Endianness::BIG_ENDIAN);
-		std::copy(byteArray.begin(), byteArray.end(), m_writeBuffer.begin());
+	/*{
+		const auto byteArray = ToBytes<UInt16>(static_cast<UInt16>(buffer->index), Endianness::BIG_ENDIAN);
+		std::copy(byteArray.begin(), byteArray.end(), buffer->data.begin());
 
 		m_currentFileSend->packetIndex++;
-	}
-	
-	m_currentFileSend->readStream.read((char*)&m_writeBuffer[2], m_writeBuffer.size() - 2);
+	}*/
+
+	m_currentFileSend->readStream.read((char*)&buffer->data, buffer->data.size());
 	const std::streamsize dataSize = m_currentFileSend->readStream.gcount();
 	
-	
-	m_currentFileSend->sentSize += (UInt32)dataSize;
+	//m_currentFileSend->sentSize += (UInt32)dataSize;
 
 	//LOG_DEBUG << "Read " << dataSize << " bytes from file";
-	return currentPacketIndex;
+	return buffer;
 }
 
-void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, UInt16 packetIndex, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
+void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<WriteBuffer> buffer, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
 {
 	ASSERT(IsSendingFile());
-	//LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " index: " << packetIndex;
+	LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " index: " << buffer->index;
+
+	m_currentFileSend->sentSize += bytesTransferred;
 	
-	if (m_currentFileSend->sentSize == m_currentFileSend->fileSize || bytesTransferred == 0)
+	if (m_currentFileSend->sentSize >= m_currentFileSend->fileSize)
 	{
 		m_currentFileSend->readStream.close();
 		OnFileSentInternal();
@@ -107,12 +147,12 @@ void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code&
 	else
 	{
 		//std::this_thread::sleep_for(4ms);	// TODO IMPORTANT THIS THING IS NECESSARY FOR NOW TO HAVE DATA RECEIVED IN THE RIGHT ORDER
-		const UInt16 newPacketIndex = ReadFromFile();
+		std::shared_ptr<WriteBuffer> newBuffer = ReadFromFile();
 
 		auto self(shared_from_this());
-		m_socket->async_write_some(boost::asio::buffer(m_writeBuffer), boost::asio::bind_executor(m_strand, [this, self, newPacketIndex](boost::system::error_code er, size_t bytesTransferred)
+		m_socket->async_write_some(boost::asio::buffer(newBuffer->data), boost::asio::bind_executor(m_strand, [this, self, newBuffer](boost::system::error_code er, size_t bytesTransferred)
 		{
-			HandleFileWriteAsync(er, bytesTransferred, newPacketIndex, self);
+			HandleFileWriteAsync(er, bytesTransferred, newBuffer, self);
 		}));
 	}
 
@@ -139,17 +179,19 @@ void FileStreamConnection::StartReading()
 
 void FileStreamConnection::OnReceiveData(size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
 {
+	std::shared_ptr<NetBuffer> dataBuffer = std::make_shared<NetBuffer>();
+	std::copy(m_readBuffer.begin(), m_readBuffer.begin() + bytesTransferred, dataBuffer->begin());
+	Range data(*dataBuffer, bytesTransferred);
+	
 	if (global->isServer && !m_socketAuthenticated)
 	{
 		if (bytesTransferred == (sha256Length + sha256Length))	// Username + auth code
 		{
-			Range range(m_readBuffer, bytesTransferred);
-			
-			const Username username = Username(ByteContainer(range.begin(), range.begin() + sha256Length));
-			range.Consume(sha256Length);
+			const Username username = Username(ByteContainer(data.begin(), data.begin() + sha256Length));
+			data.Consume(sha256Length);
 			
 			hash_SHA256 authCode;
-			std::copy(range.begin(), range.begin() + sha256Length, authCode.begin());
+			std::copy(data.begin(), data.begin() + sha256Length, authCode.begin());
 			
 			Authenticate(username, authCode);
 		}
@@ -181,33 +223,31 @@ void FileStreamConnection::OnReceiveData(size_t bytesTransferred, std::shared_pt
 		LOG << "Start file download (size: " << m_currentFileDownload->fileSize << ")";
 	}
 
-	Range data(m_readBuffer, bytesTransferred);
-
 	//m_currentFileDownload->receivedSize += static_cast<UInt32>(data.size());
 
-	if (IsDownloadingFile() && data.size() > 0)
+	if (IsDownloadingFile() && bytesTransferred > 0)
 	{
-		OnFilePartReceived(data);
+		OnFilePartReceived(bytesTransferred, dataBuffer);
 	}
-
-	StartReading();
 }
 
-void FileStreamConnection::OnFilePartReceived(Range<std::array<byte, FILE_STREAM_READ_BUFFER_SIZE>> data)
+void FileStreamConnection::OnFilePartReceived(size_t bytesTransferred, std::shared_ptr<NetBuffer> dataBuffer)
 {
-	const UInt16 packetIndex = FromBytes<UInt16>(data, Endianness::BIG_ENDIAN);
-	data.Consume(2);
+	Range data(*dataBuffer, bytesTransferred);
+	//const UInt16 packetIndex = FromBytes<UInt16>(data, Endianness::BIG_ENDIAN);
+	//data.Consume(2);
 
 	const UInt32 bytesToWrite = std::min((UInt32)data.size(), (m_currentFileDownload->fileSize - m_currentFileDownload->writtenSize));
 
-	std::shared_ptr<NetBuffer> dataBuffer = std::make_shared<NetBuffer>();
-	std::copy(m_readBuffer.begin(), m_readBuffer.end(), dataBuffer->begin());
+
 	m_currentFileDownload->writtenSize += bytesToWrite;
+	//LOG_DEBUG << std::string(data.begin(), data.begin() + bytesToWrite);
 
 	auto& bufferRef = *dataBuffer;
-	m_currentFileDownload->writeStream.write((const char*)data.data(), bytesToWrite);
+	m_currentFileDownload->writeStream.write((const char*)&bufferRef, bytesToWrite);
+	//LOG_DEBUG << "bytesToWrite " << bytesToWrite;
 
-	LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileDownload->writtenSize << " of " << m_currentFileDownload->fileSize << " index: " << packetIndex;
+	LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileDownload->writtenSize << " of " << m_currentFileDownload->fileSize/* << " index: " << packetIndex*/;
 	
 	if (m_currentFileDownload->writtenSize == m_currentFileDownload->fileSize)
 	{
@@ -218,13 +258,35 @@ void FileStreamConnection::OnFilePartReceived(Range<std::array<byte, FILE_STREAM
 
 		m_filesToReceiveQueue.pop_front();
 		m_currentFileDownload.reset();
+
+		StartReading();
+	}
+	else
+	{
+		const UInt32 totalIndexLenght = (m_currentFileDownload->fileSize / FILE_STREAM_READ_BUFFER_SIZE) * 2;
+		const UInt32 bytesToTransfer = std::min((m_currentFileDownload->fileSize + totalIndexLenght) - m_currentFileDownload->writtenSize, (UInt32)FILE_STREAM_READ_BUFFER_SIZE);
+
+		auto self(shared_from_this());
+		if (m_socket->available())
+		{
+			boost::asio::async_read(*m_socket, boost::asio::buffer(m_readBuffer), boost::asio::transfer_all(), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
+			{
+				OnReceiveData(bytesTransferred, self);
+			}));
+		}
+		else
+		{
+			StartReading();
+		}
+		
+
 	}
 }
 
 bool FileStreamConnection::OnSocketConnectedInternal()
 {
-	StartReading();
 	OnSocketConnected();
+	StartReading();
 	return true;
 }
 
