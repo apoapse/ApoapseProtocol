@@ -19,7 +19,8 @@ UNIT_TEST("NetworkPayload:Insert:ReadHeader")
 
 	payload.Insert(range, 4);
 
-	UnitTest::Assert(payload.headerInfo->payloadLength == 2 && payload.headerInfo->cmdShortName == "er", std::to_string(payload.headerInfo->payloadLength));
+	CHECK(payload.headerInfo->payloadLength == 2);
+	CHECK(payload.headerInfo->cmdShortName == "er");
 } UNIT_TEST_END
 
 UNIT_TEST("NetworkPayload:Insert:BytesLeft")
@@ -30,17 +31,14 @@ UNIT_TEST("NetworkPayload:Insert:BytesLeft")
 
 	NetworkPayload payload;
 
-	if (payload.BytesLeft() == 0)
-		UnitTest::Fail("#1");
-
+	REQUIRE(payload.BytesLeft() != 0);
 	payload.Insert(range, 4);
 
-	if (payload.BytesLeft() != NetworkPayload::headerLength - 4)
-		UnitTest::Fail("#2");
-
+	REQUIRE(!(payload.BytesLeft() != NetworkPayload::headerLength - 4));
 	payload.Insert(range, 4);
 
-	UnitTest::Assert(payload.BytesLeft() == 0, std::to_string(payload.BytesLeft()));
+	CHECK(payload.BytesLeft() == 0);
+	
 } UNIT_TEST_END
 
 UNIT_TEST("NetworkPayload:Insert:GetPayloadContent")
@@ -55,7 +53,10 @@ UNIT_TEST("NetworkPayload:Insert:GetPayloadContent")
 	payload.Insert(range, 4);
 
 	auto payloadContent = payload.GetPayloadContent();
-	UnitTest::Assert(payloadContent[0] == 0x01 && payloadContent[1] == 0x02);
+
+	CHECK(payloadContent[0] == 0x01);
+	CHECK(payloadContent[1] == 0x02);
+	
 } UNIT_TEST_END
 
 UNIT_TEST("NetworkPayload:WriteHeader")
@@ -67,7 +68,9 @@ UNIT_TEST("NetworkPayload:WriteHeader")
 	NetworkPayload payload("er", std::move(testVec));
 	payload.ReadHeader();
 
-	UnitTest::Assert(payload.headerInfo->payloadLength == 2 && payload.headerInfo->cmdShortName == "er");
+	CHECK(payload.headerInfo->payloadLength == 2);
+	CHECK(payload.headerInfo->cmdShortName == "er");
+	
 } UNIT_TEST_END
 
 #endif	// UNIT_TESTS

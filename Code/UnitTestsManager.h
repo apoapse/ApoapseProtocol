@@ -7,7 +7,13 @@
 
 class UnitTestsManager
 {
+	struct TestExec
+	{
+		std::vector<std::string> errorMsgs;
+	};
+	
 	std::vector<UnitTest> m_registeredUnitTests;
+	std::optional<TestExec> m_currentTest;
 
 	enum class ConsoleColors
 	{
@@ -31,6 +37,9 @@ public:
 		return testsManager;
 	}
 
+	void Check(bool exp, const std::string& code);
+	void Require(bool exp, const std::string& code);
+
 private:
 	void Log(const std::string& msg, ConsoleColors color = ConsoleColors::DEFAULT) const;
 	void SortTests();
@@ -47,3 +56,5 @@ public:
 
 #define UNIT_TEST(_name)	static UnitTestAutoRegister MACRO_CONCAT(testRegister_, __COUNTER__)(UnitTest(_name, []() -> void
 #define UNIT_TEST_END		));
+#define CHECK(_exp)	UnitTestsManager::GetInstance().Check(_exp, #_exp);
+#define REQUIRE(_exp)	UnitTestsManager::GetInstance().Require(_exp, #_exp);

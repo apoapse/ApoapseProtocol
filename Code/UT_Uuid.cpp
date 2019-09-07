@@ -12,7 +12,7 @@ UNIT_TEST("Uuid:generate_and_validate")
 
 	std::vector<byte> vec(uuid.GetInRawFormat().begin(), uuid.GetInRawFormat().end());
 
-	UnitTest::Assert(Uuid::IsValid(vec));
+	CHECK(Uuid::IsValid(vec));
 } UNIT_TEST_END
 
 UNIT_TEST("Uuid:generate_uniqueness")
@@ -20,21 +20,21 @@ UNIT_TEST("Uuid:generate_uniqueness")
 	auto uuid1 = Uuid::Generate();
 	auto uuid2 = Uuid::Generate();
 	
-	UnitTest::Assert(uuid1.GetInRawFormat() != uuid2.GetInRawFormat());
+	CHECK(uuid1.GetInRawFormat() != uuid2.GetInRawFormat());
 } UNIT_TEST_END
 
 UNIT_TEST("Uuid:validate:too_short")
 {
 	std::vector<byte> vec{0x01, 0x02, 0x03, 0x04, 0x01, 0x01, 0x01 };
 
-	UnitTest::Assert(!Uuid::IsValid(vec));
+	CHECK(!Uuid::IsValid(vec));
 } UNIT_TEST_END
 
 UNIT_TEST("Uuid:validate:too_long")
 {
 	std::vector<byte> vec{ 0x01, 0x02, 0x03, 0x04, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 };
 
-	UnitTest::Assert(!Uuid::IsValid(vec));
+	CHECK(!Uuid::IsValid(vec));
 } UNIT_TEST_END
 
 #endif	// UNIT_TESTS

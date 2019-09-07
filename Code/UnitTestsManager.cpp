@@ -19,30 +19,52 @@ void UnitTestsManager::RunTests(const std::string& testsPath /*= ""*/)
 
 	for (const UnitTest& test : m_registeredUnitTests)
 	{
-		//std::this_thread::sleep_for(3ms);	// Weirds things happen when all the function follow themselves too fast
+		m_currentTest = TestExec();
 
-		std::string errorMsg = "";
-		bool testResult = test.Run(errorMsg);
+		const bool testResult = test.Run();
 
-		if (testResult)
+		if (testResult && m_currentTest->errorMsgs.empty())
 		{
 			Log("TEST " + test.GetFullName() + " -> SUCCESS", ConsoleColors::GREEN);
 			++successCount;
 		}
 		else
 		{
-			Log("TEST " + test.GetFullName() + " -> FAILURE " + errorMsg, ConsoleColors::RED);
+			Log("TEST " + test.GetFullName() + " -> FAILURE", ConsoleColors::RED);
+
+			for (const std::string& errorMsg : m_currentTest->errorMsgs)
+			{
+				Log("\t " + errorMsg, ConsoleColors::RED);
+			}
+			
 			++errorsCount;
 		}
 	}
 
-	ConsoleColors resultColor = (errorsCount == 0) ? ConsoleColors::DEFAULT : ConsoleColors::RED;
+	const ConsoleColors resultColor = (errorsCount == 0) ? ConsoleColors::DEFAULT : ConsoleColors::RED;
 	Log("EXECUTED " + std::to_string(toExecuteTestsCount) + " UNIT TESTS. " + std::to_string(successCount) + " successful, " + std::to_string(errorsCount) + " failed", resultColor);
 }
 
 void UnitTestsManager::RegisterTest(const UnitTest& test)
 {
 	m_registeredUnitTests.push_back(test);
+}
+
+void UnitTestsManager::Check(bool exp, const std::string& code)
+{
+	if (!exp)
+	{
+		m_currentTest->errorMsgs.push_back("CHECK failed on: " + code);
+	}
+}
+
+void UnitTestsManager::Require(bool exp, const std::string& code)
+{
+	if (!exp)
+	{
+		m_currentTest->errorMsgs.push_back("REQUIRE failed on: " + code);
+		throw FailException();
+	}
 }
 
 void UnitTestsManager::Log(const std::string& msg, ConsoleColors color /*= ConsoleColors::DEFAULT*/) const

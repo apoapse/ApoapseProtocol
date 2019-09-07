@@ -15,7 +15,7 @@ UNIT_TEST("ProtectedByteContainer:Read")
 	}
 
 	ProtectedByteContainer key(input);
-	UnitTest::Assert(key.Read() == input);
+	CHECK(key.Read() == input);
 } UNIT_TEST_END
 
 #endif	// UNIT_TESTS

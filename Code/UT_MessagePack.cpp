@@ -21,7 +21,9 @@ UNIT_TEST("MessagePack:serialize:ordered")
 
 	MessagePackDeserializer deserializer(serializer.GetMessagePackBytes());
 
-	UnitTest::Assert(deserializer.GetValue<std::string>("string1") == "string_value1" && deserializer.GetValue<Int16>("int1") == -26 && deserializer.GetArray<int>("test_array").at(1) == 7);
+	CHECK(deserializer.GetValue<std::string>("string1") == "string_value1");
+	CHECK(deserializer.GetValue<Int16>("int1") == -26);
+	CHECK(deserializer.GetArray<int>("test_array").at(1) == 7);
 } UNIT_TEST_END
 
 UNIT_TEST("MessagePack:serialize:unordered")
@@ -33,7 +35,9 @@ UNIT_TEST("MessagePack:serialize:unordered")
 
 	MessagePackDeserializer deserializer(ser.GetMessagePackBytes());
 
-	UnitTest::Assert(deserializer.GetValue<std::string>("test") == "coucou" && deserializer.GetValue<bool>("testb") == true && deserializer.GetArray<std::string>("loli.arr_test").at(1) == "lul");
+	CHECK(deserializer.GetValue<std::string>("test") == "coucou");
+	CHECK(deserializer.GetValue<bool>("testb") == true);
+	CHECK(deserializer.GetArray<std::string>("loli.arr_test").at(1) == "lul");
 } UNIT_TEST_END
 
 UNIT_TEST("MessagePack:serialize:unordered_2")
@@ -48,7 +52,8 @@ UNIT_TEST("MessagePack:serialize:unordered_2")
 
 	auto test = ser.GetMessagePackBytes();
 	auto val = deserializer.GetValue<bool>("testb");
-	UnitTest::Assert(deserializer.GetValue<std::vector<byte>>("bytes").size() == 2 && deserializer.GetValue<bool>("testb"));
+	CHECK(deserializer.GetValue<std::vector<byte>>("bytes").size() == 2);
+	CHECK(deserializer.GetValue<bool>("testb"));
 } UNIT_TEST_END
 
 UNIT_TEST("MessagePack:serialize:no_root:ordered")
@@ -65,8 +70,8 @@ UNIT_TEST("MessagePack:serialize:no_root:ordered")
 	MessagePackDeserializer deserializer(serializer.GetMessagePackBytes());
 	auto test = serializer.GetMessagePackBytes();
 
-
-	UnitTest::Assert(deserializer.GetValue<Int16>("root.int1") == -26 && deserializer.GetArray<int>("root.test_array").at(1) == 7);
+	CHECK(deserializer.GetValue<Int16>("root.int1") == -26);
+	CHECK(deserializer.GetArray<int>("root.test_array").at(1) == 7);
 } UNIT_TEST_END
 
 UNIT_TEST("MessagePack:serialize:no_root:unordered")
@@ -79,7 +84,9 @@ UNIT_TEST("MessagePack:serialize:no_root:unordered")
 
 	MessagePackDeserializer deserializer(serializer.GetMessagePackBytes());
 
-	UnitTest::Assert(deserializer.GetValue<Int16>("root.int1") == -26 && deserializer.GetArray<int>("root.test_array").at(1) == 7);
+	CHECK(deserializer.GetValue<Int16>("root.int1") == -26);
+	CHECK(deserializer.GetArray<int>("root.test_array").at(1) == 7);
+	
 } UNIT_TEST_END
 
 UNIT_TEST("MessagePack:serialize:unordered:std_array")
@@ -92,7 +99,9 @@ UNIT_TEST("MessagePack:serialize:unordered:std_array")
 	MessagePackDeserializer deserializer(ser.GetMessagePackBytes());
 
 	const auto val = deserializer.GetValue<std::vector<byte>>("arr");
-	UnitTest::Assert(val[0] == 0xf3 && val[1] == 0x08);
+	CHECK(val[0] == 0xf3);
+	CHECK(val[1] == 0x08);
+
 } UNIT_TEST_END
 
 UNIT_TEST("MessagePack:deserialize:optional")
@@ -102,8 +111,8 @@ UNIT_TEST("MessagePack:deserialize:optional")
 
 	MessagePackDeserializer deserializer(ser.GetMessagePackBytes());
 
-	UnitTest::Assert(deserializer.GetValueOptional<std::string>("test") && !deserializer.GetValueOptional<std::string>("test.noes_not_exist"));
-
+	CHECK(deserializer.GetValueOptional<std::string>("test").has_value());
+	CHECK(!deserializer.GetValueOptional<std::string>("test.noes_not_exist"));
 } UNIT_TEST_END
 
 UNIT_TEST("MessagePack:serialize:ordered:bytes")
@@ -118,7 +127,9 @@ UNIT_TEST("MessagePack:serialize:ordered:bytes")
 
 	MessagePackDeserializer deserializer(serializer.GetMessagePackBytes());
 
-	UnitTest::Assert(Uuid::IsValid(deserializer.GetValue<std::vector<byte>>("related_item")) && deserializer.GetValue<int>("test_int") == 32);
+	CHECK(Uuid::IsValid(deserializer.GetValue<std::vector<byte>>("related_item")));
+	CHECK(deserializer.GetValue<int>("test_int") == 32);
+	
 } UNIT_TEST_END
 
 UNIT_TEST("MessagePack:serialize:nested_serializer")
@@ -133,7 +144,7 @@ UNIT_TEST("MessagePack:serialize:nested_serializer")
 
 	MessagePackDeserializer deserializer(ser.GetMessagePackBytes());
 
-	UnitTest::Assert(deserializer.GetValue<MessagePackDeserializer>("nested").GetValue<std::string>("str") == "test string");
+	CHECK(deserializer.GetValue<MessagePackDeserializer>("nested").GetValue<std::string>("str") == "test string");
 } UNIT_TEST_END
 
 UNIT_TEST("MessagePack:serialize:nested_serializer:array")
@@ -155,14 +166,15 @@ UNIT_TEST("MessagePack:serialize:nested_serializer:array")
 
 		finalBytes = ser.GetMessagePackBytes();
 
-		if (finalBytes.empty())
-			UnitTest::Fail();
+		REQUIRE(!finalBytes.empty());
 	}
 
 	MessagePackDeserializer deserializer(finalBytes);
 	auto deserializersArray = deserializer.GetArray<MessagePackDeserializer>("nested");
 
-	UnitTest::Assert(deserializersArray[0].GetValue<std::string>("test_str") == "test_str_0" && deserializersArray[1].GetValue<std::string>("test_str") == "test_str_1");
+	CHECK(deserializersArray[0].GetValue<std::string>("test_str") == "test_str_0");
+	CHECK(deserializersArray[1].GetValue<std::string>("test_str") == "test_str_1");
+	
 } UNIT_TEST_END
 
 UNIT_TEST("MessagePack:ToSerializer")
@@ -180,8 +192,9 @@ UNIT_TEST("MessagePack:ToSerializer")
 	auto serializerFinal = deserializer.ToSerializer();
 	MessagePackDeserializer deserializerFinal(serializerFinal.GetMessagePackBytes());
 
-
-	UnitTest::Assert(deserializerFinal.GetValue<int>("simple") == 58 && deserializerFinal.GetValue<MessagePackDeserializer>("nested").GetValue<std::string>("str") == "test string");
+	CHECK(deserializerFinal.GetValue<int>("simple") == 58);
+	CHECK(deserializerFinal.GetValue<MessagePackDeserializer>("nested").GetValue<std::string>("str") == "test string");
+	
 } UNIT_TEST_END
 
 #endif	// UNIT_TESTS

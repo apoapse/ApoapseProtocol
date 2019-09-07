@@ -17,7 +17,7 @@ UNIT_TEST("Cryptography:HMAC_SHA256")
 
 	auto hmacSignature = Cryptography::HMAC::Sign_SHA256(key, message);
 
-	UnitTest::Assert(Cryptography::HMAC::VerifySignature_SHA256(key, hmacSignature, message));
+	CHECK(Cryptography::HMAC::VerifySignature_SHA256(key, hmacSignature, message));
 } UNIT_TEST_END
 
 UNIT_TEST("Cryptography:RSA:EncryptDecrypt")
@@ -28,7 +28,7 @@ UNIT_TEST("Cryptography:RSA:EncryptDecrypt")
 	auto cipher = Cryptography::RSA::Encrypt(publicKey, std::vector<byte>(message.begin(), message.end()));
 	auto result = Cryptography::RSA::Decrypt(privateKey, cipher);
 
-	UnitTest::Assert(std::string(result.begin(), result.end()) == message);
+	CHECK(std::string(result.begin(), result.end()) == message);
 } UNIT_TEST_END
 
 UNIT_TEST("Cryptography:RSA:Sign")
@@ -38,7 +38,7 @@ UNIT_TEST("Cryptography:RSA:Sign")
 
 	auto signature = Cryptography::RSA::Sign(privateKey, std::vector<byte>(message.begin(), message.end()));
 
-	UnitTest::Assert(Cryptography::RSA::VerifySignature(signature, publicKey, std::vector<byte>(message.begin(), message.end())));
+	CHECK(Cryptography::RSA::VerifySignature(signature, publicKey, std::vector<byte>(message.begin(), message.end())));
 } UNIT_TEST_END
 
 UNIT_TEST("Cryptography:AES_CBC:EncryptDecrypt")
@@ -49,7 +49,7 @@ UNIT_TEST("Cryptography:AES_CBC:EncryptDecrypt")
 
 	auto decryptedMsg = Cryptography::AES_CBC::Decrypt(key, iv, encryptedMsg);
 
-	UnitTest::Assert(decryptedMsg == plain);
+	CHECK(decryptedMsg == plain);
 } UNIT_TEST_END
 
 #endif	// UNIT_TESTS
