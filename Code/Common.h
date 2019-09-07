@@ -44,11 +44,13 @@ extern Global* global;
 // Logs
 void FatalError(const std::string& msg);
 #define LOG if (global->logger.get() != nullptr) Log(*global->logger) << "[" << ExtractClassName(__FUNCTION__) << "] "
+
 #ifdef DEBUG
 #define LOG_DEBUG	LOG << LogSeverity::debug
 #else
-#define LOG_DEBUG	//
+#define LOG_DEBUG DummyLog()
 #endif
+
 
 #ifdef DEBUG
 #define LOG_DEBUG_FUNCTION_NAME()	LOG << LogSeverity::debug << __FUNCTION__

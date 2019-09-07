@@ -67,6 +67,7 @@ void GenericConnection::ProcessDataGeneric(Range<std::array<byte, READ_BUFFER_SI
 			ReadPayloadData(std::move(payload));
 
 #ifndef DEBUG
+	}
 	catch (const std::length_error&)
 	{
 		SecurityLog::LogAlert(ApoapseErrorCode::network_message_too_long, *this);
@@ -122,7 +123,7 @@ void GenericConnection::OnReceivedPayload(std::shared_ptr<NetworkPayload> payloa
 		}
 		catch (const std::exception& e)
 		{
-			LOG << LogSeverity::error << "Exception trigged while processing a command of type " << cmd.name << ": " << e;
+			LOG << LogSeverity::error << "Exception trigged while processing a command of type " << cmd->name << ": " << e;
 			Close();
 		}
 #endif

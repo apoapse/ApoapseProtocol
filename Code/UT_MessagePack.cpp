@@ -51,7 +51,7 @@ UNIT_TEST("MessagePack:serialize:unordered_2")
 	MessagePackDeserializer deserializer(ser.GetMessagePackBytes());
 
 	auto test = ser.GetMessagePackBytes();
-	auto val = deserializer.GetValue<bool>("testb");
+
 	CHECK(deserializer.GetValue<std::vector<byte>>("bytes").size() == 2);
 	CHECK(deserializer.GetValue<bool>("testb"));
 } UNIT_TEST_END

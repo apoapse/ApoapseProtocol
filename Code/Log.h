@@ -19,6 +19,15 @@ private:
 	void GenerateDateTime();
 };
 
+struct DummyLog
+{
+	template<typename T>
+	DummyLog& operator<<(const T&)
+	{
+		return *this;
+	}
+};
+
 class Log
 {
 	std::stringstream m_stream;
