@@ -12,7 +12,7 @@ ThreadPool::ThreadPool(const std::string& threadPoolName, UInt32 nbThreads, bool
 	{
 		for (UInt32 i = 0; i < nbThreads; i++)
 		{
-			std::thread thread([this, &threadPoolName, i]
+			std::thread thread([this, threadPoolName, i]
 			{
 				{
 					std::stringstream threadName;
