@@ -14,8 +14,8 @@ class UnitTest
 
 public:
 	UnitTest(const std::string& fullName, const std::function<void()> code)
-		: m_fullName(fullName)
-		, m_testCode(code)
+		: m_testCode(code)
+		, m_fullName(fullName)
 	{
 	}
 
@@ -24,7 +24,7 @@ public:
 		return m_fullName == other.GetFullName();
 	}
 
-	bool Run() const
+	bool Run(std::string& exceptionError) const
 	{
 		try
 		{
@@ -35,8 +35,9 @@ public:
 		{
 			return false;
 		}
-		catch (const std::exception&)
+		catch (const std::exception& e)
 		{
+			exceptionError = e.what();
 			return false;
 		}
 	}

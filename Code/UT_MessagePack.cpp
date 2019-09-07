@@ -135,6 +135,7 @@ UNIT_TEST("MessagePack:serialize:ordered:bytes")
 UNIT_TEST("MessagePack:serialize:nested_serializer")
 {
 	MessagePackSerializer ser;
+	
 	{
 		MessagePackSerializer nestedSer;
 		nestedSer.UnorderedAppend("str", "test string"s);
@@ -144,6 +145,7 @@ UNIT_TEST("MessagePack:serialize:nested_serializer")
 
 	MessagePackDeserializer deserializer(ser.GetMessagePackBytes());
 
+	CHECK(deserializer.GetValue<MessagePackDeserializer>("nested").Exist("str"));
 	CHECK(deserializer.GetValue<MessagePackDeserializer>("nested").GetValue<std::string>("str") == "test string");
 } UNIT_TEST_END
 

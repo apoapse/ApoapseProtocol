@@ -19,9 +19,10 @@ void UnitTestsManager::RunTests(const std::string& testsPath /*= ""*/)
 
 	for (const UnitTest& test : m_registeredUnitTests)
 	{
+		std::string exceptionError;
 		m_currentTest = TestExec();
 
-		const bool testResult = test.Run();
+		const bool testResult = test.Run(exceptionError);
 
 		if (testResult && m_currentTest->errorMsgs.empty())
 		{
@@ -35,6 +36,11 @@ void UnitTestsManager::RunTests(const std::string& testsPath /*= ""*/)
 			for (const std::string& errorMsg : m_currentTest->errorMsgs)
 			{
 				Log("\t " + errorMsg, ConsoleColors::RED);
+			}
+
+			if (!exceptionError.empty())
+			{
+				Log("\t Exception triggered: " + exceptionError, ConsoleColors::RED);
 			}
 			
 			++errorsCount;
