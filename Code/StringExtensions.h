@@ -59,6 +59,8 @@ namespace StringExtensions
 
 	void split(const std::string& str, std::vector<std::string>& output, const std::string& separator);
 
+	std::string join(const std::vector<std::string>& input, const std::string& separator, bool trimLastSeparator = false);
+
 	template <typename T>
 	inline std::basic_string<T> get_last_chars(const std::basic_string<T>& str, size_t nb_of_chars)
 	{

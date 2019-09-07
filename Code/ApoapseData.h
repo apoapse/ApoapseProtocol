@@ -35,6 +35,12 @@ public:
 	static bool AllowDatabaseStorage(const DataField& field);
 
 	template <typename T>
+	DataStructure ReadItemFromDBCustomFields(const std::string& name, const std::string& searchBy, const T& searchValue, const std::vector<std::string>& fieldsToRead)
+	{
+		return ReadItemFromDbInternalCustomFields(name, searchBy, GenerateSQLValue(searchValue), fieldsToRead);
+	}
+
+	template <typename T>
 	DataStructure ReadItemFromDatabase(const std::string& name, const std::string& searchBy, const T& searchValue)
 	{
 		return ReadItemFromDbInternal(name, searchBy, GenerateSQLValue(searchValue));
@@ -47,6 +53,7 @@ public:
 	}
 
 	DataStructure ReadFromDbResult(DataStructureDef& dataStructDef, const SQLRow& row);
+	DataStructure ReadFromDbResultCustomFields(DataStructureDef& dataStructDef, const SQLRow& row, const std::vector<std::string>& fieldsToRead);
 
 private:
 	template <typename T>
@@ -73,6 +80,7 @@ private:
 	DataFieldType GetTypeByTypeName(const std::string& typeStr, bool* isCustomType) const;
 	static ReadPermission GetPermissionByName(const std::string& name);
 
-	DataStructure ReadItemFromDbInternal(const std::string& name, const std::string& seachFieldName, const SQLValue& searchValue);
-	std::vector<DataStructure> ReadListFromDbInternal(const std::string& name, const std::string& seachFieldName, const SQLValue& searchValue, const std::string& orderBy, ResultOrder order, Int64 limit);
+	DataStructure ReadItemFromDbInternal(const std::string& name, const std::string& searchBy, const SQLValue& searchValue);
+	DataStructure ReadItemFromDbInternalCustomFields(const std::string& name, const std::string& searchBy, const SQLValue& searchValue, const std::vector<std::string>& fieldsToRead);
+	std::vector<DataStructure> ReadListFromDbInternal(const std::string& name, const std::string& searchBy, const SQLValue& searchValue, const std::string& orderBy, ResultOrder order, Int64 limit);
 };

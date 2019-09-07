@@ -127,7 +127,7 @@ void ApoapseData::FillAndValidate(MessagePackDeserializer& payloadData, DataStru
 					datArray.push_back(dat);
 				}
 
-				field.value = datArray;
+				field.SetValue(datArray);
 			}
 
 			data.isValid = field.Validate();
@@ -344,10 +344,39 @@ DataStructure ApoapseData::ReadFromDbResult(DataStructureDef& dataStructDef, con
 	return data;
 }
 
+DataStructure ApoapseData::ReadFromDbResultCustomFields(DataStructureDef& dataStructDef, const SQLRow& row, const std::vector<std::string>& fieldsToRead)
+{
+	DataStructure data = dataStructDef;
+	int dbValueId = 0;
+
+	data.SetDbId(row[0].GetInt64());
+	dbValueId++;	// We set it to 1 to skip the id db field which is added by default
+
+	for (const std::string& fieldName : fieldsToRead)
+	{
+		auto& field = data.GetField(fieldName);
+
+		if (field.basicType == DataFieldType::boolean)
+			field.value = row[dbValueId].GetBoolean();
+
+		else if (field.basicType == DataFieldType::byte_blob)
+			field.value = row[dbValueId].GetByteArray();
+
+		else if (field.basicType == DataFieldType::integer)
+			field.value = row[dbValueId].GetInt64();
+
+		else if (field.basicType == DataFieldType::text)
+			field.value = row[dbValueId].GetText();
+
+		dbValueId++;
+	}
+	
+	return data;
+}
+
 DataStructure ApoapseData::ReadItemFromDbInternal(const std::string& name, const std::string& searchBy, const SQLValue& searchValue)
 {
 	auto& structureDef = GetStructureDefinition(name);
-	//auto& fieldInfo = structureDef.GetField(seachFieldName);
 
 	SQLQuery query(*global->database);
 	if (searchBy.empty())
@@ -358,6 +387,29 @@ DataStructure ApoapseData::ReadItemFromDbInternal(const std::string& name, const
 	auto res = query.Exec();
 
 	return ReadFromDbResult(structureDef, res[0]);
+}
+
+DataStructure ApoapseData::ReadItemFromDbInternalCustomFields(const std::string& name, const std::string& searchBy, const SQLValue& searchValue, const std::vector<std::string>& fieldsToRead)
+{
+	auto& structureDef = GetStructureDefinition(name);
+	std::string fields;
+
+	{
+		std::vector<std::string> fieldsArr;
+		fieldsArr.push_back("id");	// Make sure the id field is first
+		std::copy(fieldsToRead.begin(), fieldsToRead.end(), std::back_inserter(fieldsArr));
+		fields = StringExtensions::join(fieldsArr, ",", true);
+	}
+	
+	SQLQuery query(*global->database);
+	if (searchBy.empty())
+		query << SELECT << fields.c_str() << FROM << structureDef.GetDBTableName().c_str();
+	else
+		query << SELECT << fields.c_str() << FROM << structureDef.GetDBTableName().c_str() << WHERE << searchBy.c_str() << EQUALS << searchValue;
+
+	auto res = query.Exec();
+
+	return ReadFromDbResultCustomFields(structureDef, res[0], fieldsToRead);
 }
 
 std::vector<DataStructure> ApoapseData::ReadListFromDbInternal(const std::string& name, const std::string& searchBy, const SQLValue& searchValue, const std::string& orderBy, ResultOrder order, Int64 limit)
