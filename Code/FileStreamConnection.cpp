@@ -128,9 +128,9 @@ void FileStreamConnection::StartReading()
 
 void FileStreamConnection::OnReceiveData(size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
 {
-	if (bytesTransferred == 0)
+	if (bytesTransferred == 0 && !IsConnected())
 		return;
-	
+		
 	std::shared_ptr<NetBuffer> dataBuffer = std::make_shared<NetBuffer>();
 	std::copy(m_readBuffer.begin(), m_readBuffer.begin() + bytesTransferred, dataBuffer->begin());
 	Range data(*dataBuffer, bytesTransferred);
