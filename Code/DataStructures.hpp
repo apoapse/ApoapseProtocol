@@ -405,7 +405,7 @@ static std::string GetDataStructures()
 					"uses":	{
 						"server_storage": true,
 						"client_storage": true,
-						"command": false
+						"command": true
 					}
 				},
 				{
