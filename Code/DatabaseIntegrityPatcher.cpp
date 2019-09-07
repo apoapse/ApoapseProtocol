@@ -129,17 +129,17 @@ bool DatabaseIntegrityPatcher::CheckAndResolve()
 
 					// Rename the actual table to a temporary name
 					{
-						SQLQuery query(*global->database);
-						query << "ALTER TABLE '" << STR_TO_QUERY_SYNTAX(tableOnDb.name) << "' RENAME TO " << STR_TO_QUERY_SYNTAX(tempTableName);
-						if (!query.Exec())
+						SQLQuery query2(*global->database);
+						query2 << "ALTER TABLE '" << STR_TO_QUERY_SYNTAX(tableOnDb.name) << "' RENAME TO " << STR_TO_QUERY_SYNTAX(tempTableName);
+						if (!query2.Exec())
 							return false;
 					}
 
 					// Create the new table
 					{
-						SQLQuery query(*global->database);
-						query << GenerateCreateTableQuery(table).c_str();
-						if (!query.Exec())
+						SQLQuery query2(*global->database);
+						query2 << GenerateCreateTableQuery(table).c_str();
+						if (!query2.Exec())
 							return false;
 					}
 
@@ -155,17 +155,17 @@ bool DatabaseIntegrityPatcher::CheckAndResolve()
 								fieldsList += ", ";
 						}
 
-						SQLQuery query(*global->database);
-						query << "INSERT INTO '" << STR_TO_QUERY_SYNTAX(table.name) << "' (" << STR_TO_QUERY_SYNTAX(fieldsList) <<") SELECT " << STR_TO_QUERY_SYNTAX(fieldsList)<< " FROM " << STR_TO_QUERY_SYNTAX(tempTableName);
-						if (!query.Exec())
+						SQLQuery query2(*global->database);
+						query2 << "INSERT INTO '" << STR_TO_QUERY_SYNTAX(table.name) << "' (" << STR_TO_QUERY_SYNTAX(fieldsList) <<") SELECT " << STR_TO_QUERY_SYNTAX(fieldsList)<< " FROM " << STR_TO_QUERY_SYNTAX(tempTableName);
+						if (!query2.Exec())
 							return false;
 					}
 
 					// Remove the old table
 					{
-						SQLQuery query(*global->database);
-						query << "DROP TABLE " << STR_TO_QUERY_SYNTAX(tempTableName);
-						if (!query.Exec())
+						SQLQuery query2(*global->database);
+						query2 << "DROP TABLE " << STR_TO_QUERY_SYNTAX(tempTableName);
+						if (!query2.Exec())
 							return false;
 					}
 
@@ -182,9 +182,9 @@ bool DatabaseIntegrityPatcher::CheckAndResolve()
 			// The table need to be created
 			LOG << "Creating table " << table.name << " has it does not exist on the database currently";
 
-			SQLQuery query(*global->database);
-			query << GenerateCreateTableQuery(table).c_str();
-			if (!query.Exec())
+			SQLQuery query2(*global->database);
+			query2 << GenerateCreateTableQuery(table).c_str();
+			if (!query2.Exec())
 				return false;
 
 			tablesCreatedCount++;

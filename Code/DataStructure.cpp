@@ -111,11 +111,11 @@ DbId DataStructure::GetDbId()
 		else
 		{
 			// If the item is not already registered, we predict the id that will be used once saved
-			SQLQuery query(*global->database);
-			query << SELECT << "COUNT(*)" FROM << GetDBTableName().c_str();
-			auto res = query.Exec();
+			SQLQuery query2(*global->database);
+			query2 << SELECT << "COUNT(*)" FROM << GetDBTableName().c_str();
+			auto res2 = query2.Exec();
 
-			dbId = (res[0][0].GetInt64() + 1);
+			dbId = (res2[0][0].GetInt64() + 1);
 		}
 	}
 
@@ -147,7 +147,7 @@ void DataStructure::SaveToDatabase()
 			fieldsToSave.push_back(&field);
 	}
 
-	auto& primaryField = GetPrimaryField();
+	auto primaryField = GetPrimaryField();
 
 	SQLQuery query(*global->database);
 

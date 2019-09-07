@@ -39,8 +39,6 @@ public:
 		{
 			return false;
 		}
-
-		return false;
 	}
 
 	std::string GetFullName() const

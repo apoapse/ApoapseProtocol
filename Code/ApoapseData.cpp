@@ -137,7 +137,7 @@ void ApoapseData::FillAndValidate(MessagePackDeserializer& payloadData, DataStru
 
 DataStructureDef& ApoapseData::GetStructureDefinition(const std::string& name)
 {
-	auto& res = std::find_if(m_registeredDataStructures.begin(), m_registeredDataStructures.end(), [&name](const DataStructureDef& dataStruct)
+	const auto res = std::find_if(m_registeredDataStructures.begin(), m_registeredDataStructures.end(), [&name](const DataStructureDef& dataStruct)
 	{
 		return (dataStruct.name == name);
 	});
@@ -155,7 +155,7 @@ const std::vector<DataStructureDef>& ApoapseData::GetRegisteredStructures() cons
 
 const DataStructureDef& ApoapseData::GetStructure(const std::string& name) const
 {
-	auto& res = std::find_if(m_registeredDataStructures.begin(), m_registeredDataStructures.end(), [&name](const DataStructureDef& dataStruct)
+	const auto res = std::find_if(m_registeredDataStructures.begin(), m_registeredDataStructures.end(), [&name](const DataStructureDef& dataStruct)
 	{
 		return (dataStruct.name == name);
 	});
@@ -168,7 +168,7 @@ const DataStructureDef& ApoapseData::GetStructure(const std::string& name) const
 
 const CustomFieldType* ApoapseData::GetCustomTypeInfo(const std::string& name) const
 {
-	auto& res = std::find_if(m_customTypes.begin(), m_customTypes.end(), [&name](const CustomFieldType& fieldType)
+	const auto res = std::find_if(m_customTypes.begin(), m_customTypes.end(), [&name](const CustomFieldType& fieldType)
 	{
 		return (fieldType.name == name);
 	});
@@ -181,7 +181,7 @@ const CustomFieldType* ApoapseData::GetCustomTypeInfo(const std::string& name) c
 
 bool ApoapseData::DataStructureExist(const std::string& name) const
 {
-	auto& res = std::find_if(m_registeredDataStructures.begin(), m_registeredDataStructures.end(), [&name](const DataStructureDef& dataStruct)
+	const auto res = std::find_if(m_registeredDataStructures.begin(), m_registeredDataStructures.end(), [&name](const DataStructureDef& dataStruct)
 	{
 		return (dataStruct.name == name);
 	});
