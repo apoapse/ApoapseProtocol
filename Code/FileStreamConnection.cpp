@@ -89,7 +89,7 @@ void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code&
 	ASSERT(IsSendingFile());
 	//LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " index: " << buffer->index;
 
-	m_currentFileSend->sentSize += bytesTransferred;
+	m_currentFileSend->sentSize += (UInt32)bytesTransferred;
 	
 	if (m_currentFileSend->sentSize >= m_currentFileSend->fileSize)
 	{
@@ -128,6 +128,9 @@ void FileStreamConnection::StartReading()
 
 void FileStreamConnection::OnReceiveData(size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
 {
+	if (bytesTransferred == 0)
+		return;
+	
 	std::shared_ptr<NetBuffer> dataBuffer = std::make_shared<NetBuffer>();
 	std::copy(m_readBuffer.begin(), m_readBuffer.begin() + bytesTransferred, dataBuffer->begin());
 	Range data(*dataBuffer, bytesTransferred);
