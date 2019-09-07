@@ -52,6 +52,7 @@ struct DataField
 	ReadPermission readPermission = ReadPermission::none;
 
 	std::optional<std::any> value;
+	std::optional<std::vector<class DataStructure>> dataArray;
 
 	template <typename T>
 	T GetValue()
@@ -71,9 +72,9 @@ struct DataField
 			return optional;
 	}
 
-	std::vector<class DataStructure> GetDataArray()
+	std::vector<class DataStructure>& GetDataArray()
 	{
-		return std::any_cast<std::vector<class DataStructure>>(value.value());
+		return dataArray.value();
 	}
 
 	void SetValue(Int64 val)
@@ -113,14 +114,17 @@ struct DataField
 			throw std::exception("DataField:SetValue no ICustomDataType converter defined for this base type");
 	}
 
-	void SetValue(std::vector<class DataStructure>& dataArray)
+	void SetValue(std::vector<class DataStructure>& structArray)
 	{
-		value = dataArray;
+		dataArray = structArray;
 	}
 
 	bool HasValue() const
 	{
-		return value.has_value();
+		if (basicType == DataFieldType::data_array)
+			return dataArray.has_value();
+		else
+			return value.has_value();
 	}
 
 	bool Validate() const;

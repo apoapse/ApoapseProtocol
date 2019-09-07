@@ -53,7 +53,7 @@ MessagePackSerializer DataStructure::GetMessagePackFormat(bool includeAllFields/
 		{
 			std::vector<MessagePackSerializer> serArray;
 
-			auto dataArray = field.GetValue<std::vector<DataStructure>>();
+			auto& dataArray = field.GetDataArray();
 			serArray.reserve(dataArray.size());
 
 			for (auto& dat : dataArray)
