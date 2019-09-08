@@ -85,8 +85,10 @@
     <LibraryPath>..\ThirdParty\sqlcipher;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IntDir>$(SolutionDir)vs_build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)ThirdParty;$(SolutionDir)..\ApoapseCore\ThirdParty\boost_1_67_0\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+    <IncludePath>..\ThirdParty\sqlcipher\include;$(SolutionDir)..\ApoapseCore\ThirdParty\boost_1_67_0\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
+    <LibraryPath>..\ThirdParty\sqlcipher;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -141,13 +143,14 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>COMPILE_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)Code\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\ApoapseCore\Code\</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\dll_win64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(SolutionDir)ThirdParty\dll_win64\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
