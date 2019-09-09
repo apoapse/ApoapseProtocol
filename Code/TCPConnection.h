@@ -59,7 +59,6 @@ public:
 private:
 	void HandleConnectAsync(const boost::system::error_code& error, Device device);
 	void HandleAcceptedAsync(const boost::system::error_code& error);
-	void OnReceivedErrorInternal(const boost::system::error_code& error);
 
 	void SendTLSHandshake(ssl::stream_base::handshake_type handshakeType);
 	void HandleHandshake(const boost::system::error_code& error);
@@ -70,6 +69,8 @@ private:
 	void HandleWriteAsync(const boost::system::error_code& error, size_t bytesTransferred);
 
 protected:
+	void OnReceivedErrorInternal(const boost::system::error_code& error);
+	
 	template <typename T, typename FUNC>	// FUNC = std::function<void(size_t)>
 	void ReadUntil(boost::asio::streambuf& streambuf, T delimiter, FUNC&& externalHandler)
 	{

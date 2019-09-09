@@ -88,7 +88,7 @@ private:
 	void OnFileSentInternal();
 	
 	void StartReading();
-	void OnReceiveData(size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection);
+	void OnReceiveData(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection);
 	std::shared_ptr<WriteBuffer> ReadFromFile();
 
 	void OnFilePartReceived(size_t bytesTransferred, std::shared_ptr<NetBuffer> dataBuffer);

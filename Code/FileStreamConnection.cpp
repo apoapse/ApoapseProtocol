@@ -87,6 +87,12 @@ std::shared_ptr<FileStreamConnection::WriteBuffer> FileStreamConnection::ReadFro
 void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<WriteBuffer> buffer, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
 {
 	ASSERT(IsSendingFile());
+	if (error)
+	{
+		OnReceivedErrorInternal(error);
+		return;
+	}
+	
 	//LOG_DEBUG << "HandleFileWriteAsync " << m_currentFileSend->sentSize << " of " << m_currentFileSend->fileSize << " index: " << buffer->index;
 
 	m_currentFileSend->sentSize += (UInt32)bytesTransferred;
@@ -122,12 +128,18 @@ void FileStreamConnection::StartReading()
 	auto self(shared_from_this());
 	m_socket->async_read_some(boost::asio::buffer(m_readBuffer), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
 	{
-		OnReceiveData(bytesTransferred, self);
+		OnReceiveData(er, bytesTransferred, self);
 	}));
 }
 
-void FileStreamConnection::OnReceiveData(size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
+void FileStreamConnection::OnReceiveData(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection)
 {
+	if (error)
+	{
+		OnReceivedErrorInternal(error);
+		return;
+	}
+	
 	if (bytesTransferred == 0 && !IsConnected())
 		return;
 		
@@ -212,7 +224,7 @@ void FileStreamConnection::OnFilePartReceived(size_t bytesTransferred, std::shar
 		{
 			boost::asio::async_read(*m_socket, boost::asio::buffer(m_readBuffer), boost::asio::transfer_all(), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
 			{
-				OnReceiveData(bytesTransferred, self);
+				OnReceiveData(er, bytesTransferred, self);
 			}));
 		}
 		else
