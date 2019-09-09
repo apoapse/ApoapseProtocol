@@ -198,7 +198,7 @@ public:
 private:
 	void UnorderedFieldsCompile()
 	{
-		ASSERT_MSG(m_unorderedFields, "No unordered data to compile");
+		ASSERT_MSG(m_unorderedFields.has_value(), "No unordered data to compile");
 
 		StartGroupOrdered((m_unorderedFields->size() - 1) + CountItemsInRootNode(), "");	// Root node, we remove 1 to the total count because CountItemsInRootNode() will include what's inside
 
@@ -478,9 +478,9 @@ public:
 		Parse();
 	}
 
-	MessagePackDeserializer(std::vector<byte>&& data)	// This constructor is used to make the deserializer owner of the raw data via a std::move, compaired to the normal constructor which take a reference where the lifetime of the raw data as to be managed by the user.
+	MessagePackDeserializer(const std::vector<byte>&& data)	// This constructor is used to make the deserializer owner of the raw data via a std::move, compaired to the normal constructor which take a reference where the lifetime of the raw data as to be managed by the user.
 		: m_dataOwner(data)
-		, m_rawData(m_dataOwner.value())
+		, m_rawData(data)
 	{
 		Parse();
 	}
