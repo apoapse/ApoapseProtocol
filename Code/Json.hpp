@@ -6,13 +6,14 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+using namespace std::literals::string_literals;
 
 class JsonHelper
 {
 	struct StringTranslator
 	{
 		boost::optional<std::string> get_value(const std::string& str) { return  str.substr(1, str.size() - 2); }
-		boost::optional<std::string> put_value(const std::string& str) { return '"' + EscapeDoubleQuotes(str) + '"'; }
+		boost::optional<std::string> put_value(const std::string& str) { return '"' + EscapeChars(str) + '"'; }
 	};
 
 	boost::property_tree::ptree m_properties;
@@ -181,10 +182,12 @@ public:
 	}
 
 	private:
-		static std::string EscapeDoubleQuotes(const std::string& str)
+		static std::string EscapeChars(const std::string& str)
 		{
 			std::string output = str;
 
+			output = std::regex_replace(output, std::regex(R"(\\)"), R"(\\)");
+			
 			output = std::regex_replace(output, std::regex("\\\\"), "\\\\");
 			output = std::regex_replace(output, std::regex("\""), "\\\"");
 
