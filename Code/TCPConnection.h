@@ -28,7 +28,7 @@ protected:
 
 private:
 	std::atomic<bool> m_isConnected = { false };
-	//boost::asio::io_service::strand m_writeStrand;
+	boost::asio::io_context::strand m_strand;
 
 	std::deque<std::variant<BytesWrapper, StrWrapper, std::shared_ptr<NetworkPayload>>> m_sendQueue;
 
@@ -84,7 +84,7 @@ protected:
 	{
 		auto handler = boost::bind(&TCPConnection::HandleReadInternal, shared_from_this(), externalHandler, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
 
-		m_socket->async_read_some(boost::asio::buffer(buffer), handler);
+		m_socket->async_read_some(boost::asio::buffer(buffer), boost::asio::bind_executor(m_strand, handler));
 	}
 
 	virtual bool OnSocketConnectedInternal() = 0;

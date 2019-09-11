@@ -3,8 +3,7 @@
 #include "TCPConnection.h"
 #include "ThreadUtils.h"
 
-TCPConnection::TCPConnection(boost::asio::io_service& io_service, ssl::context& context)
-	//, m_writeStrand(io_service)
+TCPConnection::TCPConnection(boost::asio::io_service& io_service, ssl::context& context) : m_strand(io_service)
 {
 	m_socket = std::make_unique<SSLSocket>(io_service, context);
 }
@@ -177,18 +176,18 @@ void TCPConnection::InternalSend()
 
 	if (std::holds_alternative<std::shared_ptr<NetworkPayload>>(item))
 	{	
-		m_socket->async_write_some(boost::asio::buffer(std::get<std::shared_ptr<NetworkPayload>>(item)->GetRawData()), handler);
+		m_socket->async_write_some(boost::asio::buffer(std::get<std::shared_ptr<NetworkPayload>>(item)->GetRawData()), boost::asio::bind_executor(m_strand, handler));
 		//boost::asio::async_write(GetSocket(), boost::asio::buffer(std::get<std::shared_ptr<NetworkPayload>>(item)->GetRawData()), handler);
 	}
 	else if (std::holds_alternative<StrWrapper>(item))
 	{
-		m_socket->async_write_some(boost::asio::buffer(*std::get<StrWrapper>(item)), handler);
+		m_socket->async_write_some(boost::asio::buffer(*std::get<StrWrapper>(item)), boost::asio::bind_executor(m_strand, handler));
 		//boost::asio::async_write(GetSocket(), boost::asio::buffer(*std::get<StrWrapper>(item)), handler);
 	}
 	else
 	{
 		//boost::asio::async_write(GetSocket(), boost::asio::buffer(*std::get<BytesWrapper>(item)), handler);
-		m_socket->async_write_some(boost::asio::buffer(*std::get<BytesWrapper>(item)), handler);
+		m_socket->async_write_some(boost::asio::buffer(*std::get<BytesWrapper>(item)), boost::asio::bind_executor(m_strand, handler));
 	}
 	
 }
