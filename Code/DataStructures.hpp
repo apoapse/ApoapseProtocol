@@ -268,8 +268,8 @@ static std::string GetDataStructures()
 					"required": false,
 					"unique": false,
 					"uses":	{
-						"server_storage": true,
-						"client_storage": true,
+						"server_storage": false,
+						"client_storage": false,
 						"command": true
 					}
 				}
@@ -840,6 +840,17 @@ static std::string GetDataStructures()
 					"name": "nickname",
 					"type": "text",
 					"required": true,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				},
+				{
+					"name": "avatar",
+					"type": "blob",
+					"required": false,
+					"unique": false,
 					"uses":	{
 						"server_storage": false,
 						"client_storage": false,
