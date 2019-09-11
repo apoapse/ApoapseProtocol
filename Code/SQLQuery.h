@@ -15,6 +15,7 @@
 #define EQUALS			" = "
 #define OR				" OR "
 #define AND				" AND "
+#define LIKE			" LIKE "
 #define INSERT_INTO		"INSERT INTO "
 #define VALUES			" VALUES "
 #define UPDATE			"UPDATE "
