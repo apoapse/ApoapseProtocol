@@ -187,6 +187,9 @@
     <ClInclude Include="TCPServerNoTLS.h">
       <Filter>Network\Sockets</Filter>
     </ClInclude>
+    <ClInclude Include="FileUtils.h">
+      <Filter>DataSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -301,6 +304,9 @@
     </ClCompile>
     <ClCompile Include="TCPServerNoTLS.cpp">
       <Filter>Network\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="FileUtils.cpp">
+      <Filter>DataSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

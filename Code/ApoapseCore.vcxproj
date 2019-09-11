@@ -153,6 +153,7 @@
     <ClCompile Include="DatabaseIntegrityPatcher.cpp" />
     <ClCompile Include="DataStructure.cpp" />
     <ClCompile Include="FileStreamConnection.cpp" />
+    <ClCompile Include="FileUtils.cpp" />
     <ClCompile Include="ProtectedByteContainer.cpp" />
     <ClCompile Include="SecurityAlert.cpp" />
     <ClCompile Include="StringExtensions.cpp" />
@@ -170,6 +171,7 @@
     </ClCompile>
     <ClCompile Include="Uuid.cpp" />
     <ClInclude Include="FileStreamConnection.h" />
+    <ClInclude Include="FileUtils.h" />
     <ClInclude Include="IUser.h" />
     <ClInclude Include="AES.hpp" />
     <ClInclude Include="ApoapseData.h" />
