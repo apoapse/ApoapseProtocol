@@ -28,12 +28,9 @@ void TCPConnectionNoTLS::Close()
 
 	m_isConnected = false;
 
-	m_socket->get_io_service().post([this]()
-	{
-		GetSocket().shutdown(boostTCP::socket::shutdown_both);
-		GetSocket().close();
-		//GetSocket().release();
-	});
+	GetSocket().shutdown(boostTCP::socket::shutdown_both);
+	GetSocket().close();
+	//GetSocket().release();
 }
 
 void TCPConnectionNoTLS::RequestClose()
