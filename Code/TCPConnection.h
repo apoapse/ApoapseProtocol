@@ -25,11 +25,12 @@ class TCPConnection : public std::enable_shared_from_this<TCPConnection>, public
 
 protected:
 	std::unique_ptr<SSLSocket> m_socket;
+	bool m_closeRequested = false;
 
 private:
 	std::atomic<bool> m_isConnected = { false };
 	boost::asio::io_context::strand m_strand;
-
+	
 	std::deque<std::variant<BytesWrapper, StrWrapper, std::shared_ptr<NetworkPayload>>> m_sendQueue;
 
 public:
@@ -49,6 +50,7 @@ public:
 	void Connect(const std::string& adress, const UInt16 port);
 	bool IsConnected() const;
 	void Close() override;
+	void RequestClose() override;
 
 	void Send(BytesWrapper bytesPtr, TCPConnection* excludedConnection = nullptr) override;
 	void Send(StrWrapper strPtr, TCPConnection* excludedConnection = nullptr) override;

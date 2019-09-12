@@ -35,6 +35,11 @@ void TCPConnection::Close()
 	});
 }
 
+void TCPConnection::RequestClose()
+{
+	m_closeRequested = true;
+}
+
 boost::asio::ip::tcp::endpoint TCPConnection::GetEndpoint() const
 {
 	try

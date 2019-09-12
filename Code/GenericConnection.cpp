@@ -3,12 +3,17 @@
 #include "Common.h"
 #include "MessagePack.hpp"
 #include "NetworkPayload.h"
-#include "SecurityAlert.h"
+#include "ApoapseError.h"
 #include "CommandV2.h"
 
 GenericConnection::GenericConnection(boost::asio::io_service& ioService, ssl::context& context) : TCPConnection(ioService, context)
 {
 
+}
+
+bool GenericConnection::CloseRequested() const
+{
+	return m_closeRequested;
 }
 
 bool GenericConnection::OnSocketConnectedInternal()
@@ -105,7 +110,7 @@ void GenericConnection::OnReceivedPayload(std::shared_ptr<NetworkPayload> payloa
 {
 	if (!global->cmdManager->CommandExist(payload->headerInfo->cmdShortName))
 	{
-		SecurityLog::LogAlert(ApoapseErrorCode::unknown_cmd, *this);
+		ApoapseError(ApoapseErrors::unknown_cmd, this);
 		return;
 	}
 

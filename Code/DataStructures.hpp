@@ -3,7 +3,7 @@
 
 static std::string GetDataStructures()
 {
-	static std::string scheme = R"(
+	static std::string scheme1 = R"(
 {
 	"custom_types": [
 		{
@@ -36,6 +36,31 @@ static std::string GetDataStructures()
 		{
 			"name": "empty",
 			"fields": [	]
+		},
+		{
+			"name": "error",
+			"fields": [
+				{
+					"name": "error",
+					"type": "integer",
+					"required": true,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				},
+				{
+					"name": "related_item",
+					"type": "uuid",
+					"required": false,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				}
+			]
 		},
 		{
 			"name": "client_login",
@@ -193,6 +218,9 @@ static std::string GetDataStructures()
 				}
 			]
 		},
+)";
+	
+static std::string scheme2 = R"(
 		{
 			"name": "user",
 			"fields": [
@@ -881,5 +909,5 @@ static std::string GetDataStructures()
 
 )";
 
-	return scheme;
+	return scheme1 + scheme2;
 }

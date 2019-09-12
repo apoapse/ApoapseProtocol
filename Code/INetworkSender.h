@@ -34,5 +34,10 @@ struct INetworkSender
 
 	//virtual boost::asio::ip::tcp::endpoint GetEndpoint() const = 0;
 	virtual std::string GetEndpointStr() const = 0;
+
+	// Close immediately the connection
 	virtual void Close() = 0;
+
+	// Close the connection as soon as cmd processing is completed
+	virtual void RequestClose() = 0;
 };

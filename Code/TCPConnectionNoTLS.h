@@ -29,6 +29,7 @@ protected:
 private:
 	std::atomic<bool> m_isConnected = { false };
 	//boost::asio::io_service::strand m_writeStrand;
+	bool m_closeRequested = false;
 
 	std::deque<std::variant<BytesWrapper, StrWrapper, std::shared_ptr<NetworkPayload>>> m_sendQueue;
 
@@ -49,6 +50,7 @@ public:
 	void Connect(const std::string& adress, const UInt16 port);
 	bool IsConnected() const;
 	void Close() override;
+	void RequestClose() override;
 
 	void Send(BytesWrapper bytesPtr, TCPConnection* excludedConnection = nullptr) override;
 	void Send(StrWrapper strPtr, TCPConnection* excludedConnection = nullptr) override;

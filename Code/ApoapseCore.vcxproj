@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ApoapseData.cpp" />
+    <ClCompile Include="ApoapseError.cpp" />
     <ClCompile Include="ApoapseOperation.cpp" />
     <ClCompile Include="CommandsManagerV2.cpp" />
     <ClCompile Include="CommandV2.cpp" />
@@ -155,7 +156,6 @@
     <ClCompile Include="FileStreamConnection.cpp" />
     <ClCompile Include="FileUtils.cpp" />
     <ClCompile Include="ProtectedByteContainer.cpp" />
-    <ClCompile Include="SecurityAlert.cpp" />
     <ClCompile Include="StringExtensions.cpp" />
     <ClCompile Include="TCPConnectionNoTLS.cpp" />
     <ClCompile Include="TCPServerNoTLS.cpp" />
@@ -170,6 +170,8 @@
       <FileType>CppHeader</FileType>
     </ClCompile>
     <ClCompile Include="Uuid.cpp" />
+    <ClInclude Include="ApoapseError.h" />
+    <ClInclude Include="ApoapseErrors.hpp" />
     <ClInclude Include="FileStreamConnection.h" />
     <ClInclude Include="FileUtils.h" />
     <ClInclude Include="IUser.h" />
@@ -193,8 +195,6 @@
     <ClInclude Include="GlobalVarDefines.hpp" />
     <ClInclude Include="Random.hpp" />
     <ClInclude Include="RSA.hpp" />
-    <ClInclude Include="SecurityAlert.h" />
-    <ClInclude Include="ApoapseErrorCodes.hpp" />
     <ClInclude Include="ByteUtils.hpp" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Database.hpp" />

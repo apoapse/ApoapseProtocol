@@ -36,6 +36,11 @@ void TCPConnectionNoTLS::Close()
 	});
 }
 
+void TCPConnectionNoTLS::RequestClose()
+{
+	m_closeRequested = true;
+}
+
 boost::asio::ip::tcp::endpoint TCPConnectionNoTLS::GetEndpoint() const
 {
 	try

@@ -88,14 +88,8 @@
     <ClInclude Include="Uuid.h">
       <Filter>UUID</Filter>
     </ClInclude>
-    <ClInclude Include="ApoapseErrorCodes.hpp">
-      <Filter>Network\Protocol</Filter>
-    </ClInclude>
     <ClInclude Include="LibraryLoader.hpp">
       <Filter>DllUtils</Filter>
-    </ClInclude>
-    <ClInclude Include="SecurityAlert.h">
-      <Filter>Network\Protocol</Filter>
     </ClInclude>
     <ClInclude Include="Json.hpp">
       <Filter>Parsers</Filter>
@@ -190,6 +184,12 @@
     <ClInclude Include="FileUtils.h">
       <Filter>DataSystem</Filter>
     </ClInclude>
+    <ClInclude Include="ApoapseErrors.hpp">
+      <Filter>Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="ApoapseError.h">
+      <Filter>Network\Protocol</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -248,9 +248,6 @@
     <ClCompile Include="UT_MessagePack.cpp">
       <Filter>UnitTests\Tests</Filter>
     </ClCompile>
-    <ClCompile Include="SecurityAlert.cpp">
-      <Filter>Network\Protocol</Filter>
-    </ClCompile>
     <ClCompile Include="UT_Range.cpp">
       <Filter>UnitTests\Tests</Filter>
     </ClCompile>
@@ -307,6 +304,9 @@
     </ClCompile>
     <ClCompile Include="FileUtils.cpp">
       <Filter>DataSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ApoapseError.cpp">
+      <Filter>Network\Protocol</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

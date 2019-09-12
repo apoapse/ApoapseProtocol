@@ -3,10 +3,10 @@
 #include "CommandsManagerV2.h"
 #include "Json.hpp"
 #include "NetworkPayload.h"
-#include "SecurityAlert.h"
 #include "GenericConnection.h"
 #include "ApoapseOperation.h"
 #include "StringExtensions.h"
+#include "ApoapseError.h"
 
 CommandsManagerV2::CommandsManagerV2(const std::string& cmdSchemeJson)
 {
@@ -118,8 +118,13 @@ void CommandsManagerV2::OnReceivedCmdInternal(CommandV2& cmd, GenericConnection&
 	else
 	{
 		LOG << LogSeverity::error << "The command " << cmd.name << " was rejected by CommandsManagerV2::OnReceivedCommandPre";
-		SecurityLog::LogAlert(ApoapseErrorCode::invalid_cmd, connection);
+		
+		if (!connection.CloseRequested())
+			ApoapseError(ApoapseErrors::invalid_cmd, &connection);
 	}
+
+	if (connection.CloseRequested())
+		connection.Close();
 }
 
 void CommandsManagerV2::PropagateToClientUI(CommandV2& cmd) const

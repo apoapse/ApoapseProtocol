@@ -18,6 +18,8 @@ public:
 
 	virtual bool IsAuthenticated() const = 0;
 	virtual std::optional<Username> GetConnectedUser() const = 0;
+
+	bool CloseRequested() const;
 	
 private:
 	bool OnSocketConnectedInternal() override;
