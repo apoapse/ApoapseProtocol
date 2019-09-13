@@ -134,16 +134,6 @@ static std::string GetDataStructures()
 						"client_storage": false,
 						"command": true
 					}
-				},
-				{
-					"name": "admin_nickname",
-					"type": "text",
-					"required": true,
-					"uses":	{
-						"server_storage": false,
-						"client_storage": false,
-						"command": true
-					}
 				}
 			]
 		},

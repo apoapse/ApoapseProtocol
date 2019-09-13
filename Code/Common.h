@@ -25,8 +25,6 @@ struct Global
 	std::unique_ptr<ApoapseData> apoapseData;
 	std::unique_ptr<ICommandManager> cmdManager;
 
-	std::unique_ptr<boost::asio::io_service> mainConnectionIOService;
-
 #ifdef APOAPSE_SERVER
 	class ServerSettings* settings = nullptr;
 #endif // APOAPSE_SERVER
