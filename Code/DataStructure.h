@@ -128,6 +128,7 @@ struct DataField
 	}
 
 	bool Validate() const;
+	void SaveToDatabase(class DataStructure& dat, DbId useId = 0);
 
 	SQLValue GetSQLValue();
 	SqlValueType ConvertFieldTypeToSqlType() const;
@@ -160,7 +161,7 @@ public:
 	DbId GetDbId();
 	void SetDbId(DbId id);
 
+	std::optional<DataField> GetPrimaryField();
 private:
 	bool IsAlreadyRegisteredOnDatabase(DataField& primaryField);
-	std::optional<DataField> GetPrimaryField();
 };

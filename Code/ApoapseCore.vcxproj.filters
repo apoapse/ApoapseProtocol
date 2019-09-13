@@ -190,6 +190,9 @@
     <ClInclude Include="ApoapseError.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
+    <ClInclude Include="DatabaseSettings.h">
+      <Filter>DataSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -307,6 +310,9 @@
     </ClCompile>
     <ClCompile Include="ApoapseError.cpp">
       <Filter>Network\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="DatabaseSettings.cpp">
+      <Filter>DataSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -116,6 +116,16 @@ static std::string GetDataStructures()
 			"name": "install",
 			"fields": [
 				{
+					"name": "server_name",
+					"type": "text",
+					"required": true,
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				},
+				{
 					"name": "admin_username",
 					"type": "username",
 					"required": true,
@@ -131,6 +141,21 @@ static std::string GetDataStructures()
 					"required": true,
 					"uses":	{
 						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
+				}
+			]
+		},
+		{
+			"name": "server_setting",
+			"fields": [
+				{
+					"name": "server_name",
+					"type": "text",
+					"required": false,
+					"uses":	{
+						"server_storage": true,
 						"client_storage": false,
 						"command": true
 					}

@@ -168,7 +168,7 @@ void DataStructure::SaveToDatabase()
 		query << WHERE << primaryField.value().name.c_str() << EQUALS << primaryField.value().GetSQLValue();
 		query.Exec();
 
-		LOG << LogSeverity::verbose << "Udpated entry on the database with data from the datastructure " << name;
+		LOG << LogSeverity::verbose << "Updated entry on the database with data from the datastructure " << name;
 	}
 	else
 	{
@@ -268,6 +268,24 @@ bool DataField::Validate() const
 	}
 
 	return isValid;
+}
+
+void DataField::SaveToDatabase(DataStructure& dat, DbId useId/* = 0*/)
+{
+	ASSERT(HasValue());
+	auto primaryField = dat.GetPrimaryField();
+	
+	SQLQuery query(*global->database);
+	query << UPDATE << dat.GetDBTableName().c_str() << SET << name.c_str() << "=" << GetSQLValue();
+
+	if (useId)
+		query << WHERE << "id" << EQUALS << useId;
+	else
+		query << WHERE << primaryField.value().name.c_str() << EQUALS << primaryField.value().GetSQLValue();
+
+	query.Exec();
+
+	LOG << LogSeverity::verbose << "Updated field " << name << " from data structure " << dat.name;
 }
 
 SQLValue DataField::GetSQLValue()

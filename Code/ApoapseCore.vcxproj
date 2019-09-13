@@ -152,6 +152,7 @@
     <ClCompile Include="CommandV2.cpp" />
     <ClCompile Include="CustomDataType.cpp" />
     <ClCompile Include="DatabaseIntegrityPatcher.cpp" />
+    <ClCompile Include="DatabaseSettings.cpp" />
     <ClCompile Include="DataStructure.cpp" />
     <ClCompile Include="FileStreamConnection.cpp" />
     <ClCompile Include="FileUtils.cpp" />
@@ -172,6 +173,7 @@
     <ClCompile Include="Uuid.cpp" />
     <ClInclude Include="ApoapseError.h" />
     <ClInclude Include="ApoapseErrors.hpp" />
+    <ClInclude Include="DatabaseSettings.h" />
     <ClInclude Include="FileStreamConnection.h" />
     <ClInclude Include="FileUtils.h" />
     <ClInclude Include="IUser.h" />
