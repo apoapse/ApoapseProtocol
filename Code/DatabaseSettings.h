@@ -8,6 +8,7 @@ class DatabaseSettings
 public:
 	DatabaseSettings() = default;
 	DatabaseSettings(const std::string& name);
+	DatabaseSettings(const DataStructure& dat);
 
 	template <typename T>
 	void SetValue(const std::string& fieldName, const T& value)
@@ -29,4 +30,6 @@ public:
 	{
 		return m_settings.GetField(name).GetValueOr<T>(optional);
 	}
+
+	DataStructure GetDataStructure() const;
 };

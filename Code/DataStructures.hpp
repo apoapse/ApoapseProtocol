@@ -157,7 +157,8 @@ static std::string GetDataStructures()
 					"uses":	{
 						"server_storage": true,
 						"client_storage": false,
-						"command": true
+						"command": true,
+						"client_ui": true
 					}
 				}
 			]

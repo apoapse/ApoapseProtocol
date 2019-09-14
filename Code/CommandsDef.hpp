@@ -50,6 +50,21 @@ static std::string GetCommandDef()
 			}
 		},
 		{
+			"name": "server_settings",
+			"name_short": "ss",
+			"datastructure": "server_setting",
+			"require_authentication": false,
+			"only_non_authenticated": true,
+			"reception": {
+				"server": false,
+				"client": true
+			},
+			"client_ui": {
+				"propagate": true,
+				"signal_name": "OnUpdatedServerSettings"
+			}
+		},
+		{
 			"name": "server_info",
 			"name_short": "si",
 			"datastructure": "server_info",
