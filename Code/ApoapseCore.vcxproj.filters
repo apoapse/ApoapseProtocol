@@ -193,6 +193,9 @@
     <ClInclude Include="DatabaseSettings.h">
       <Filter>DataSystem</Filter>
     </ClInclude>
+    <ClInclude Include="ApoapseOpenSSL.h">
+      <Filter>Cryptography\TLS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -313,6 +316,9 @@
     </ClCompile>
     <ClCompile Include="DatabaseSettings.cpp">
       <Filter>DataSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ApoapseOpenSSL.cpp">
+      <Filter>Cryptography\TLS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

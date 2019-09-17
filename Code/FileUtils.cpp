@@ -39,8 +39,8 @@ std::vector<byte> FileUtils::ReadFile(const std::string& filePath)
 	{
 		const size_t size = static_cast<size_t>(inputStream.tellg());
 		inputStream.seekg(0);
-
 		output.resize(size);
+		
 		inputStream.read(reinterpret_cast<char*>(output.data()), size);
 
 		ASSERT(output.size() == size);

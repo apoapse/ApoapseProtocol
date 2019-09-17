@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="ApoapseData.cpp" />
     <ClCompile Include="ApoapseError.cpp" />
+    <ClCompile Include="ApoapseOpenSSL.cpp" />
     <ClCompile Include="ApoapseOperation.cpp" />
     <ClCompile Include="CommandsManagerV2.cpp" />
     <ClCompile Include="CommandV2.cpp" />
@@ -173,6 +174,7 @@
     <ClCompile Include="Uuid.cpp" />
     <ClInclude Include="ApoapseError.h" />
     <ClInclude Include="ApoapseErrors.hpp" />
+    <ClInclude Include="ApoapseOpenSSL.h" />
     <ClInclude Include="DatabaseSettings.h" />
     <ClInclude Include="FileStreamConnection.h" />
     <ClInclude Include="FileUtils.h" />
