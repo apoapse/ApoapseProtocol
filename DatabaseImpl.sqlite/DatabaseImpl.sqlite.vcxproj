@@ -71,22 +71,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)vs_build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)ThirdParty;$(SolutionDir)..\ApoapseCore\ThirdParty\boost_1_67_0\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ThirdParty;$(SolutionDir)..\ApoapseCore\ThirdParty\boost_1_71_0\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)vs_build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)ThirdParty;$(SolutionDir)..\ApoapseCore\ThirdParty\boost_1_67_0\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ThirdParty;$(SolutionDir)..\ApoapseCore\ThirdParty\boost_1_71_0\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>..\ThirdParty\sqlite\include;$(SolutionDir)..\ApoapseCore\ThirdParty\boost_1_67_0\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>..\ThirdParty\sqlite\include;$(SolutionDir)..\ApoapseCore\ThirdParty\boost_1_71_0\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
     <LibraryPath>..\ThirdParty\sqlite\dll_win64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>..\ThirdParty\sqlite\include;$(SolutionDir)..\ApoapseCore\ThirdParty\boost_1_67_0\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>..\ThirdParty\sqlite\include;$(SolutionDir)..\ApoapseCore\ThirdParty\boost_1_71_0\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
     <LibraryPath>..\ThirdParty\sqlite\dll_win64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
