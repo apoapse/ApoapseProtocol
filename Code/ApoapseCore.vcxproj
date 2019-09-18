@@ -71,7 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
-    <IncludePath>C:\OpenSSL-Win64\include;$(ProjectDir)..\ThirdParty\cryptopp\;..\ThirdParty\boost_1_71_0\;..\ThirdParty\magic_enum\include\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>C:\OpenSSL-Win64-3\include;$(ProjectDir)..\ThirdParty\cryptopp\;..\ThirdParty\boost_1_71_0\;..\ThirdParty\magic_enum\include\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
     <EnableCppCoreCheck>true</EnableCppCoreCheck>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -80,7 +80,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
-    <IncludePath>C:\OpenSSL-Win64\include;$(ProjectDir)..\ThirdParty\cryptopp\;..\ThirdParty\boost_1_71_0\;..\ThirdParty\magic_enum\include\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>C:\OpenSSL-Win64-3\include;$(ProjectDir)..\ThirdParty\cryptopp\;..\ThirdParty\boost_1_71_0\;..\ThirdParty\magic_enum\include\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -103,7 +103,7 @@
     <Lib>
       <AdditionalDependencies>
       </AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\boost_1_71_0\lib64-msvc-14.2;C:\OpenSSL\openssl-1.1.0c-64bit-release-DLL-VS2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\OpenSSL-Win64-3\lib\VC;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>
       </LinkTimeCodeGeneration>
     </Lib>
@@ -141,7 +141,7 @@
     <Lib>
       <AdditionalDependencies>
       </AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\OpenSSL\openssl-1.1.0c-64bit-release-DLL-VS2015\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\OpenSSL-Win64-3\lib\VC;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
