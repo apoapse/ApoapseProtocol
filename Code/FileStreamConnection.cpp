@@ -14,7 +14,7 @@ AttachmentFile::AttachmentFile(DataStructure& data, const std::string& filePath)
 	this->filePath = filePath;
 }
 
-FileStreamConnection::FileStreamConnection(io_context& ioService/*, ssl::context& context*/) : TCPConnectionNoTLS(ioService/*, context*/), m_strand(ioService)
+FileStreamConnection::FileStreamConnection(io_context& ioService, ssl::context& context) : TCPConnection(ioService, context), m_strand(ioService)
 {
 }
 
@@ -88,7 +88,7 @@ void FileStreamConnection::ListenExactly(Int64 size)
 	}));
 }
 
-void FileStreamConnection::OnReceiveAuthCode(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS)
+void FileStreamConnection::OnReceiveAuthCode(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnection> TCPConnection)
 {
 	if (error)
 	{
@@ -121,7 +121,7 @@ void FileStreamConnection::OnReceiveAuthCode(const boost::system::error_code& er
 	ListenForNewData();
 }
 
-void FileStreamConnection::OnReceiveData(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS)
+void FileStreamConnection::OnReceiveData(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnection> TCPConnection)
 {
 	if (error)
 	{
@@ -247,7 +247,7 @@ void FileStreamConnection::SendChunk()
 	}));
 }
 
-void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS)
+void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnection> TCPConnection)
 {
 	ASSERT(IsSendingFile());
 	if (error)

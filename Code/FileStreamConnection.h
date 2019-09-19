@@ -1,10 +1,9 @@
 #pragma once
-//#include "TCPConnection.h"
 #include <fstream>
 #include <deque>
 #include "Uuid.h"
 #include <boost/asio/strand.hpp>
-#include "TCPConnectionNoTLS.h"
+#include "TCPConnection.h"
 constexpr auto FILE_STREAM_BUFFER_SIZE = 1024 * 500;
 
 using NetBuffer = std::array<byte, FILE_STREAM_BUFFER_SIZE>;
@@ -21,7 +20,7 @@ struct AttachmentFile
 	AttachmentFile(DataStructure& data, const std::string& filePath);
 };
 
-class FileStreamConnection : public TCPConnectionNoTLS
+class FileStreamConnection : public TCPConnection
 {
 	struct FileReceive
 	{
@@ -51,13 +50,13 @@ class FileStreamConnection : public TCPConnectionNoTLS
 	boost::asio::io_context::strand m_strand;
 
 public:
-	FileStreamConnection(io_context& ioService/*, ssl::context& context*/);
+	FileStreamConnection(io_context& ioService, ssl::context& context);
 	virtual ~FileStreamConnection();
 
 	bool IsDownloadingFile() const;
 	bool IsSendingFile() const;
 
-	// TCPConnectionNoTLS
+	// TCPConnection
 	void SetCustomTCPOptions() override;
 	bool OnSocketConnectedInternal() override;
 	bool OnReceivedError(const boost::system::error_code& error) override;
@@ -78,8 +77,8 @@ protected:
 private:
 	void ListenForNewData();
 	void ListenExactly(Int64 size);
-	void OnReceiveAuthCode(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS);
-	void OnReceiveData(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS);
+	void OnReceiveAuthCode(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnection> TCPConnection);
+	void OnReceiveData(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnection> TCPConnection);
 	void StartReceiveFile();
 	void ReadChunk(Range<NetBuffer>& data);
 
@@ -88,5 +87,5 @@ private:
 	void OnFileSentInternal();
 	void SendChunk();
 
-	void HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS);
+	void HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnection> TCPConnection);
 };
