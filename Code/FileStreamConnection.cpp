@@ -77,14 +77,23 @@ bool FileStreamConnection::OnSocketConnectedInternal()
 	}
 	else
 	{
-		SocketRead(FILE_STREAM_READ_BUFFER_SIZE);
+		ListenForNewData();
 	}
 	
 	return true;
 }
 
 /////////////////////////////// DOWNLOAD //////////////////////////////////
-void FileStreamConnection::SocketRead(Int64 size)
+void FileStreamConnection::ListenForNewData()
+{
+	auto self(shared_from_this());
+	m_socket->async_read_some(boost::asio::buffer(m_readBuffer), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
+	{
+		OnReceiveData(er, bytesTransferred, self);
+	}));
+}
+
+void FileStreamConnection::ListenExactly(Int64 size)
 {
 	auto self(shared_from_this());
 	boost::asio::async_read(*m_socket, boost::asio::buffer(m_readBuffer), boost::asio::transfer_exactly(size), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
@@ -123,7 +132,7 @@ void FileStreamConnection::OnReceiveAuthCode(const boost::system::error_code& er
 		}
 	}
 
-	SocketRead(m_readBuffer.size());
+	ListenForNewData();
 }
 
 void FileStreamConnection::OnReceiveData(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS)
@@ -133,7 +142,8 @@ void FileStreamConnection::OnReceiveData(const boost::system::error_code& error,
 		OnReceivedErrorInternal(error);
 		return;
 	}
-
+	
+	std::cout << "OnReceiveData " << bytesTransferred << '\n';
 	Range data(m_readBuffer, bytesTransferred);
 
 	if (!IsDownloadingFile())
@@ -144,10 +154,6 @@ void FileStreamConnection::OnReceiveData(const boost::system::error_code& error,
 	if (data.size() != 0)
 	{
 		ReadChunk(data);
-	}
-	else
-	{
-		SocketRead(m_readBuffer.size());
 	}
 }
 
@@ -190,13 +196,15 @@ void FileStreamConnection::ReadChunk(Range<NetBuffer>& data)
 		
 		m_filesToReceiveQueue.pop_front();
 		m_currentFileDownload.reset();
+
+		ListenForNewData();
 	}
 	else
 	{
 		const auto bytesLeft = std::min((Int64)m_readBuffer.size(), (m_currentFileDownload->fileSize - m_currentFileDownload->receivedSize));
 		ASSERT(bytesLeft > 0);
 		
-		SocketRead(bytesLeft);
+		ListenExactly(bytesLeft);
 	}
 }
 

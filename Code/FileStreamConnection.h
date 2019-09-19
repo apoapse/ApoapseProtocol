@@ -86,7 +86,8 @@ protected:
 	virtual void OnSocketConnected() = 0;
 	
 private:
-	void SocketRead(Int64 size);
+	void ListenForNewData();
+	void ListenExactly(Int64 size);
 	void OnReceiveAuthCode(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS);
 	void OnReceiveData(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS);
 	void StartReceiveFile();
