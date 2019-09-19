@@ -235,20 +235,19 @@ void FileStreamConnection::SendChunk()
 {
 	ASSERT(IsSendingFile());
 
-	auto chunk = std::make_shared<WriteBuffer>();
-	chunk->chunkSize = (UInt32)std::min((Int64)chunk->data.size(), (Int64)(m_currentFileSend->fileSize - m_currentFileSend->sentSize));
+	const Int64 chunkSize = std::min((Int64)FILE_STREAM_BUFFER_SIZE, (Int64)(m_currentFileSend->fileSize - m_currentFileSend->sentSize));
 
 	m_currentFileSend->readStream.seekg(m_currentFileSend->sentSize);
-	m_currentFileSend->readStream.read((char*)chunk->data.data(), chunk->chunkSize);
-	
+	m_currentFileSend->readStream.read((char*)m_writeBuffer.data(), chunkSize);
+
 	auto self(shared_from_this());
-	boost::asio::async_write(*m_socket, boost::asio::buffer(chunk->data, chunk->data.size()), boost::asio::transfer_exactly(chunk->chunkSize), boost::asio::bind_executor(m_strand, [this, self, chunk](boost::system::error_code er, size_t bytesTransferred)
+	boost::asio::async_write(*m_socket, boost::asio::buffer(m_writeBuffer.data(), m_writeBuffer.size()), boost::asio::transfer_exactly(chunkSize), boost::asio::bind_executor(m_strand, [this, self](boost::system::error_code er, size_t bytesTransferred)
 	{
-		HandleFileWriteAsync(er, bytesTransferred, chunk, self);
+		HandleFileWriteAsync(er, bytesTransferred, self);
 	}));
 }
 
-void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<WriteBuffer> chunk, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS)
+void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS)
 {
 	ASSERT(IsSendingFile());
 	if (error)

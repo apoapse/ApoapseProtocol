@@ -39,15 +39,9 @@ class FileStreamConnection : public TCPConnectionNoTLS
 
 		std::ifstream readStream;
 	};
-
-	struct WriteBuffer
-	{
-		NetBuffer data{};
-		UInt32 chunkSize = 0;
-	};
 	
 	NetBuffer m_readBuffer;
-	//NetBuffer m_writeBuffer;
+	NetBuffer m_writeBuffer;
 	std::optional<FileReceive> m_currentFileDownload;
 	std::optional<FileSend> m_currentFileSend;
 	bool m_socketAuthenticated = false;
@@ -94,5 +88,5 @@ private:
 	void OnFileSentInternal();
 	void SendChunk();
 
-	void HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<WriteBuffer> chunk, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS);
+	void HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS);
 };
