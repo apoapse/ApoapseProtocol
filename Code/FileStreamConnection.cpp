@@ -225,8 +225,9 @@ void FileStreamConnection::SendFileInternal(const std::string& filePath, UInt64 
 	m_currentFileSend = FileSend();
 	m_currentFileSend->fileSize = (UInt32)size;
 	m_currentFileSend->sentSize = 0;
-	//m_currentFileSend->readStream = std::ifstream(filePath, std::ifstream::binary);
-	m_fullFile = FileUtils::ReadFile(filePath);
+	
+	m_currentFileSend->readStream = std::ifstream(filePath, std::ios::binary);
+	//m_fullFile = FileUtils::ReadFile(filePath);
 
 	LOG << "Sending file " << filePath << " size: " << m_currentFileSend->fileSize;
 
@@ -235,6 +236,9 @@ void FileStreamConnection::SendFileInternal(const std::string& filePath, UInt64 
 
 void FileStreamConnection::OnFileSentInternal()
 {
+	m_currentFileSend->readStream.close();
+	m_currentFileSend.reset();
+	
 	const AttachmentFile fileSent = m_filesToSendQueue.front();
 	m_filesToSendQueue.pop_front();
 	
@@ -251,7 +255,10 @@ void FileStreamConnection::SendChunk()
 	auto chunk = std::make_shared<WriteBuffer>();
 	chunk->chunckSize = std::min((Int64)chunk->data.size(), (Int64)(m_currentFileSend->fileSize - m_currentFileSend->sentSize));
 
-	std::copy(m_fullFile.begin() + m_currentFileSend->sentSize, m_fullFile.begin() + m_currentFileSend->sentSize + chunk->chunckSize, chunk->data.begin());
+	m_currentFileSend->readStream.seekg(m_currentFileSend->sentSize);
+	m_currentFileSend->readStream.read((char*)chunk->data.data(), chunk->chunckSize);
+	
+	//std::copy(m_fullFile.begin() + m_currentFileSend->sentSize, m_fullFile.begin() + m_currentFileSend->sentSize + chunk->chunckSize, chunk->data.begin());
 
 	auto self(shared_from_this());
 	boost::asio::async_write(*m_socket, boost::asio::buffer(chunk->data, chunk->data.size()), boost::asio::transfer_exactly(chunk->chunckSize), boost::asio::bind_executor(m_strand, [this, self, chunk](boost::system::error_code er, size_t bytesTransferred)
