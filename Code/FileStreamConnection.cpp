@@ -36,12 +36,12 @@ bool FileStreamConnection::IsSendingFile() const
 void FileStreamConnection::SetCustomTCPOptions()
 {
 	/*{
-		const boost::asio::socket_base::send_buffer_size option(FILE_STREAM_READ_BUFFER_SIZE);
+		const boost::asio::socket_base::send_buffer_size option(FILE_STREAM_BUFFER_SIZE);
 		GetSocket().set_option(option);
 	}
 
 	{
-		const boost::asio::socket_base::receive_buffer_size option(FILE_STREAM_READ_BUFFER_SIZE);
+		const boost::asio::socket_base::receive_buffer_size option(FILE_STREAM_BUFFER_SIZE);
 		GetSocket().set_option(option);
 	}
 
@@ -50,18 +50,6 @@ void FileStreamConnection::SetCustomTCPOptions()
 
 bool FileStreamConnection::OnSocketConnectedInternal()
 {
-/*	{
-		boost::asio::socket_base::receive_buffer_size option;
-		GetSocket().get_option(option);
-		LOG_DEBUG << "receive_buffer_size "<< option.value();
-	}
-
-	{
-		boost::asio::socket_base::send_buffer_size option;
-		GetSocket().get_option(option);
-		LOG_DEBUG << "send_buffer_size "<< option.value();
-	}
-	*/
 	OnSocketConnected();
 
 	// Start read auth code
@@ -141,7 +129,6 @@ void FileStreamConnection::OnReceiveData(const boost::system::error_code& error,
 		return;
 	}
 	
-	std::cout << "OnReceiveData " << bytesTransferred << '\n';
 	Range data(m_readBuffer, bytesTransferred);
 
 	if (!IsDownloadingFile())
@@ -249,7 +236,7 @@ void FileStreamConnection::SendChunk()
 	ASSERT(IsSendingFile());
 
 	auto chunk = std::make_shared<WriteBuffer>();
-	chunk->chunkSize = std::min((Int64)chunk->data.size(), (Int64)(m_currentFileSend->fileSize - m_currentFileSend->sentSize));
+	chunk->chunkSize = (UInt32)std::min((Int64)chunk->data.size(), (Int64)(m_currentFileSend->fileSize - m_currentFileSend->sentSize));
 
 	m_currentFileSend->readStream.seekg(m_currentFileSend->sentSize);
 	m_currentFileSend->readStream.read((char*)chunk->data.data(), chunk->chunkSize);
@@ -270,12 +257,11 @@ void FileStreamConnection::HandleFileWriteAsync(const boost::system::error_code&
 		return;
 	}
 
-	std::cout << "HandleFileWriteAsync " << bytesTransferred << '\n';
 	m_currentFileSend->sentSize += bytesTransferred;
 
 	if (m_currentFileSend->sentSize >= m_currentFileSend->fileSize)
 	{
-		LOG << "File " << m_filesToSendQueue.front().fileName << " send successfully";
+		LOG << "File " << m_filesToSendQueue.front().fileName << " sent successfully";
 		
 		OnFileSentInternal();
 	}

@@ -1,14 +1,13 @@
 #pragma once
-//#include "TCPConnectionNoTLS.h"
+//#include "TCPConnection.h"
 #include <fstream>
 #include <deque>
 #include "Uuid.h"
 #include <boost/asio/strand.hpp>
 #include "TCPConnectionNoTLS.h"
-constexpr auto FILE_STREAM_READ_BUFFER_SIZE = 1024 * 500;
-//constexpr auto FILE_STREAM_READ_BUFFER_SIZE = 1024 * 12 * 42;
+constexpr auto FILE_STREAM_BUFFER_SIZE = 1024 * 500;
 
-using NetBuffer = std::array<byte, FILE_STREAM_READ_BUFFER_SIZE>;
+using NetBuffer = std::array<byte, FILE_STREAM_BUFFER_SIZE>;
 
 struct AttachmentFile
 {
@@ -28,7 +27,6 @@ class FileStreamConnection : public TCPConnectionNoTLS
 	{
 		Int64 fileSize = 0;
 		Int64 receivedSize = 0;
-		//UInt32 writtenSize = 0;
 		
 		std::ofstream writeStream;
 	};
