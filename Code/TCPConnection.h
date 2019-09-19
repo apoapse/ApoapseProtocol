@@ -92,4 +92,5 @@ protected:
 	virtual bool OnSocketConnectedInternal() = 0;
 	virtual bool OnReceivedError(const boost::system::error_code& error) = 0;
 	virtual void OnSendingSuccessful(size_t bytesTransferred) = 0;
+	virtual void SetCustomTCPOptions() {}
 };

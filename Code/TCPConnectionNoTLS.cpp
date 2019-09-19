@@ -60,6 +60,8 @@ void TCPConnectionNoTLS::HandleConnectAsync(const boost::system::error_code& err
 	else
 	{
 		m_isConnected = true;
+		SetCustomTCPOptions();
+		
 		this->OnSocketConnectedInternal();
 	}
 }

@@ -58,6 +58,8 @@ void TCPConnection::HandleConnectAsync(const boost::system::error_code& error, D
 	}
 	else
 	{
+		SetCustomTCPOptions();
+		
 		if (device == Device::server)
 		{
 			SendTLSHandshake(ssl::stream_base::handshake_type::server);

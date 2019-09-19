@@ -1,13 +1,12 @@
 #pragma once
-//#include "TCPConnection.h"
+//#include "TCPConnectionNoTLS.h"
 #include <fstream>
 #include <deque>
 #include "Uuid.h"
 #include <boost/asio/strand.hpp>
-#include <mutex>
 #include "TCPConnectionNoTLS.h"
-#include <boost/multi_index/detail/adl_swap.hpp>
 constexpr auto FILE_STREAM_READ_BUFFER_SIZE = 1024 * 500;
+//constexpr auto FILE_STREAM_READ_BUFFER_SIZE = 1024 * 12 * 42;
 
 using NetBuffer = std::array<byte, FILE_STREAM_READ_BUFFER_SIZE>;
 
@@ -27,17 +26,17 @@ class FileStreamConnection : public TCPConnectionNoTLS
 {
 	struct FileReceive
 	{
-		UInt32 fileSize = 0;
-		UInt32 receivedSize = 0;
-		UInt32 writtenSize = 0;
+		Int64 fileSize = 0;
+		Int64 receivedSize = 0;
+		//UInt32 writtenSize = 0;
 		
 		std::ofstream writeStream;
 	};
 
 	struct FileSend
 	{
-		UInt32 fileSize = 0;
-		UInt32 sentSize = 0;
+		Int64 fileSize = 0;
+		Int64 sentSize = 0;
 		UInt16 packetIndex = 0;
 
 		std::ifstream readStream;
@@ -45,12 +44,12 @@ class FileStreamConnection : public TCPConnectionNoTLS
 
 	struct WriteBuffer
 	{
-		NetBuffer data;
-		UInt16 index;
+		NetBuffer data{};
+		UInt32 chunckSize = 0;
 	};
 	
 	std::array<byte, FILE_STREAM_READ_BUFFER_SIZE> m_readBuffer;
-	std::array<byte, FILE_STREAM_READ_BUFFER_SIZE> m_writeBuffer;
+	//std::array<byte, FILE_STREAM_READ_BUFFER_SIZE> m_writeBuffer;
 	std::optional<FileReceive> m_currentFileDownload;
 	std::optional<FileSend> m_currentFileSend;
 	bool m_socketAuthenticated = false;
@@ -59,6 +58,8 @@ class FileStreamConnection : public TCPConnectionNoTLS
 	std::deque<AttachmentFile> m_filesToReceiveQueue;
 	boost::asio::io_context::strand m_strand;
 
+	std::vector<byte> m_fullFile;
+
 public:
 	FileStreamConnection(io_context& ioService/*, ssl::context& context*/);
 	virtual ~FileStreamConnection();
@@ -66,9 +67,11 @@ public:
 	bool IsDownloadingFile() const;
 	bool IsSendingFile() const;
 
-	// TCPConnection
+	// TCPConnectionNoTLS
+	void SetCustomTCPOptions() override;
 	bool OnSocketConnectedInternal() override;
 	bool OnReceivedError(const boost::system::error_code& error) override;
+	void OnSendingSuccessful(size_t bytesTransferred) override {}
 
 	void PushFileToReceive(const AttachmentFile& file);
 	void PushFileToSend(const AttachmentFile& file);
@@ -83,17 +86,16 @@ protected:
 	virtual void OnSocketConnected() = 0;
 	
 private:
+	void SocketRead(Int64 size);
+	void OnReceiveAuthCode(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS);
+	void OnReceiveData(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS);
+	void StartReceiveFile();
+	void ReadChunk(Range<NetBuffer>& data);
+
 	void SendFileFromQueue();
 	void SendFileInternal(const std::string& filePath, UInt64 size);
 	void OnFileSentInternal();
-	
-	void StartReading();
-	void OnReceiveData(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<TCPConnectionNoTLS> tcpConnection);
-	std::shared_ptr<WriteBuffer> ReadFromFile();
+	void SendChunk();
 
-	void OnFilePartReceived(size_t bytesTransferred, std::shared_ptr<NetBuffer> dataBuffer);
-
-	void HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<WriteBuffer> buffer, std::shared_ptr<TCPConnectionNoTLS> tcpConnection);
-
-	void OnSendingSuccessful(size_t bytesTransferred) override;	// Used with generic ByteContainer, strings sends not for files
+	void HandleFileWriteAsync(const boost::system::error_code& error, size_t bytesTransferred, std::shared_ptr<WriteBuffer> chunk, std::shared_ptr<TCPConnectionNoTLS> TCPConnectionNoTLS);
 };
