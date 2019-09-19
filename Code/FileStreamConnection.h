@@ -45,11 +45,11 @@ class FileStreamConnection : public TCPConnectionNoTLS
 	struct WriteBuffer
 	{
 		NetBuffer data{};
-		UInt32 chunckSize = 0;
+		UInt32 chunkSize = 0;
 	};
 	
-	std::array<byte, FILE_STREAM_READ_BUFFER_SIZE> m_readBuffer;
-	//std::array<byte, FILE_STREAM_READ_BUFFER_SIZE> m_writeBuffer;
+	NetBuffer m_readBuffer;
+	//NetBuffer m_writeBuffer;
 	std::optional<FileReceive> m_currentFileDownload;
 	std::optional<FileSend> m_currentFileSend;
 	bool m_socketAuthenticated = false;
@@ -57,8 +57,6 @@ class FileStreamConnection : public TCPConnectionNoTLS
 	std::deque<AttachmentFile> m_filesToSendQueue;
 	std::deque<AttachmentFile> m_filesToReceiveQueue;
 	boost::asio::io_context::strand m_strand;
-
-	std::vector<byte> m_fullFile;
 
 public:
 	FileStreamConnection(io_context& ioService/*, ssl::context& context*/);

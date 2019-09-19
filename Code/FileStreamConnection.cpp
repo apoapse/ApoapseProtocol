@@ -4,8 +4,6 @@
 #include "CryptographyTypes.hpp"
 #include "Username.h"
 #include <filesystem>
-#include "ThreadUtils.h"
-#include "FileUtils.h"
 
 AttachmentFile::AttachmentFile(DataStructure& data, const std::string& filePath)
 {
@@ -172,8 +170,7 @@ void FileStreamConnection::StartReceiveFile()
 		std::filesystem::create_directory(filePathFolder);
 	}
 
-	//m_currentFileDownload->writeStream = std::ofstream(fileToReceive.filePath, std::ofstream::binary);
-	m_fullFile.resize(m_currentFileDownload->fileSize);
+	m_currentFileDownload->writeStream = std::ofstream(fileToReceive.filePath, std::ofstream::binary | std::ofstream::app);
 
 	LOG << "Start downloading file " << fileToReceive.fileName << " size: " << fileToReceive.fileSize;
 }
@@ -181,15 +178,15 @@ void FileStreamConnection::StartReceiveFile()
 void FileStreamConnection::ReadChunk(Range<NetBuffer>& data)
 {
 	ASSERT(IsDownloadingFile());
-
-	std::copy(data.begin(), data.end(), m_fullFile.begin() + m_currentFileDownload->receivedSize);
+	
+	m_currentFileDownload->writeStream.write((char*)data.data(), data.size());
 	m_currentFileDownload->receivedSize += data.size();
 	
 	if (m_currentFileDownload->receivedSize >= m_currentFileDownload->fileSize)
 	{
 		const AttachmentFile& file = m_filesToReceiveQueue.front();
 
-		FileUtils::SaveBytesToFile(file.filePath, m_fullFile);
+		m_currentFileDownload->writeStream.close();
 		LOG << "File " << file.fileName << " download completed";
 		
 		OnFileDownloadCompleted(file);
@@ -227,7 +224,6 @@ void FileStreamConnection::SendFileInternal(const std::string& filePath, UInt64 
 	m_currentFileSend->sentSize = 0;
 	
 	m_currentFileSend->readStream = std::ifstream(filePath, std::ios::binary);
-	//m_fullFile = FileUtils::ReadFile(filePath);
 
 	LOG << "Sending file " << filePath << " size: " << m_currentFileSend->fileSize;
 
@@ -253,15 +249,13 @@ void FileStreamConnection::SendChunk()
 	ASSERT(IsSendingFile());
 
 	auto chunk = std::make_shared<WriteBuffer>();
-	chunk->chunckSize = std::min((Int64)chunk->data.size(), (Int64)(m_currentFileSend->fileSize - m_currentFileSend->sentSize));
+	chunk->chunkSize = std::min((Int64)chunk->data.size(), (Int64)(m_currentFileSend->fileSize - m_currentFileSend->sentSize));
 
 	m_currentFileSend->readStream.seekg(m_currentFileSend->sentSize);
-	m_currentFileSend->readStream.read((char*)chunk->data.data(), chunk->chunckSize);
+	m_currentFileSend->readStream.read((char*)chunk->data.data(), chunk->chunkSize);
 	
-	//std::copy(m_fullFile.begin() + m_currentFileSend->sentSize, m_fullFile.begin() + m_currentFileSend->sentSize + chunk->chunckSize, chunk->data.begin());
-
 	auto self(shared_from_this());
-	boost::asio::async_write(*m_socket, boost::asio::buffer(chunk->data, chunk->data.size()), boost::asio::transfer_exactly(chunk->chunckSize), boost::asio::bind_executor(m_strand, [this, self, chunk](boost::system::error_code er, size_t bytesTransferred)
+	boost::asio::async_write(*m_socket, boost::asio::buffer(chunk->data, chunk->data.size()), boost::asio::transfer_exactly(chunk->chunkSize), boost::asio::bind_executor(m_strand, [this, self, chunk](boost::system::error_code er, size_t bytesTransferred)
 	{
 		HandleFileWriteAsync(er, bytesTransferred, chunk, self);
 	}));
