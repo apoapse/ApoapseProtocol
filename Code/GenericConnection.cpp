@@ -75,7 +75,8 @@ void GenericConnection::ProcessDataGeneric(Range<std::array<byte, READ_BUFFER_SI
 	}
 	catch (const std::length_error&)
 	{
-		SecurityLog::LogAlert(ApoapseErrorCode::network_message_too_long, *this);
+		LOG << "length_error" << LogSeverity::error;
+		Close();
 	}
 	catch (const std::exception& e)
 	{
