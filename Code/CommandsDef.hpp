@@ -22,6 +22,20 @@ static std::string GetCommandDef()
 			}
 		},
 		{
+			"name": "version",
+			"name_short": "gv",
+			"datastructure": "empty",
+			"require_authentication": false,
+			"only_non_authenticated": false,
+			"reception": {
+				"server": true,
+				"client": true
+			},
+			"operation": {
+				"register": false
+			}
+		},
+		{
 			"name": "install",
 			"name_short": "in",
 			"datastructure": "install",
