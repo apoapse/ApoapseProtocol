@@ -17,6 +17,9 @@ public:
 		: m_associatedArray(array)
 	{
 		m_upperBound = (upperBound == 0) ? m_associatedArray.size() : upperBound;
+		
+		if (m_upperBound > array.size())
+			m_upperBound = array.size();
 	}
 
 	Range(const Range<T>& inputRange, size_t upperBound = 0)
