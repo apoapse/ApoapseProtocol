@@ -13,6 +13,7 @@ enum class ApoapseErrors : UInt16
 	protocol_version_not_supported = 7,
 	unable_to_register_user = 8,
 	unable_to_authenticate_user = 9,
+	access_denied = 10,
 	//future_datetime = 10,
 	//related_item_does_not_exist = 11,
 };
