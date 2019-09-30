@@ -351,6 +351,24 @@ static std::string GetCommandDef()
 				"propagate": false,
 				"exclude_self": false
 			}
+		},
+		{
+			"name": "attachment_available",
+			"name_short": "av",
+			"datastructure": "attachment_uuid",
+			"require_authentication": true,
+			"save_on_receive": {
+				"server": false,
+				"client": false
+			},
+			"reception": {
+				"server": false,
+				"client": true
+			},
+			"operation": {
+				"register": true,
+				"datastructure": "attachment"
+			}
 		}
 	]
 }

@@ -47,6 +47,32 @@ void ApoapseOperation::RegisterOperation(CommandV2& cmd, const std::optional<Use
 	LOG << "Saved operation " << opName;
 }
 
+void ApoapseOperation::RegisterOperation(const std::string& name, const std::optional<Username>& sender, const std::optional<DbId>& relatedItem, OperationOwnership ownership)
+{
+	auto opData = global->apoapseData->GetStructure("operation");
+	opData.GetField("uuid").SetValue(Uuid::Generate());
+	opData.GetField("name").SetValue(name);
+	opData.GetField("time").SetValue(DateTimeUtils::UnixTimestampNow());
+
+	if (global->isServer)
+	{
+		opData.GetField("ownership").SetValue((Int64)ownership);
+		
+		if (sender.has_value() && (ownership == OperationOwnership::self || ownership == OperationOwnership::usergroup))
+		{
+			opData.GetField("related_user").SetValue(sender.value());
+		}
+	}
+
+	if (relatedItem.has_value())
+	{
+		opData.GetField("item").SetValue(relatedItem.value());
+	}
+
+	opData.SaveToDatabase();
+	LOG << "Saved operation " << name << " manually";
+}
+
 void ApoapseOperation::PrepareCmdSend(CommandV2& cmd)
 {
 	ASSERT(cmd.operationRegister);
@@ -85,9 +111,11 @@ void ApoapseOperation::ExecuteSyncRequest(Int64 sinceTimestamp, GenericConnectio
 	{
 		auto opData = global->apoapseData->ReadFromDbResult(operationStruct, sqlRow);
 		const std::string cmdName = opData.GetField("name").GetValue<std::string>();
-		const std::string dataStructName = global->cmdManager->GetCmdDefByFullName(cmdName).relatedDataStructure;
+		const CommandV2Def cmdDef = global->cmdManager->GetCmdDefByFullName(cmdName);
 
-		DataStructure itemData = global->apoapseData->ReadItemFromDatabase(dataStructName, "id", opData.GetField("item").GetValue<Int64>());
+		DataStructure itemData = global->apoapseData->ReadItemFromDatabase(cmdDef.operationDatastructure, "id", opData.GetField("item").GetValue<Int64>());
+
+		//TODO filter
 
 		AddOperationFields(itemData);
 		itemData.GetField("operation_uuid").SetValue(opData.GetField("uuid").GetValue<Uuid>());

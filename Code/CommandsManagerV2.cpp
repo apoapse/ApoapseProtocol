@@ -24,6 +24,7 @@ CommandsManagerV2::CommandsManagerV2(const std::string& cmdSchemeJson)
 		cmd.clientUIPropagate = dser.ReadFieldValue<bool>("client_ui.propagate").value_or(false);
 		cmd.clientUISignalName = dser.ReadFieldValue<std::string>("client_ui.signal_name").value_or(std::string());
 		cmd.operationRegister = dser.ReadFieldValue<bool>("operation.register").value_or(false);
+		cmd.operationDatastructure = dser.ReadFieldValue<std::string>("operation.datastructure").value_or(cmd.relatedDataStructure);
 		cmd.operationOwnership = CommandV2::ConvertFieldToOwnership(dser.ReadFieldValue<std::string>("operation.ownership").value_or(""));
 		cmd.saveOnReceiveServer = dser.ReadFieldValue<bool>("save_on_receive.server").value_or(false);
 		cmd.saveOnReceiveClient = dser.ReadFieldValue<bool>("save_on_receive.client").value_or(false);
@@ -31,7 +32,7 @@ CommandsManagerV2::CommandsManagerV2(const std::string& cmdSchemeJson)
 		cmd.receiveOnServer = dser.ReadFieldValue<bool>("reception.server").value_or(false);
 		cmd.propagate = dser.ReadFieldValue<bool>("propagation.propagate").value_or(false);
 		cmd.excludeSelfPropagation = dser.ReadFieldValue<bool>("propagation.exclude_self").value_or(false);
-
+		
 		if (dser.ReadFieldValue<std::string>("required_permissions").is_initialized())
 		{
 			const std::string permStr = dser.ReadFieldValue<std::string>("required_permissions").value();

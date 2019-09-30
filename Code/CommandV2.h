@@ -43,6 +43,7 @@ public:
 
 	bool operationRegister = false;
 	OperationOwnership operationOwnership = OperationOwnership::all;
+	std::string operationDatastructure;
 	static OperationOwnership ConvertFieldToOwnership(const std::string& value);
 
 	void SetData(const DataStructure& data);

@@ -463,6 +463,35 @@ static std::string scheme2 = R"(
 						"client_storage": true,
 						"command": false
 					}
+				},
+				{
+					"name": "is_available",
+					"type": "bool",
+					"required": true,
+					"unique": false,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": false,
+						"client_storage": true,
+						"command": true
+					}
+				}
+			]
+		},
+		{
+			"name": "attachment_uuid",
+			"fields": [
+				{
+					"name": "uuid",
+					"type": "uuid",
+					"required": true,
+					"unique": true,
+					"read_permission": "all",
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true
+					}
 				}
 			]
 		},
