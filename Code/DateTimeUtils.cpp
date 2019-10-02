@@ -8,7 +8,7 @@
 DateTimeUtils::UTCDateTime::UTCDateTime(const std::string& dateTime) : m_dateTimeStr(dateTime)
 {
 	if (!ValidateFormat(dateTime))
-		throw std::exception("Text of unexpected format for a ISO-8601 date time");
+		throw std::runtime_error("Text of unexpected format for a ISO-8601 date time");
 }
 
 std::string DateTimeUtils::UTCDateTime::GetStr() const

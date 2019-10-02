@@ -39,7 +39,7 @@ public:
 	{
 	}
 
-	virtual const char* what() const override
+	virtual const char* what() const noexcept override
 	{
 		return m_errorMsg.c_str();
 	}

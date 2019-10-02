@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Log.h"
-#include <boost\date_time.hpp>
+#include <boost/date_time.hpp>
 #include "ByteUtils.hpp"
 
 LogMessage::LogMessage(const std::string& message, LogSeverity severity)

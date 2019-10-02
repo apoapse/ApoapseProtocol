@@ -3,11 +3,11 @@
 #include <vector>
 #include "TypeDefs.hpp"
 #include "Range.hpp"
-#include "CustomDataType.h"
+#include "ICustomDataType.hpp"
 
 constexpr size_t uuidLengthInBytes = 16;
 
-class Uuid : public ICustomDataType
+class Uuid final : public ICustomDataType
 {
 	std::array<byte, uuidLengthInBytes> m_uuidRawFormat;
 

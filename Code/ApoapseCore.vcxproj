@@ -178,6 +178,7 @@
     <ClInclude Include="DatabaseSettings.h" />
     <ClInclude Include="FileStreamConnection.h" />
     <ClInclude Include="FileUtils.h" />
+    <ClInclude Include="ICustomDataType.hpp" />
     <ClInclude Include="IUser.h" />
     <ClInclude Include="AES.hpp" />
     <ClInclude Include="ApoapseData.h" />

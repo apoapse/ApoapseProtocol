@@ -111,7 +111,7 @@ struct DataField
 			value = val.GetBytes();
 
 		else
-			throw std::exception("DataField:SetValue no ICustomDataType converter defined for this base type");
+			throw std::runtime_error("DataField:SetValue no ICustomDataType converter defined for this base type");
 	}
 
 	void SetValue(std::vector<class DataStructure>& structArray)

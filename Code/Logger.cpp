@@ -56,8 +56,8 @@ void Logger::LogToConsole(const LogMessage& logMessage)
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);	// Reset to default color
 
 #else
-	PLATFORM_NOT_IMPLEMENTED("unix console colors");
-	std::cout << steam.rdbuf() << '\n';
+	//PLATFORM_NOT_IMPLEMENTED("unix console colors");
+	std::cout << logMessage.msg << '\n';
 #endif
 }
 

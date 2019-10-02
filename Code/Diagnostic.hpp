@@ -11,7 +11,7 @@ public:
 	{
 	}
 
-	virtual char const* what() const override
+	virtual char const* what() const noexcept override
 	{
 		return m_msg.c_str();
 	}

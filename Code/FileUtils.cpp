@@ -29,7 +29,7 @@ std::vector<byte> FileUtils::ReadFile(const std::string& filePath)
 	if (!std::filesystem::exists(filePath))
 	{
 		LOG << LogSeverity::error << "Unable to find the requested file to read: " << filePath;
-		throw std::exception("Unable to find the requested file to read");
+		throw std::runtime_error("Unable to find the requested file to read");
 	}
 
 	std::vector<byte> output;

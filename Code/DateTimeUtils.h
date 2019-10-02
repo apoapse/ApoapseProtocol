@@ -1,7 +1,7 @@
 #pragma once
 #include "TypeDefs.hpp"
 #include <string>
-#include "CustomDataType.h"
+#include "ICustomDataType.hpp"
 
 namespace DateTimeUtils
 {

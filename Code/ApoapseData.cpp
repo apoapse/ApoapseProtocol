@@ -143,7 +143,7 @@ DataStructureDef& ApoapseData::GetStructureDefinition(const std::string& name)
 	});
 
 	if (res == m_registeredDataStructures.end())
-		throw std::exception("The requested data structure do not exist");
+		throw std::runtime_error("The requested data structure do not exist");
 
 	return *res;
 }
@@ -161,7 +161,7 @@ const DataStructureDef& ApoapseData::GetStructure(const std::string& name) const
 	});
 
 	if (res == m_registeredDataStructures.end())
-		throw std::exception("The requested data structure do not exist");
+		throw std::runtime_error("The requested data structure do not exist");
 
 	return *res;
 }
@@ -265,7 +265,7 @@ bool ApoapseData::AllowDatabaseStorage(const DataStructure& dataStructure)
 
 bool ApoapseData::AllowDatabaseStorage(const DataField& field)
 {
-	return (global->isClient && field.usedInClientDb || global->isServer && field.usedInServerDb);
+	return ((global->isClient && field.usedInClientDb) || (global->isServer && field.usedInServerDb));
 }
 
 DataFieldType ApoapseData::GetTypeByTypeName(const std::string& typeStr, bool* isCustomType) const

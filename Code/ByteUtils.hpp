@@ -14,19 +14,19 @@
 
 enum class Endianness
 {
-	LITTLE_ENDIAN,
-	BIG_ENDIAN
+	AP_LITTLE_ENDIAN,
+	AP_BIG_ENDIAN
 };
 
 template <typename T>
-inline std::array<byte, sizeof(T)> ToBytes(T data, Endianness endianness = Endianness::LITTLE_ENDIAN)
+inline std::array<byte, sizeof(T)> ToBytes(T data, Endianness endianness = Endianness::AP_LITTLE_ENDIAN)
 {
 	static_assert(std::is_trivially_copyable<T>::value, "The type provided is not trivially copyable");
-	std::array<byte, sizeof(T)> bytes;
+	std::array<byte, sizeof(T)> bytes{};
 
 	const byte* it = static_cast<const byte*>(static_cast<void*>(std::addressof(data)));
 
-	if (endianness == Endianness::LITTLE_ENDIAN)
+	if (endianness == Endianness::AP_LITTLE_ENDIAN)
 		std::copy(it, it + sizeof(T), bytes.begin());
 	else
 		std::reverse_copy(it, it + sizeof(T), bytes.begin());
@@ -35,13 +35,13 @@ inline std::array<byte, sizeof(T)> ToBytes(T data, Endianness endianness = Endia
 }
 
 template <typename T>
-inline T FromBytes(std::array<byte, sizeof(T)>& byteArray, Endianness endianness = Endianness::LITTLE_ENDIAN)
+inline T FromBytes(std::array<byte, sizeof(T)>& byteArray, Endianness endianness = Endianness::AP_LITTLE_ENDIAN)
 {
 	static_assert(std::is_trivially_copyable<T>::value, "The type provided is not trivially copyable");
 
 	T output;
 
-	if (endianness == Endianness::LITTLE_ENDIAN)
+	if (endianness == Endianness::AP_LITTLE_ENDIAN)
 		std::copy(byteArray.begin(), byteArray.end(), static_cast<byte*>(static_cast<void*>(std::addressof(output))));
 	else
 		std::reverse_copy(byteArray.begin(), byteArray.end(), static_cast<byte*>(static_cast<void*>(std::addressof(output))));
@@ -50,13 +50,13 @@ inline T FromBytes(std::array<byte, sizeof(T)>& byteArray, Endianness endianness
 }
 
 template <typename T, typename RANGE_TYPE>
-inline T FromBytes(Range<RANGE_TYPE>& bytes, Endianness endianness = Endianness::LITTLE_ENDIAN)
+inline T FromBytes(Range<RANGE_TYPE>& bytes, Endianness endianness = Endianness::AP_LITTLE_ENDIAN)
 {
 	static_assert(std::is_trivially_copyable<T>::value, "The type provided is not trivially copyable");
 
 	T output;
 
-	if (endianness == Endianness::LITTLE_ENDIAN)
+	if (endianness == Endianness::AP_LITTLE_ENDIAN)
 		std::copy(bytes.begin(), bytes.begin() + sizeof(T), static_cast<byte*>(static_cast<void*>(std::addressof(output))));
 	else
 		std::reverse_copy(bytes.begin(), bytes.begin() + sizeof(T), static_cast<byte*>(static_cast<void*>(std::addressof(output))));
@@ -67,7 +67,7 @@ inline T FromBytes(Range<RANGE_TYPE>& bytes, Endianness endianness = Endianness:
 template <typename T>
 std::string BytesToHexString(const T& bytesArray)
 {
-	static_assert(std::is_same<T::value_type, byte>::value, "The array provided do not contain bytes");
+	static_assert(std::is_same<typename T::value_type, byte>::value, "The array provided do not contain bytes");
 
 	std::stringstream ss;
 	ss << std::hex << std::setfill('0');

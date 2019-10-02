@@ -12,7 +12,7 @@ DataField& DataStructure::GetField(const std::string& fieldName)
 	});
 
 	if (res == fields.end())
-		throw std::exception("The requested field do not exist");
+		throw std::runtime_error("The requested field do not exist");
 
 	return *res;
 }
@@ -131,7 +131,7 @@ void DataStructure::SaveToDatabase()
 {
 	const int nbFieldToSave = std::count_if(fields.begin(), fields.end(), [](const DataField& field)
 	{
-		return (field.usedInClientDb == global->isClient || field.usedInServerDb && global->isServer);
+		return ((field.usedInClientDb == global->isClient) || (field.usedInServerDb && global->isServer));
 	});
 
 	if (nbFieldToSave == 0)

@@ -196,6 +196,9 @@
     <ClInclude Include="ApoapseOpenSSL.h">
       <Filter>Cryptography\TLS</Filter>
     </ClInclude>
+    <ClInclude Include="ICustomDataType.hpp">
+      <Filter>DataSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">

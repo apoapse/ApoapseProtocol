@@ -68,7 +68,7 @@ void NetworkPayload::ReadHeader()
 	}
 
 	{
-		headerInfo->payloadLength = FromBytes<UInt32>(range, Endianness::BIG_ENDIAN);
+		headerInfo->payloadLength = FromBytes<UInt32>(range, Endianness::AP_BIG_ENDIAN);
 
 		if (headerInfo->payloadLength > payloadMaxAllowedLength)
 			throw std::length_error("");
@@ -85,7 +85,7 @@ void NetworkPayload::WriteHeader(const std::string& cmdShortName, std::vector<by
 
 	{
 		const UInt32 pyaloadContentSize = (static_cast<UInt32>(data.size()) - headerLength);
-		const auto payloadLength = ToBytes<UInt32>(static_cast<UInt32>(pyaloadContentSize), Endianness::BIG_ENDIAN);
+		const auto payloadLength = ToBytes<UInt32>(static_cast<UInt32>(pyaloadContentSize), Endianness::AP_BIG_ENDIAN);
 		std::copy(payloadLength.begin(), payloadLength.end(), data.begin() + cmdShortName.size());
 	}
 }

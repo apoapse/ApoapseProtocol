@@ -60,7 +60,7 @@ CommandV2 CommandsManagerV2::CreateCommand(std::shared_ptr<NetworkPayload> netPa
 	auto cmdDef = GetCmdDef(netPayload->headerInfo->cmdShortName);
 	if (!cmdDef)
 	{
-		throw std::exception("The related command do not exist.");
+		throw std::runtime_error("The related command do not exist.");
 	}
 
 	CommandV2 cmd = cmdDef.value();
@@ -154,7 +154,7 @@ const CommandV2Def& CommandsManagerV2::GetCmdDefByFullName(const std::string& na
 		});
 
 	if (res == m_registeredCommands.end())
-		throw std::exception("The requested command do not exist. Wrong full name.");
+		throw std::runtime_error("The requested command do not exist. Wrong full name.");
 
 	return *res;
 }

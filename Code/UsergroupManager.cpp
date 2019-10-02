@@ -81,7 +81,7 @@ const Usergroup& UsergroupManager::GetUsergroup(const Uuid& uuid) const
 	const auto res = std::find(m_registeredUsergroups.begin(), m_registeredUsergroups.end(), uuid);
 
 	if (res == m_registeredUsergroups.end())
-		throw std::exception("No usergroup with the provided uuid");
+		throw std::runtime_error("No usergroup with the provided uuid");
 
 	return *res;
 }
@@ -91,7 +91,7 @@ const Usergroup& UsergroupManager::GetUsergroup(const std::string& name) const
 	const auto res = std::find(m_registeredUsergroups.begin(), m_registeredUsergroups.end(), name);
 
 	if (res == m_registeredUsergroups.end())
-		throw std::exception("No usergroup with the provided name");
+		throw std::runtime_error("No usergroup with the provided name");
 
 	return *res;
 }

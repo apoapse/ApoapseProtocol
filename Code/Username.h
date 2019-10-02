@@ -2,7 +2,7 @@
 #include <string>
 #include "CryptographyTypes.hpp"
 #include <optional>
-#include "CustomDataType.h"
+#include "ICustomDataType.hpp"
 
 class Username : public ICustomDataType
 {

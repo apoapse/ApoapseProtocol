@@ -3,7 +3,7 @@
 #include <thread>
 #include <condition_variable>
 #include <future>
-#include <boost\lockfree\queue.hpp>
+#include <boost/lockfree/queue.hpp>
 #include "TypeDefs.hpp"
 
 #define INITIAL_QUEUE_CAPACITY 512

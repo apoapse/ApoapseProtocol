@@ -5,10 +5,10 @@
 #include <functional>
 #include <map>
 #include <optional>
+#include "ByteUtils.hpp"
 #include "TypeDefs.hpp"
 #include "Maths.hpp"
 #include "Range.hpp"
-#include "ByteUtils.hpp"
 #include "StringExtensions.h"
 #include "Diagnostic.hpp"
 
@@ -89,7 +89,7 @@ public:
 	{
 	}
 
-	const char* what() const override
+	const char* what() const noexcept override
 	{
 		return m_message.c_str();
 	}
@@ -286,10 +286,10 @@ private:
 		else
 		{
 			if (CanFit<UInt16>(nbItems))
-				InsertBytes<UInt16, FormatFirstByte::map_16>(ToBytes<UInt16>((UInt16)nbItems, Endianness::BIG_ENDIAN));
+				InsertBytes<UInt16, FormatFirstByte::map_16>(ToBytes<UInt16>((UInt16)nbItems, Endianness::AP_BIG_ENDIAN));
 
 			else if (CanFit<UInt32>(nbItems))
-				InsertBytes<UInt32, FormatFirstByte::map_32>(ToBytes<UInt32>((UInt32)nbItems, Endianness::BIG_ENDIAN));
+				InsertBytes<UInt32, FormatFirstByte::map_32>(ToBytes<UInt32>((UInt32)nbItems, Endianness::AP_BIG_ENDIAN));
 		}
 	}
 
@@ -310,13 +310,13 @@ private:
 		else
 		{
 			if (CanFit<UInt8>(str.length()))
-				InsertBytes<UInt8, FormatFirstByte::str_8>(ToBytes<UInt8>((UInt8)str.length(), Endianness::BIG_ENDIAN));
+				InsertBytes<UInt8, FormatFirstByte::str_8>(ToBytes<UInt8>((UInt8)str.length(), Endianness::AP_BIG_ENDIAN));
 
 			else if (CanFit<UInt16>(str.length()))
-				InsertBytes<UInt16, FormatFirstByte::str_16>(ToBytes<UInt16>((UInt16)str.length(), Endianness::BIG_ENDIAN));
+				InsertBytes<UInt16, FormatFirstByte::str_16>(ToBytes<UInt16>((UInt16)str.length(), Endianness::AP_BIG_ENDIAN));
 
 			else
-				InsertBytes<UInt32, FormatFirstByte::str_32>(ToBytes<UInt32>((UInt32)str.length(), Endianness::BIG_ENDIAN));
+				InsertBytes<UInt32, FormatFirstByte::str_32>(ToBytes<UInt32>((UInt32)str.length(), Endianness::AP_BIG_ENDIAN));
 		}
 
 		m_data.insert(m_data.end(), str.begin(), str.end());
@@ -328,13 +328,13 @@ private:
 			throw std::out_of_range("The byte array size is too high to fit into a UInt32");
 
 		if (CanFit<UInt8>(data.size()))
-			InsertBytes<UInt8, FormatFirstByte::bin_8>(ToBytes<UInt8>((UInt8)data.size(), Endianness::BIG_ENDIAN));
+			InsertBytes<UInt8, FormatFirstByte::bin_8>(ToBytes<UInt8>((UInt8)data.size(), Endianness::AP_BIG_ENDIAN));
 
 		else if (CanFit<UInt16>(data.size()))
-			InsertBytes<UInt16, FormatFirstByte::bin_16>(ToBytes<UInt16>((UInt16)data.size(), Endianness::BIG_ENDIAN));
+			InsertBytes<UInt16, FormatFirstByte::bin_16>(ToBytes<UInt16>((UInt16)data.size(), Endianness::AP_BIG_ENDIAN));
 
 		else
-			InsertBytes<UInt32, FormatFirstByte::bin_32>(ToBytes<UInt32>((UInt32)data.size(), Endianness::BIG_ENDIAN));
+			InsertBytes<UInt32, FormatFirstByte::bin_32>(ToBytes<UInt32>((UInt32)data.size(), Endianness::AP_BIG_ENDIAN));
 
 		m_data.insert(m_data.end(), data.begin(), data.end());
 	}
@@ -348,10 +348,10 @@ private:
 			m_data.push_back(static_cast<byte>((size_t)FormatFirstByte::fixarray_low_bound + data.size()));
 
 		else if (CanFit<UInt16>(data.size()))
-			InsertBytes<UInt16, FormatFirstByte::array_16>(ToBytes<UInt16>((UInt16)data.size(), Endianness::BIG_ENDIAN));
+			InsertBytes<UInt16, FormatFirstByte::array_16>(ToBytes<UInt16>((UInt16)data.size(), Endianness::AP_BIG_ENDIAN));
 
 		else
-			InsertBytes<UInt32, FormatFirstByte::array_32>(ToBytes<UInt32>((UInt32)data.size(), Endianness::BIG_ENDIAN));
+			InsertBytes<UInt32, FormatFirstByte::array_32>(ToBytes<UInt32>((UInt32)data.size(), Endianness::AP_BIG_ENDIAN));
 
 		for (const auto& item : data)
 			AppendItem(item);
@@ -378,14 +378,14 @@ private:
 
 			else if (CanFit<UInt16>(data))
 			{
-				const auto byteArray = ToBytes<UInt16>(static_cast<UInt16>(data), Endianness::BIG_ENDIAN);
+				const auto byteArray = ToBytes<UInt16>(static_cast<UInt16>(data), Endianness::AP_BIG_ENDIAN);
 
 				InsertBytes<UInt16, FormatFirstByte::uint_16>(byteArray);
 			}
 
 			else if (CanFit<UInt32>(data))
 			{
-				const auto byteArray = ToBytes<UInt32>(static_cast<UInt32>(data), Endianness::BIG_ENDIAN);
+				const auto byteArray = ToBytes<UInt32>(static_cast<UInt32>(data), Endianness::AP_BIG_ENDIAN);
 
 				InsertBytes<UInt32, FormatFirstByte::uint_32>(byteArray);
 			}
@@ -398,28 +398,28 @@ private:
 
 			else if (CanFit<Int16>(data))
 			{
-				const auto byteArray = ToBytes<Int16>(static_cast<Int16>(data), Endianness::BIG_ENDIAN);
+				const auto byteArray = ToBytes<Int16>(static_cast<Int16>(data), Endianness::AP_BIG_ENDIAN);
 
 				InsertBytes<Int16, FormatFirstByte::int_16>(byteArray);
 			}
 
 			else if (CanFit<int>(data))
 			{
-				const auto byteArray = ToBytes<int>(static_cast<int>(data), Endianness::BIG_ENDIAN);
+				const auto byteArray = ToBytes<int>(static_cast<int>(data), Endianness::AP_BIG_ENDIAN);
 
 				InsertBytes<int, FormatFirstByte::int_32>(byteArray);
 			}
 
 			else if (CanFit<UInt64>(data))
 			{
-				const auto byteArray = ToBytes<UInt64>(static_cast<UInt64>(data), Endianness::BIG_ENDIAN);
+				const auto byteArray = ToBytes<UInt64>(static_cast<UInt64>(data), Endianness::AP_BIG_ENDIAN);
 
 				InsertBytes<UInt64, FormatFirstByte::uint_64>(byteArray);
 			}
 
 			else
 			{
-				const auto byteArray = ToBytes<Int64>(static_cast<Int64>(data), Endianness::BIG_ENDIAN);
+				const auto byteArray = ToBytes<Int64>(static_cast<Int64>(data), Endianness::AP_BIG_ENDIAN);
 
 				InsertBytes<Int64, FormatFirstByte::int_64>(byteArray);
 			}
@@ -552,7 +552,7 @@ public:
 			return ReadAndCheckInteger<Int64, T>(bytesRange);
 
 		default:
-			throw std::exception("Cannot convert the requested value");
+			throw std::runtime_error("Cannot convert the requested value");
 		}
 	}
 
@@ -936,7 +936,7 @@ private:
 		std::array<byte, sizeof(T)> bytes;
 		std::copy(bytesRange.begin(), bytesRange.begin() + sizeof(T), bytes.begin());
 
-		return FromBytes<T>(bytes, Endianness::BIG_ENDIAN);
+		return FromBytes<T>(bytes, Endianness::AP_BIG_ENDIAN);
 	}
 
 	static std::string ReadText(const Range<ByteContainer>& workingRange, UInt32 length)

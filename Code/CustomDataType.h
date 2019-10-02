@@ -1,29 +1,12 @@
 #pragma once
 #include <any>
 #include "TypeDefs.hpp"
+#include "ICustomDataType.hpp"
+#include "Uuid.h"
+#include "Username.h"
+#include "DateTimeUtils.h"
 struct CustomFieldType;
-class Uuid;
-class Username;
 struct DataField;
-namespace DateTimeUtils
-{
-	class UTCDateTime;
-}
-
-struct ICustomDataType
-{
-	virtual ~ICustomDataType() = default;
-
-	virtual std::vector<byte> GetBytes() const
-	{
-		throw std::exception("ICustomDataType members should not be called directly");
-	}
-
-	virtual std::string GetStr() const
-	{
-		throw std::exception("ICustomDataType members should not be called directly");
-	}
-};
 
 namespace CustomDataType
 {
