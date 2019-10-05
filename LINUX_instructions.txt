@@ -1,0 +1,26 @@
+EMPLACEMENTS
+/mnt/c/Apoapse/DEV/ApoapseCore/Code
+/mnt/c/Apoapse/DEV/ApoapseCore/DatabaseImpl.sqlite
+/mnt/c/Apoapse/DEV/ApoapseServer/ApoapseServerShared
+/mnt/c/Apoapse/DEV/ApoapseServer/ServerConsole
+
+BUILD OPEN SSL
+/mnt/c/Apoapse/DEV/ApoapseCore/ThirdParty/openssl
+	./config -fPIC shared
+
+BUILD BOOST
+/mnt/c/Apoapse/DEV/ApoapseCore/ThirdParty/boost_1_71_0_LINUX/
+	./b2 cxxflags=-fPIC cflags=-fPIC
+	
+
+BUILD ANYTHING WITH CLANG
+CXX=clang++ make
+
+COMMON LINUX
+sudo apt-get update
+sudo apt-get install cmake
+ls
+
+RUN APOAPSE SERVER
+/mnt/c/Apoapse/DEV/BinLinux
+./ServerConsole
