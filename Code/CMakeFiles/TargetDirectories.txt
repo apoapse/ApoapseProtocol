@@ -1,0 +1,3 @@
+/mnt/c/Apoapse/DEV/ApoapseCore/Code/CMakeFiles/rebuild_cache.dir
+/mnt/c/Apoapse/DEV/ApoapseCore/Code/CMakeFiles/ApoapseCore.dir
+/mnt/c/Apoapse/DEV/ApoapseCore/Code/CMakeFiles/edit_cache.dir

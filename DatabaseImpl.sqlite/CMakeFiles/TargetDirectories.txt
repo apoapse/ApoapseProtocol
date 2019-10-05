@@ -1,0 +1,3 @@
+/mnt/c/Apoapse/DEV/ApoapseCore/DatabaseImpl.sqlite/CMakeFiles/rebuild_cache.dir
+/mnt/c/Apoapse/DEV/ApoapseCore/DatabaseImpl.sqlite/CMakeFiles/DatabaseImpl.sqlite.dir
+/mnt/c/Apoapse/DEV/ApoapseCore/DatabaseImpl.sqlite/CMakeFiles/edit_cache.dir

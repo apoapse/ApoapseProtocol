@@ -1,0 +1,1 @@
+clang++ -fPIC   -shared -Wl,-soname,libDatabaseImpl.sqlite.so -o /mnt/c/Apoapse/DEV/BinLinux/libDatabaseImpl.sqlite.so CMakeFiles/DatabaseImpl.sqlite.dir/SQLite.cpp.o -lsqlite3 

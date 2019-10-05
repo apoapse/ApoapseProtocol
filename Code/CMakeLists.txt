@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.4)
 project(ApoapseCore LANGUAGES CXX)
+set(CMAKE_CXX_COMPILER "clang++")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lstdc++fs")
 	
 include_directories("../ThirdParty/openssl/include/")
 include_directories("../ThirdParty/cryptopp/")
-include_directories("../ThirdParty/boost_1_71_0/")
+include_directories("../ThirdParty/boost_1_71_0_LINUX/")
 include_directories("../ThirdParty/magic_enum/include/")
 
 set(OUTPUT_RELEASE ../../BinLinux/)
@@ -134,3 +136,4 @@ source_group("Headers" FILES ${HEADERS_FILES})
 ADD_LIBRARY(${PROJECT_NAME} ${SRC_FILES} ${HEADERS_FILES})
 
 set_property(TARGET ApoapseCore PROPERTY CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
