@@ -13,9 +13,9 @@ namespace LibraryLoader
 		{
 			dll = boost::dll::import<T>(libraryName, "apoapse_internal_dll", boost::dll::load_mode::append_decorations);
 		}
-		catch (const std::exception&)
+		catch (const std::exception& e)
 		{
-			std::cout << "Unable to load the dynamic library " << std::string(libraryName);
+			std::cout << "Unable to load the dynamic library " << std::string(libraryName) << " Exception: " << e.what();
 			std::abort();
 		}
 
