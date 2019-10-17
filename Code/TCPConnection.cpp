@@ -2,6 +2,7 @@
 #include "Common.h"
 #include "TCPConnection.h"
 #include "ThreadUtils.h"
+#include <boost/exception/all.hpp>
 
 TCPConnection::TCPConnection(boost::asio::io_service& io_service, ssl::context& context) : m_strand(io_service)
 {
@@ -23,13 +24,23 @@ bool TCPConnection::IsConnected() const
 
 void TCPConnection::Close()
 {
-	LOG << "Manual closing of the TCP connection socket " << GetEndpoint();
+	LOG << "Manual closing of the TCP connection socket";
 
 	m_isConnected = false;
 
-	GetSocket().shutdown(boostTCP::socket::shutdown_both);
-	GetSocket().close();
-	//GetSocket().release();
+	auto self(shared_from_this());
+	m_strand.post([this, self]
+	{
+		try
+		{
+			GetSocket().shutdown(boostTCP::socket::shutdown_both);
+			GetSocket().close();
+		}
+		catch (const boost::exception& e)
+        {
+			LOG << LogSeverity::error << boost::diagnostic_information(e);
+        }
+	});
 }
 
 void TCPConnection::RequestClose()
