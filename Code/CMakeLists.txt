@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.4)
 project(ApoapseCore LANGUAGES CXX)
 set(CMAKE_CXX_COMPILER "clang++")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lstdc++fs")
 	
 include_directories("../ThirdParty/openssl/include/")
 include_directories("../ThirdParty/cryptopp/")
