@@ -98,6 +98,12 @@ void CommandsManagerV2::OnReceivedCmdInternal(CommandV2& cmd, GenericConnection&
 		// Cmd process
 		OnReceivedCommand(cmd, connection);
 
+		if (!connection.m_isConnected)	// In case a Close was called on the previous cmd pipeline step
+		{
+			LOG << "Command processing cancelled prematurely because a Close have been called on the connection";
+			return;
+		}
+
 		// Cmd receive client notify UI
 		if (global->isClient && cmd.clientUIPropagate)
 			PropagateToClientUI(cmd);

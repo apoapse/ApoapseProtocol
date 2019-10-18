@@ -28,13 +28,13 @@ protected:
 	bool m_closeRequested = false;
 
 private:
-	std::atomic<bool> m_isConnected = { false };
 	boost::asio::io_context::strand m_strand;
 	
 	std::deque<std::variant<BytesWrapper, StrWrapper, std::shared_ptr<NetworkPayload>>> m_sendQueue;
 
 public:
 	using TCPConnection_ptr = std::shared_ptr<TCPConnection>;
+	std::atomic<bool> m_isConnected = { false };
 
 	TCPConnection(boost::asio::io_service& io_service, ssl::context& context);
 	virtual ~TCPConnection() override = default;
