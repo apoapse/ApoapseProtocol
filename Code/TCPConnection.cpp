@@ -27,8 +27,7 @@ void TCPConnection::Close()
 
 	m_isConnected = false;
 
-	auto self(shared_from_this());
-	m_strand.post([this, self]
+	m_strand.post([this]
 	{
 		GetSocket().shutdown(boostTCP::socket::shutdown_both);
 		GetSocket().close();
