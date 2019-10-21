@@ -7,13 +7,15 @@ SQLite::~SQLite()
 
 }
 
+bool SQLite::Initialize()
+{
+	return (sqlite3_config(SQLITE_CONFIG_SERIALIZED) != SQLITE_OK);
+}
+
 bool SQLite::Open(const char** params, size_t paramsCount)
 {
 	if (paramsCount < 1)
-		throw std::exception();
-
-	if (sqlite3_config(SQLITE_CONFIG_SERIALIZED) != SQLITE_OK)
-		return false;
+		throw std::runtime_error("At least one argument expected");
 
 	return (sqlite3_open(params[0], &m_database) == SQLITE_OK);
 }

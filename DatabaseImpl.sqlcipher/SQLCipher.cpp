@@ -7,13 +7,15 @@ SQLCipher::~SQLCipher()
 
 }
 
+bool SQLCipher::Initialize()
+{
+	return (sqlite3_config(SQLITE_CONFIG_SERIALIZED) != SQLITE_OK);
+}
+
 bool SQLCipher::Open(const char** params, size_t paramsCount)
 {
 	if (paramsCount < 2)
-		throw std::exception("SQLCipher: 2 parameters expected");
-
-	if (sqlite3_config(SQLITE_CONFIG_SERIALIZED) != SQLITE_OK)
-		return false;
+		throw std::runtime_error("SQLCipher: 2 parameters expected");
 
 	if (sqlite3_open(params[0], &m_database) != SQLITE_OK)
 		return false;

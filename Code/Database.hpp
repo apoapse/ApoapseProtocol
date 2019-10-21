@@ -8,6 +8,7 @@ struct IDatabase
 {
 	virtual ~IDatabase() = default;
 
+	virtual bool Initialize() = 0;
 	virtual bool Open(const char** params, size_t paramsCount) = 0;
 	virtual void Close() = 0;
 

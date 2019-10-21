@@ -14,6 +14,7 @@ class SQLCipher : public IDatabase
 public:
 	~SQLCipher();
 
+	bool Initialize() override;
 	bool Open(const char** params, size_t paramsCount) override;
 	void Close() override;
 
