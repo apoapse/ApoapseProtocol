@@ -157,6 +157,7 @@
     <ClCompile Include="DataStructure.cpp" />
     <ClCompile Include="FileStreamConnection.cpp" />
     <ClCompile Include="FileUtils.cpp" />
+    <ClCompile Include="JsonFileSettings.cpp" />
     <ClCompile Include="ProtectedByteContainer.cpp" />
     <ClCompile Include="StringExtensions.cpp" />
     <ClCompile Include="TCPConnectionNoTLS.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="ICommandManager.hpp" />
     <ClInclude Include="IHtmlUI.hpp" />
     <ClInclude Include="Json.hpp" />
+    <ClInclude Include="JsonFileSettings.h" />
     <ClInclude Include="ProtectedByteContainer.h" />
     <ClInclude Include="GlobalVarDefines.hpp" />
     <ClInclude Include="Random.hpp" />

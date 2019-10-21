@@ -190,14 +190,17 @@
     <ClInclude Include="ApoapseError.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="DatabaseSettings.h">
-      <Filter>DataSystem</Filter>
-    </ClInclude>
     <ClInclude Include="ApoapseOpenSSL.h">
       <Filter>Cryptography\TLS</Filter>
     </ClInclude>
     <ClInclude Include="ICustomDataType.hpp">
       <Filter>DataSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="DatabaseSettings.h">
+      <Filter>SettingSystems</Filter>
+    </ClInclude>
+    <ClInclude Include="JsonFileSettings.h">
+      <Filter>SettingSystems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -317,11 +320,14 @@
     <ClCompile Include="ApoapseError.cpp">
       <Filter>Network\Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="DatabaseSettings.cpp">
-      <Filter>DataSystem</Filter>
-    </ClCompile>
     <ClCompile Include="ApoapseOpenSSL.cpp">
       <Filter>Cryptography\TLS</Filter>
+    </ClCompile>
+    <ClCompile Include="DatabaseSettings.cpp">
+      <Filter>SettingSystems</Filter>
+    </ClCompile>
+    <ClCompile Include="JsonFileSettings.cpp">
+      <Filter>SettingSystems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -393,6 +399,9 @@
     </Filter>
     <Filter Include="DataSystem">
       <UniqueIdentifier>{eb1c04b1-22ca-4f71-9ef5-baa518d4c581}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SettingSystems">
+      <UniqueIdentifier>{ca39114e-8b7d-4042-af49-14fb68741db7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -126,6 +126,13 @@ public:
 		return m_properties.get_optional<T>(name);
 	}
 
+	template <typename T>
+	void EditField(const std::string& name, const T& val)
+	{
+		//m_properties.get<T>(name) = val;
+		m_properties.put(name, val, StringTranslator());
+	}
+
 	bool ValueExist(const std::string& name) const
 	{
 		return (m_properties.count(name));
@@ -154,7 +161,7 @@ public:
 		for (const auto& item : m_properties.get_child(name))
 		{
 			auto test = item.second;
-			output.push_back(JsonHelper(item.second));
+			output.emplace_back(item.second);
 		}
 
 		return output;
