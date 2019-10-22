@@ -160,6 +160,16 @@ static std::string GetDataStructures()
 						"command": true,
 						"client_ui": true
 					}
+				},
+				{
+					"name": "server_prefix",
+					"type": "text",
+					"required": false,
+					"uses":	{
+						"server_storage": true,
+						"client_storage": false,
+						"command": true
+					}
 				}
 			]
 		},

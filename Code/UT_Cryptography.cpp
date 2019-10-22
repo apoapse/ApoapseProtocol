@@ -8,6 +8,7 @@
 #include "RSA.hpp"
 #include "Hash.hpp"
 #include "AES.hpp"
+#include "Random.hpp"
 
 UNIT_TEST("Cryptography:HMAC_SHA256")
 {
@@ -51,5 +52,34 @@ UNIT_TEST("Cryptography:AES_CBC:EncryptDecrypt")
 
 	CHECK(decryptedMsg == plain);
 } UNIT_TEST_END
+
+UNIT_TEST("Cryptography:Random:GenerateRandomCharacters:fixed")
+{
+	const std::string txt = Cryptography::GenerateRandomCharacters(12, 12);
+	
+	CHECK(txt.length() == 12);
+} UNIT_TEST_END
+
+UNIT_TEST("Cryptography:Random:GenerateRandomCharacters:minLength")
+{
+	for (int i = 0; i < 100; ++i)
+	{
+		const std::string txt = Cryptography::GenerateRandomCharacters(5, 12);
+	
+		CHECK(txt.length() >= 5);
+		CHECK(txt.length() <= 12);
+	}
+} UNIT_TEST_END
+
+UNIT_TEST("Cryptography:Random:GenerateRandomCharacters:noSpecialChar")
+{
+	for (int i = 0; i < 300; ++i)
+	{
+		const std::string txt = Cryptography::GenerateRandomCharacters(10, 25, false);
+	
+		CHECK_PRINT(StringExtensions::IsOnlyAlphanumeric(txt), txt);
+	}
+} UNIT_TEST_END
+
 
 #endif	// UNIT_TESTS

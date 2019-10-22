@@ -38,7 +38,9 @@ public:
 	}
 
 	void Check(bool exp, const std::string& code);
+	void Check(bool exp, const std::string& code, const std::string& debugPrint);
 	void Require(bool exp, const std::string& code);
+	void Require(bool exp, const std::string& code, const std::string& debugPrint);
 
 private:
 	void Log(const std::string& msg, ConsoleColors color = ConsoleColors::DEFAULT) const;
@@ -54,7 +56,9 @@ public:
 	}
 };
 
-#define UNIT_TEST(_name)	static UnitTestAutoRegister MACRO_CONCAT(testRegister_, __COUNTER__)(UnitTest(_name, []() -> void
-#define UNIT_TEST_END		));
-#define CHECK(_exp)	UnitTestsManager::GetInstance().Check(_exp, #_exp);
-#define REQUIRE(_exp)	UnitTestsManager::GetInstance().Require(_exp, #_exp);
+#define UNIT_TEST(_name)			static UnitTestAutoRegister MACRO_CONCAT(testRegister_, __COUNTER__)(UnitTest(_name, []() -> void
+#define UNIT_TEST_END				));
+#define CHECK(_exp)					UnitTestsManager::GetInstance().Check(_exp, #_exp);
+#define CHECK_PRINT(_exp, _deb)		UnitTestsManager::GetInstance().Check(_exp, #_exp, _deb);
+#define REQUIRE(_exp)				UnitTestsManager::GetInstance().Require(_exp, #_exp);
+#define REQUIRE_PRINT(_exp, _deb)	UnitTestsManager::GetInstance().Require(_exp, #_exp, _deb);

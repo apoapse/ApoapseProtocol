@@ -64,11 +64,30 @@ void UnitTestsManager::Check(bool exp, const std::string& code)
 	}
 }
 
+void UnitTestsManager::Check(bool exp, const std::string& code, const std::string& debugPrint)
+{
+	if (!exp)
+	{
+		m_currentTest->errorMsgs.push_back("CHECK failed on: " + code + "  -  " + debugPrint);
+	}
+}
+
 void UnitTestsManager::Require(bool exp, const std::string& code)
 {
 	if (!exp)
 	{
 		m_currentTest->errorMsgs.push_back("REQUIRE failed on: " + code);
+		
+		throw FailException();
+	}
+}
+
+void UnitTestsManager::Require(bool exp, const std::string& code, const std::string& debugPrint)
+{
+	if (!exp)
+	{
+		m_currentTest->errorMsgs.push_back("REQUIRE failed on: " + code + "  -  " + debugPrint);
+
 		throw FailException();
 	}
 }
