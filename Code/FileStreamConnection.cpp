@@ -128,6 +128,9 @@ void FileStreamConnection::OnReceiveData(const boost::system::error_code& error,
 		OnReceivedErrorInternal(error);
 		return;
 	}
+
+	if (bytesTransferred == 0)
+		return;
 	
 	Range data(m_readBuffer, bytesTransferred);
 
