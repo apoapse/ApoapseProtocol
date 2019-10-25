@@ -958,6 +958,24 @@ static std::string scheme2 = R"(
 					}
 				}
 			]
+		},
+		{
+			"name": "sync_info",
+			"fields": [
+				{
+					"name": "nb_items",
+					"type": "integer",
+					"required": true,
+					"unique": false,
+					"read_permission": "self",
+					"uses":	{
+						"server_storage": false,
+						"client_storage": false,
+						"command": true,
+						"client_ui": true
+					}
+				}
+			]
 		}
 	]
 }

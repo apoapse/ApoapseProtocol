@@ -106,6 +106,14 @@ void ApoapseOperation::ExecuteSyncRequest(Int64 sinceTimestamp, GenericConnectio
 	auto res = query.Exec();
 	DataStructureDef operationStruct = global->apoapseData->GetStructure("operation");
 
+	if (res.RowCount() > 0)
+	{
+		DataStructure dat = global->apoapseData->GetStructure("sync_info");
+		dat.GetField("nb_items").SetValue((Int64)res.RowCount());
+
+		global->cmdManager->CreateCommand("start_sync", dat).Send(destination);
+	}
+
 	UInt64 syncedItems = 0;
 	for (const auto& sqlRow : res)
 	{

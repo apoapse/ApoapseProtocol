@@ -369,6 +369,20 @@ static std::string GetCommandDef()
 				"register": true,
 				"datastructure": "attachment"
 			}
+		},
+		{
+			"name": "start_sync",
+			"name_short": "sy",
+			"datastructure": "sync_info",
+			"require_authentication": true,
+			"reception": {
+				"server": false,
+				"client": true
+			},
+			"client_ui": {
+				"propagate": true,
+				"signal_name": "OnReceived"
+			}
 		}
 	]
 }
