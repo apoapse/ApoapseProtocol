@@ -20,7 +20,16 @@ COMMON LINUX
 sudo apt-get update
 sudo apt-get install cmake
 ls
+Remove all files: rm -rf *
+Remove one file: rm
 
 RUN APOAPSE SERVER
-/mnt/c/Apoapse/DEV/BinLinux
+cd /mnt/c/Apoapse/DEV/BinLinux
 ./ServerConsole
+
+./Compile.sh
+
+
+SCREEN
+Create: screen -S apoapse
+reconnect: screen -R apoapse
