@@ -107,7 +107,7 @@ void GenericConnection::OnReceivedPayloadData(size_t bytesTransferred, std::shar
 	ProcessDataGeneric(range, std::move(payload), bytesTransferred);
 }
 
-void GenericConnection::OnReceivedPayload(std::shared_ptr<NetworkPayload> payload)
+void GenericConnection::OnReceivedPayload(const std::shared_ptr<NetworkPayload>& payload)
 {
 	if (!global->cmdManager->CommandExist(payload->headerInfo->cmdShortName))
 	{

@@ -30,7 +30,7 @@ private:
 	void ReadPayloadData(std::shared_ptr<NetworkPayload> payload);
 	void OnReceivedHeaderData(size_t bytesTransferred);
 	void OnReceivedPayloadData(size_t bytesTransferred, std::shared_ptr<NetworkPayload> payload);
-	void OnReceivedPayload(std::shared_ptr<NetworkPayload> payload);
+	void OnReceivedPayload(const std::shared_ptr<NetworkPayload>& payload);
 	virtual void OnSendingSuccessful(size_t bytesTransferred) override;
 	void UpdateLastActivityClock();
 
