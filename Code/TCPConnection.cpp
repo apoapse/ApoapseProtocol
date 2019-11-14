@@ -2,6 +2,7 @@
 #include "Common.h"
 #include "TCPConnection.h"
 #include "ThreadUtils.h"
+#include <boost/exception_ptr.hpp>
 
 TCPConnection::TCPConnection(boost::asio::io_service& io_service, ssl::context& context) : m_strand(io_service)
 {
@@ -29,8 +30,19 @@ void TCPConnection::Close()
 
 	m_strand.post([this]
 	{
-		GetSocket().shutdown(boostTCP::socket::shutdown_both);
-		GetSocket().close();
+		try
+		{
+			GetSocket().shutdown(boostTCP::socket::shutdown_both);
+			GetSocket().close();
+		}
+		catch (const boost::exception& e)
+        {
+			LOG << LogSeverity::error << "TCP Close error (boost): " << diagnostic_information(e);
+        }
+		catch (const std::exception& e)
+        {
+			LOG << LogSeverity::error << "TCP Close error: " << e.what();
+        }
 	});
 }
 
@@ -47,7 +59,7 @@ boost::asio::ip::tcp::endpoint TCPConnection::GetEndpoint() const
 	}
 	catch (const std::exception&)
 	{
-		ASSERT_MSG(false, "TCPConnection::GetEndpoint() is probably called too early");
+		//ASSERT_MSG(false, "TCPConnection::GetEndpoint() is probably called too early");
 		return boost::asio::ip::tcp::endpoint();
 	}
 }

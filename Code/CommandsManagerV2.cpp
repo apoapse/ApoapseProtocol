@@ -117,11 +117,7 @@ void CommandsManagerV2::OnReceivedCmdInternal(CommandV2& cmd, GenericConnection&
 			ApoapseOperation::RegisterOperation(cmd, connection.GetConnectedUser());
 
 		// Cmd post process
-		OnReceivedCommandPost(cmd, connection);
-
-		//if (global->isServer && cmd.propagateToOtherClients)
-		//	cmd.Send(*connection.server.usersManager, &netConnection);
-	}
+		OnReceivedCommandPost(cmd, connection);	}
 	else
 	{
 		LOG << LogSeverity::error << "The command " << cmd.name << " was rejected by CommandsManagerV2::OnReceivedCommandPre";

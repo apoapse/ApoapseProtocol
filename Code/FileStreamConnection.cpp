@@ -147,6 +147,9 @@ void FileStreamConnection::OnReceiveData(const boost::system::error_code& error,
 
 void FileStreamConnection::StartReceiveFile()
 {
+	if (m_filesToReceiveQueue.empty())
+		return;
+	
 	const auto& fileToReceive = m_filesToReceiveQueue.front();
 	m_currentFileDownload = FileReceive();
 	
@@ -167,7 +170,12 @@ void FileStreamConnection::StartReceiveFile()
 
 void FileStreamConnection::ReadChunk(Range<NetBuffer>& data)
 {
-	ASSERT(IsDownloadingFile());
+	if (!IsDownloadingFile())
+	{
+		LOG << LogSeverity::error << "Receiving bytes but no download is in progress.";
+		Close();
+		return;
+	}
 	
 	m_currentFileDownload->writeStream.write((char*)data.data(), data.size());
 	m_currentFileDownload->receivedSize += data.size();

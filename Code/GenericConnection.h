@@ -33,6 +33,7 @@ private:
 	void OnReceivedPayload(const std::shared_ptr<NetworkPayload>& payload);
 	virtual void OnSendingSuccessful(size_t bytesTransferred) override;
 	void UpdateLastActivityClock();
+	void SetCustomTCPOptions() override;
 
 protected:
 	virtual bool OnConnectedToServer() = 0;

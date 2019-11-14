@@ -145,3 +145,9 @@ void GenericConnection::UpdateLastActivityClock()
 {
 	m_lastActivityTime = std::chrono::steady_clock::now();
 }
+
+void GenericConnection::SetCustomTCPOptions()
+{
+	const boost::asio::socket_base::reuse_address option(true);
+	GetSocket().set_option(option);
+}
