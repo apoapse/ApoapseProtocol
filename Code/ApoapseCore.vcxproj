@@ -71,7 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
-    <IncludePath>C:\OpenSSL-Win64-3\include;$(ProjectDir)..\ThirdParty\cryptopp\;..\ThirdParty\boost_1_71_0\;..\ThirdParty\magic_enum\include\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\ThirdParty\cryptopp\;..\ThirdParty\boost_1_71_0\;..\ThirdParty\magic_enum\include\;$(VC_IncludePath);..\ThirdParty\OpenSSL-Win64\include\;$(WindowsSDK_IncludePath)</IncludePath>
     <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
     <EnableCppCoreCheck>true</EnableCppCoreCheck>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
