@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "UnitTestsManager.h"
+#include "UnitTest.hpp"
 #include "Maths.hpp"
 #include "TypeDefs.hpp"
 

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "UnitTestsManager.h"
+#include "UnitTest.hpp"
 #include "ByteUtils.hpp"
 
 UNIT_TEST("ByteUtils:ToBytes:LittleEndian")

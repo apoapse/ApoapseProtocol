@@ -71,7 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
-    <IncludePath>$(ProjectDir)..\ThirdParty\cryptopp\;..\ThirdParty\boost_1_71_0\;..\ThirdParty\magic_enum\include\;$(VC_IncludePath);..\ThirdParty\OpenSSL-Win64\include\;$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\ThirdParty\cryptopp\;..\ThirdParty\boost_1_71_0\;..\ThirdParty\magic_enum\include\;$(VC_IncludePath);..\ThirdParty\OpenSSL-Win64\include\;$(WindowsSDK_IncludePath);..\ThirdParty\Apoapse-Very-Simple-Unit-Test-framework\</IncludePath>
     <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
     <EnableCppCoreCheck>true</EnableCppCoreCheck>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -237,8 +237,6 @@
     <ClInclude Include="ThreadUtils.h" />
     <ClInclude Include="TypeDefs.hpp" />
     <ClInclude Include="MessagePack.hpp" />
-    <ClInclude Include="UnitTest.hpp" />
-    <ClInclude Include="UnitTestsManager.h" />
     <ClCompile Include="SQLQuery.cpp" />
     <ClCompile Include="TCPServer.cpp" />
     <ClCompile Include="UT_ByteUtils.cpp">
@@ -273,7 +271,6 @@
     </ClCompile>
     <ClCompile Include="TCPConnection.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
-    <ClCompile Include="UnitTestsManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

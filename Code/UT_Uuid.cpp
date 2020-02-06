@@ -3,7 +3,7 @@
 #ifdef UNIT_TESTS
 
 #include "Common.h"
-#include "UnitTestsManager.h"
+#include "UnitTest.hpp"
 #include "Uuid.h"
 
 UNIT_TEST("Uuid:generate_and_validate")

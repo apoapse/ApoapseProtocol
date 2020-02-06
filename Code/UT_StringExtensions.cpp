@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "UnitTestsManager.h"
+#include "UnitTest.hpp"
 #include "StringExtensions.h"
 
 UNIT_TEST("StringExtensions:erase_left")

@@ -3,7 +3,7 @@
 #ifdef UNIT_TESTS
 
 #include "Common.h"
-#include "UnitTestsManager.h"
+#include "UnitTest.hpp"
 #include "NetworkPayload.h"
 
 const std::vector<byte> srcData{ 0x65, 0x72, 0x00, 0x00, 0x00, 0x02, 0x01, 0x02 };

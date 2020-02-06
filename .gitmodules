@@ -1,0 +1,3 @@
+[submodule "ThirdParty/Apoapse-Very-Simple-Unit-Test-framework"]
+	path = ThirdParty/Apoapse-Very-Simple-Unit-Test-framework
+	url = https://github.com/apoapse/Apoapse-Very-Simple-Unit-Test-framework.git

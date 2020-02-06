@@ -3,7 +3,7 @@
 #ifdef UNIT_TESTS
 
 #include "Common.h"
-#include "UnitTestsManager.h"
+#include "UnitTest.hpp"
 #include "Range.hpp"
 
 const std::array<int, 5> testArray { 1, 2, 3, 4, 5 };

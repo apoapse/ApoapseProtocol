@@ -45,12 +45,6 @@
       <Filter>Network\Sockets</Filter>
     </ClInclude>
     <ClInclude Include="MacroUtils.hpp" />
-    <ClInclude Include="UnitTest.hpp">
-      <Filter>UnitTests\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="UnitTestsManager.h">
-      <Filter>UnitTests\Framework</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="GenericConnection.h">
       <Filter>Network\Protocol</Filter>
@@ -220,9 +214,6 @@
     <ClCompile Include="TCPConnection.cpp">
       <Filter>Network\Sockets</Filter>
     </ClCompile>
-    <ClCompile Include="UnitTestsManager.cpp">
-      <Filter>UnitTests\Framework</Filter>
-    </ClCompile>
     <ClCompile Include="GenericConnection.cpp">
       <Filter>Network\Protocol</Filter>
     </ClCompile>
@@ -230,21 +221,6 @@
       <Filter>Network\Protocol</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="UT_ByteUtils.cpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_DateTimeUtils.cpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_Maths.cpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_NetworkPayload.cpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_StringExtensions.cpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClCompile>
     <ClCompile Include="TCPServer.cpp">
       <Filter>Network\Sockets</Filter>
     </ClCompile>
@@ -254,23 +230,8 @@
     <ClCompile Include="Uuid.cpp">
       <Filter>UUID</Filter>
     </ClCompile>
-    <ClCompile Include="UT_Uuid.cpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_MessagePack.cpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_Range.cpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClCompile>
     <ClCompile Include="ProtectedByteContainer.cpp">
       <Filter>Cryptography</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_ProtectedByteContainer.cpp">
-      <Filter>UnitTests\Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_Cryptography.cpp">
-      <Filter>UnitTests\Tests</Filter>
     </ClCompile>
     <ClCompile Include="Username.cpp">
       <Filter>UserSystem</Filter>
@@ -329,6 +290,36 @@
     <ClCompile Include="JsonFileSettings.cpp">
       <Filter>SettingSystems</Filter>
     </ClCompile>
+    <ClCompile Include="UT_ByteUtils.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Cryptography.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_DateTimeUtils.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Maths.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_MessagePack.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_NetworkPayload.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_ProtectedByteContainer.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Range.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_StringExtensions.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Uuid.cpp">
+      <Filter>UnitTests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Parsers">
@@ -358,14 +349,8 @@
     <Filter Include="UnitTests">
       <UniqueIdentifier>{03e370ef-ff23-4e9c-88be-88d3863be34d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UnitTests\Framework">
-      <UniqueIdentifier>{ee0a6f1e-c742-4511-ad5e-66c2b132eacf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Network\Protocol">
       <UniqueIdentifier>{210d5d66-48f9-414b-9944-c173a5ab6c05}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="UnitTests\Tests">
-      <UniqueIdentifier>{6a6d2a8a-4647-4425-8770-54ee85b26344}</UniqueIdentifier>
     </Filter>
     <Filter Include="CommandSystem">
       <UniqueIdentifier>{cd27cce5-6f89-4375-a8d0-5468339ac4ce}</UniqueIdentifier>

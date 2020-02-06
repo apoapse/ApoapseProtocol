@@ -3,7 +3,7 @@
 #ifdef UNIT_TESTS
 
 #include "Common.h"
-#include "UnitTestsManager.h"
+#include "UnitTest.hpp"
 #include "MessagePack.hpp"
 #include "Uuid.h"
 

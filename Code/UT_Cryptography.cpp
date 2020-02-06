@@ -3,7 +3,7 @@
 #ifdef UNIT_TESTS
 
 #include "Common.h"
-#include "UnitTestsManager.h"
+#include "UnitTest.hpp"
 #include "HMAC.hpp"
 #include "RSA.hpp"
 #include "Hash.hpp"
