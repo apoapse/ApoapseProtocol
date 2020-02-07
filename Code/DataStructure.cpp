@@ -129,7 +129,7 @@ void DataStructure::SetDbId(DbId id)
 
 void DataStructure::SaveToDatabase()
 {
-	const int nbFieldToSave = std::count_if(fields.begin(), fields.end(), [](const DataField& field)
+	const Int64 nbFieldToSave = std::count_if(fields.begin(), fields.end(), [](const DataField& field)
 	{
 		return ((field.usedInClientDb == global->isClient) || (field.usedInServerDb && global->isServer));
 	});
