@@ -71,7 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
-    <IncludePath>$(ProjectDir)..\ThirdParty\cryptopp\;..\ThirdParty\boost_1_71_0\;..\ThirdParty\magic_enum\include\;$(VC_IncludePath);..\ThirdParty\OpenSSL-Win64\include\;$(WindowsSDK_IncludePath);..\ThirdParty\Apoapse-Very-Simple-Unit-Test-framework\</IncludePath>
+    <IncludePath>..\ThirdParty\cryptopp\;..\ThirdParty\boost\;..\ThirdParty\magic_enum\include\;$(VC_IncludePath);..\ThirdParty\openssl\include\;$(WindowsSDK_IncludePath);..\ThirdParty\Apoapse-Very-Simple-Unit-Test-framework\</IncludePath>
     <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
     <EnableCppCoreCheck>true</EnableCppCoreCheck>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -80,7 +80,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
-    <IncludePath>..\ThirdParty\openssl\include\;$(ProjectDir)..\ThirdParty\cryptopp\;..\ThirdParty\boost_1_71_0\;..\ThirdParty\magic_enum\include\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>..\ThirdParty\cryptopp\;..\ThirdParty\boost\;..\ThirdParty\magic_enum\include\;$(VC_IncludePath);..\ThirdParty\openssl\include\;$(WindowsSDK_IncludePath);..\ThirdParty\Apoapse-Very-Simple-Unit-Test-framework\</IncludePath>
     <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
