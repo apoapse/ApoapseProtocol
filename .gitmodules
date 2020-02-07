@@ -1,3 +1,9 @@
 [submodule "ThirdParty/Apoapse-Very-Simple-Unit-Test-framework"]
 	path = ThirdParty/Apoapse-Very-Simple-Unit-Test-framework
 	url = https://github.com/apoapse/Apoapse-Very-Simple-Unit-Test-framework.git
+[submodule "ThirdParty/magic_enum"]
+	path = ThirdParty/magic_enum
+	url = https://github.com/Neargye/magic_enum.git
+[submodule "ThirdParty/cryptopp"]
+	path = ThirdParty/cryptopp
+	url = https://github.com/weidai11/cryptopp.git
