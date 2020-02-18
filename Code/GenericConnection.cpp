@@ -118,22 +118,19 @@ void GenericConnection::OnReceivedPayload(const std::shared_ptr<NetworkPayload>&
 	auto cmd = std::make_shared<CommandV2>(global->cmdManager->CreateCommand(payload));
 	LOG_DEBUG << "Received command " << cmd->name << " from payload. Total size: " << payload->GetRawData().size();
 
-	global->mainThread->PushTask([this, cmd = std::move(cmd)]()
+#ifndef DEBUG
+	try
 	{
-#ifndef DEBUG
-		try
-		{
 #endif
-			OnReceivedCommand(*cmd.get());
+		OnReceivedCommand(*cmd.get());
 #ifndef DEBUG
-		}
-		catch (const std::exception& e)
-		{
-			LOG << LogSeverity::error << "Exception trigged while processing a command of type " << cmd->name << ": " << e;
-			Close();
-		}
+	}
+	catch (const std::exception& e)
+	{
+		LOG << LogSeverity::error << "Exception trigged while processing a command of type " << cmd->name << ": " << e;
+		Close();
+	}
 #endif
-	});
 }
 
 void GenericConnection::OnSendingSuccessful(size_t bytesTransferred)
