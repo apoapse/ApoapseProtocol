@@ -184,13 +184,11 @@
     <ClInclude Include="AES.hpp" />
     <ClInclude Include="ApoapseData.h" />
     <ClInclude Include="ApoapseOperation.h" />
-    <ClInclude Include="CommandsDef.hpp" />
     <ClInclude Include="CommandsManagerV2.h" />
     <ClInclude Include="CommandV2.h" />
     <ClInclude Include="CustomDataType.h" />
     <ClInclude Include="DatabaseIntegrityPatcher.h" />
     <ClInclude Include="DataStructure.h" />
-    <ClInclude Include="DataStructures.hpp" />
     <ClInclude Include="Hash.hpp" />
     <ClInclude Include="CryptographyTypes.hpp" />
     <ClInclude Include="HMAC.hpp" />

@@ -124,9 +124,6 @@
     <ClInclude Include="SQLUtils.hpp">
       <Filter>DatabaseAbstractionLayer</Filter>
     </ClInclude>
-    <ClInclude Include="DataStructures.hpp">
-      <Filter>DataSystem</Filter>
-    </ClInclude>
     <ClInclude Include="ApoapseData.h">
       <Filter>DataSystem</Filter>
     </ClInclude>
@@ -140,9 +137,6 @@
       <Filter>CommandSystem</Filter>
     </ClInclude>
     <ClInclude Include="ICommandManager.hpp">
-      <Filter>CommandSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="CommandsDef.hpp">
       <Filter>CommandSystem</Filter>
     </ClInclude>
     <ClInclude Include="CustomDataType.h">
