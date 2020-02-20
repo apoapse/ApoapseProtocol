@@ -4,7 +4,7 @@ set(CMAKE_CXX_COMPILER "clang++")
 	
 include_directories("../ThirdParty/openssl/include/")
 include_directories("../ThirdParty/cryptopp/")
-include_directories("../ThirdParty/boost_1_71_0_LINUX/")
+include_directories("../ThirdParty/boost/")
 include_directories("../ThirdParty/magic_enum/include/")
 
 set(OUTPUT_RELEASE ../../BinLinux/)
