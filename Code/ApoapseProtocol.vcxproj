@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{8F57335E-BE7D-466B-9860-74AD3ED4F810}</ProjectGuid>
-    <RootNamespace>ApoapseCore</RootNamespace>
+    <RootNamespace>ApoapseProtocol</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

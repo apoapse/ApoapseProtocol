@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.4)
-project(ApoapseCore LANGUAGES CXX)
+project(ApoapseProtocol LANGUAGES CXX)
 set(CMAKE_CXX_COMPILER "clang++")
 	
 include_directories("../ThirdParty/openssl/include/")
@@ -134,5 +134,5 @@ source_group("Headers" FILES ${HEADERS_FILES})
 
 ADD_LIBRARY(${PROJECT_NAME} ${SRC_FILES} ${HEADERS_FILES})
 
-set_property(TARGET ApoapseCore PROPERTY CXX_STANDARD 17)
+set_property(TARGET ApoapseProtocol PROPERTY CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
