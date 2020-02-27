@@ -7,7 +7,7 @@ include_directories("../ThirdParty/cryptopp/")
 include_directories("../ThirdParty/boost/")
 include_directories("../ThirdParty/magic_enum/include/")
 
-set(OUTPUT_RELEASE ../../BinLinux/)
+set(OUTPUT_RELEASE ../../Bin/)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OUTPUT_RELEASE}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_RELEASE}")
 set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY "${OUTPUT_RELEASE}")
