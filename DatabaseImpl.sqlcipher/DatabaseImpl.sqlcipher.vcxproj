@@ -86,7 +86,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IntDir>..\..\vs_build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>..\ThirdParty\sqlcipher\include;$(SolutionDir)..\ApoapseCore\ThirdParty\boost_1_71_0\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>..\ThirdParty\sqlcipher\include;$(SolutionDir)..\ApoapseProtocol\ThirdParty\boost\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <OutDir>..\..\Bin\$(Configuration)_$(Platform)\</OutDir>
     <LibraryPath>..\ThirdParty\sqlcipher;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
@@ -143,7 +143,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>COMPILE_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\ApoapseCore\Code\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\ApoapseProtocol\Code\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
