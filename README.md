@@ -1,6 +1,8 @@
 # Apoapse Protocol
 The Apoapse Protocol is a C++ framework providing secure transfer and storage of data over the network using a message/command interface defined by a data-driven system.
 
+[🚀 Find out more about Apoapse](https://apoapse.space/) | [📥 Receive all news and updates directly to your inbox](https://apoapse.space/newsletter-opt-in/)
+
 ## How to build
 To compile the Apoapse Protocol as a static library, you can either use CMake or the provided Visual Studio solution using a C++ 17 compiler and STL.
 Third party libraries are also used and must be placed in the ThirdParty directory before compiling. While some should be pulled automatically using git modules, others (the ones in bold) must be downloaded and placed manually in the ThirdParty folder:
